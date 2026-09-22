@@ -381,7 +381,7 @@ select.input{appearance:none;-webkit-appearance:none;background-image:url("data:
   <div class="login-hint" id="login-hint">
     Primeiro acesso: <b>admin</b> / senha <b>1234</b>
   </div>
-  <div class="login-version">SISTEMA DE GESTÃO <span>· v40 · 2026</span></div>
+  <div class="login-version">SISTEMA DE GESTÃO <span>· v43 · 2026</span></div>
 </div>
 
 <!-- APP -->
@@ -2169,6 +2169,8 @@ function openProduto(prod){
     <div id="estado-box">${estadoFields(p)}</div>
     ${fld('IMEI','pr-imei',{val:p.imei,ph:'só números',inputmode:'numeric'})}
     ${fld('Número de série','pr-serie',{val:p.serie,ph:'opcional'})}
+    ${fld('Saúde da bateria (%)','pr-bateria',{val:p.bateria,ph:'ex: 89',inputmode:'numeric'})}
+    ${fld('Peças trocadas','pr-pecas',{val:p.pecas,ph:'ex: Tela original, bateria'})}
     ${fld('Fornecedor','pr-forn',{val:p.fornecedor,ph:'de quem comprou'})}
     ${fld('Data de entrada','pr-entrada',{type:'date',val:p.entrada?p.entrada.slice(0,10):todayStr()})}
     <div class="form-row">
@@ -2392,6 +2394,7 @@ function saveProduto(id){
   const data={
     cat:getV('pr-cat'),marca:getV('pr-marca'),modelo,cor:getV('pr-cor'),
     armazenamento:getV('pr-arm'),condicao:getV('pr-cond'),imei,serie,
+    bateria:getV('pr-bateria'),pecas:getV('pr-pecas'),
     fornecedor:getV('pr-forn'),entrada:getV('pr-entrada'),
     compra:getN('pr-compra'),venda:getN('pr-venda'),status:getV('pr-status'),
     obs:el('pr-obs').value.trim(),fotos:tempFotos.slice()
@@ -2455,6 +2458,8 @@ function openProdDetail(id){
       <div class="detail-line"><span class="k">Condição</span><span class="v">${p.condicao||'—'}</span></div>
       <div class="detail-line"><span class="k">IMEI</span><span class="v">${p.imei||'—'}</span></div>
       <div class="detail-line"><span class="k">Nº de série</span><span class="v">${p.serie||'—'}</span></div>
+      ${p.bateria?`<div class="detail-line"><span class="k">Saúde da bateria</span><span class="v">${p.bateria}%</span></div>`:''}
+      ${p.pecas?`<div class="detail-line"><span class="k">Peças trocadas</span><span class="v">${p.pecas}</span></div>`:''}
       <div class="detail-line"><span class="k">Fornecedor</span><span class="v">${p.fornecedor||'—'}</span></div>
       <div class="detail-line"><span class="k">Entrada</span><span class="v">${p.entrada?fmtData(p.entrada):'—'}</span></div>
       ${isAdmin?`<div class="detail-line"><span class="k">Valor de compra</span><span class="v money-in">${money(p.compra)}</span></div>
@@ -3003,14 +3008,14 @@ function finalizarVenda(total,falta){
   if(ehCarrinho){
     itensVenda=[];
     carrinho.forEach(it=>{
-      if(it.tipo==='aparelho'){ const pr=db.produtos.find(x=>x.id===it.id); if(pr) itensVenda.push({prodId:pr.id, nome:pr.marca+' '+pr.modelo, cat:pr.cat, serie:pr.serie||pr.imei||'', venda:Number(pr.venda)||0, compra:Number(pr.compra)||0}); }
+      if(it.tipo==='aparelho'){ const pr=db.produtos.find(x=>x.id===it.id); if(pr) itensVenda.push({prodId:pr.id, nome:pr.marca+' '+pr.modelo, cat:pr.cat, serie:pr.serie||'', imei:pr.imei||'', bateria:pr.bateria||'', pecas:pr.pecas||'', venda:Number(pr.venda)||0, compra:Number(pr.compra)||0}); }
       if(it.tipo==='acessorio'){ const a=(db.acessorios||[]).find(x=>x.id===it.id); if(a) itensVenda.push({acessId:a.id, nome:a.nome, cat:'Acessório', sub:a.sub, qtd:it.qtd, venda:(Number(a.venda)||0)*it.qtd, compra:(Number(a.custo)||0)*it.qtd}); }
     });
   }else if(ehAcessorio){
     const acess=db.acessorios||[];
     itensVenda=carrinhoAcess.map(it=>{ const a=acess.find(x=>x.id===it.id)||{}; return {acessId:it.id, nome:a.nome, cat:'Acessório', sub:a.sub, qtd:it.qtd, venda:(Number(a.venda)||0)*it.qtd, compra:(Number(a.custo)||0)*it.qtd}; });
   }else{
-    itensVenda=[{prodId:p.id, nome:p.marca+' '+p.modelo, cat:p.cat, serie:p.serie||p.imei||'', venda:p.venda, compra:p.compra}];
+    itensVenda=[{prodId:p.id, nome:p.marca+' '+p.modelo, cat:p.cat, serie:p.serie||'', imei:p.imei||'', bateria:p.bateria||'', pecas:p.pecas||'', venda:p.venda, compra:p.compra}];
   }
   const venda={
     id:uid(), clienteId:vendaCart.cliente.id, clienteNome:vendaCart.cliente.nome,
@@ -3048,6 +3053,83 @@ function finalizarVenda(total,falta){
 }
 
 /* ============ DETALHE VENDA ============ */
+function cupomVenda(id){
+  const v=db.vendas.find(x=>x.id===id); if(!v){ toast('Venda não encontrada'); return; }
+  const L=money;
+  const linhaItens=(v.itens||[]).map(i=>{
+    const q=i.qtd?i.qtd+'x ':'';
+    let bloco='<div class="it"><span class="it-nome">'+q+(i.nome||'')+'</span><span class="it-val">'+L(i.venda)+'</span></div>';
+    if(i.serie) bloco+='<div class="it-serie">Série: '+i.serie+'</div>';
+    if(i.imei) bloco+='<div class="it-serie">IMEI: '+i.imei+'</div>';
+    if(i.bateria) bloco+='<div class="it-serie">Saúde da bateria: '+i.bateria+'%</div>';
+    if(i.pecas) bloco+='<div class="it-serie">Peças trocadas: '+i.pecas+'</div>';
+    return bloco;
+  }).join('');
+  const linhaPags=(v.pagamentos||[]).map(p=>{
+    const parc=(p.forma==='Cartão de crédito'&&p.parcelas>1)?' '+p.parcelas+'x':'';
+    return '<div class="it"><span>'+p.forma+parc+'</span><span>'+L(p.valor)+'</span></div>';
+  }).join('');
+  const subtotal=(v.itens||[]).reduce((s,i)=>s+(Number(i.venda)||0),0);
+  const cli=v.clienteNome||'Consumidor';
+  const tel=v.clienteTel?'<div>Tel: '+v.clienteTel+'</div>':'';
+  const cpf=v.clienteCpf?'<div>CPF: '+v.clienteCpf+'</div>':'';
+  const receber=v.aReceber>0?'<div class="it" style="color:#c00"><span>A RECEBER</span><span>'+L(v.aReceber)+'</span></div>':'';
+  const desc=(Number(v.desconto)||0)>0?'<div class="it"><span>Desconto</span><span>-'+L(v.desconto)+'</span></div>':'';
+
+  const html='<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Comprovante</title><style>'
+    +'*{margin:0;padding:0;box-sizing:border-box}'
+    +'body{background:#e8e8ed;font-family:"Courier New",monospace;padding:14px;color:#000}'
+    +'.cupom{background:#fff;max-width:300px;margin:0 auto;padding:16px 14px;box-shadow:0 2px 10px rgba(0,0,0,.15)}'
+    +'.center{text-align:center}'
+    +'.logo{width:90px;max-width:45%;height:auto;margin:0 auto 4px;display:block}'
+    +'.loja{font-size:17px;font-weight:bold;letter-spacing:1px}'
+    +'.sub{font-size:11px;margin-top:2px;color:#333}'
+    +'.dados{font-size:10px;color:#444;line-height:1.5;margin-top:1px}'
+    +'.linha{border-top:1px dashed #000;margin:10px 0}'
+    +'.tit{font-size:11px;font-weight:bold;text-transform:uppercase;margin-bottom:5px;color:#333}'
+    +'.it{display:flex;justify-content:space-between;font-size:12px;margin:3px 0;gap:8px}'
+    +'.it-nome{flex:1}.it-val{white-space:nowrap}'
+    +'.it-serie{font-size:10px;color:#555;margin:0 0 4px 0}'
+    +'.total{display:flex;justify-content:space-between;font-size:16px;font-weight:bold;margin-top:6px}'
+    +'.rodape{text-align:center;font-size:10px;margin-top:12px;color:#333;line-height:1.5}'
+    +'.info{font-size:11px;line-height:1.5}'
+    +'.btns{max-width:300px;margin:14px auto 0;display:flex;gap:8px}'
+    +'.btns button{flex:1;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:600;color:#fff}'
+    +'.b-print{background:#0071e3}.b-close{background:#8e8e93}'
+    +'@media print{body{background:#fff;padding:0}.btns{display:none}.cupom{box-shadow:none;max-width:100%}}'
+    +'</style></head><body>'
+    +'<div class="cupom">'
+    +'<img class="logo" src="'+LOGO_LIGHT+'" alt="iTronic">'
+    +'<div class="center sub">Centro Especializado Apple</div>'
+    +'<div class="center dados">CNPJ: 48.879.574/0001-08</div>'
+    +'<div class="center dados">Rua Rafael Nascimento, 211 - Centro</div>'
+    +'<div class="center dados">Rio Verde - GO</div>'
+    +'<div class="center dados">(64) 3050-8813 · (64) 99641-4594</div>'
+    +'<div class="linha"></div>'
+    +'<div class="tit">Comprovante de venda</div>'
+    +'<div class="info"><div>Data: '+fmtData(v.data)+' '+(v.hora||'')+'</div>'
+    +'<div>Cliente: '+cli+'</div>'+tel+cpf
+    +(v.vendedor?'<div>Vendedor: '+v.vendedor+'</div>':'')+'</div>'
+    +'<div class="linha"></div>'
+    +'<div class="tit">Itens</div>'+linhaItens
+    +'<div class="linha"></div>'
+    +desc
+    +'<div class="total"><span>TOTAL</span><span>'+L(v.total)+'</span></div>'
+    +receber
+    +'<div class="linha"></div>'
+    +'<div class="tit">Pagamento</div>'+linhaPags
+    +'<div class="linha"></div>'
+    +'<div class="rodape">Obrigado pela preferência!<br>iTronic Rio Verde<br>Este documento não é fiscal</div>'
+    +'</div>'
+    +'<div class="btns"><button class="b-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button><button class="b-close" onclick="window.close()">Fechar</button></div>'
+    +'</body></html>';
+
+  const w=window.open('','_blank');
+  if(!w){ toast('Permita abrir janelas para ver o comprovante'); return; }
+  w.document.write(html);
+  w.document.close();
+}
 function openVendaDetail(id){
   const v=db.vendas.find(x=>x.id===id); if(!v)return;
   const isAdmin=session&&session.role==='Administrador';
@@ -3068,6 +3150,7 @@ function openVendaDetail(id){
       ${v.pagamentos.map(p=>`<div class="detail-line"><span class="k">${p.forma}${p.forma==='Cartão de crédito'&&p.parcelas>1?' '+p.parcelas+'x':''}${p.taxa?' ('+p.taxa+'%)':''}</span><span class="v money-in">${money(p.valor)}</span></div>`).join('')}
     </div>
     ${v.aReceber>0?`<button class="btn" onclick="quitarVenda('${v.id}')" style="margin-top:14px;background:var(--green)">Marcar como recebido</button>`:''}
+    <button class="btn" onclick="cupomVenda('${v.id}')" style="margin-top:14px">🧾 Comprovante (salvar/imprimir)</button>
     <button class="btn danger" onclick="delVenda('${v.id}')" style="margin-top:8px">Remover venda</button>
     <div style="height:30px"></div>
   `;
@@ -3683,7 +3766,7 @@ function openMenu(){
     </div>`:''}
     <input type="file" id="imp-input" accept="application/json" style="display:none" onchange="importBackup(event)">
     <button class="btn secondary" onclick="logout()" style="margin-top:16px">Sair da conta</button>
-    <div style="text-align:center;color:var(--text2);font-size:12px;margin-top:16px">Sistema de Gestão de Loja · v40</div>
+    <div style="text-align:center;color:var(--text2);font-size:12px;margin-top:16px">Sistema de Gestão de Loja · v43</div>
   `;
   openSheet('Menu', html);
 }
