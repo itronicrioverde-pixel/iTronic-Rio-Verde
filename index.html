@@ -765,6 +765,75 @@ body.dark .sale-main,body.dark .sale-summary{
 body #login,body.dark #login{position:fixed;inset:0;display:block;padding:0;overflow:hidden;background:#071b12!important}
 #login #login-experience{position:absolute;inset:0;display:block;width:100%;max-width:none;height:100%;border:0;background:#071b12}
 #login .login-bridge{display:none}
+/* Painel compacto aprovado */
+#page-painel .pp-header{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:2px 0 16px}
+#page-painel .pp-eyebrow{font-size:10px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#367e51}
+#page-painel .pp-header h2{font-size:clamp(26px,3vw,36px);letter-spacing:-.045em;line-height:1.1;margin:5px 0}
+#page-painel .pp-header p{font-size:12px;color:var(--text2)}
+#page-painel .pp-controls{display:flex;align-items:center;gap:8px}
+#page-painel .pp-live{border:1px solid var(--line);background:color-mix(in srgb,var(--card) 83%,#d6f5d3);border-radius:99px;padding:8px 10px;color:var(--text2);font-size:10px;font-weight:800;white-space:nowrap}
+#page-painel .pp-select{width:auto;min-width:153px;padding:10px 32px 10px 11px;background-color:var(--card);border:1px solid var(--line);border-radius:11px;font-size:12px;font-weight:700;min-height:37px}
+#page-painel .pp-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+#page-painel .pp-kpi,#page-painel .pp-card{background:color-mix(in srgb,var(--card) 91%,transparent);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow);min-width:0}
+#page-painel .pp-kpi{padding:16px 17px;min-height:111px}
+#page-painel .pp-kpi-label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--text2)}
+#page-painel .pp-kpi-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:9px;background:color-mix(in srgb,var(--brand) 16%,var(--card));color:var(--blue)}
+#page-painel .pp-kpi-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#page-painel .pp-kpi strong{display:block;margin:9px 0 4px;font-size:clamp(19px,2vw,26px);font-weight:800;letter-spacing:-.04em;line-height:1.1;overflow-wrap:anywhere}
+#page-painel .pp-kpi small{display:block;font-size:10px;color:var(--text2);line-height:1.3}
+#page-painel .pp-kpi small b{color:var(--green)}
+#page-painel .pp-main,#page-painel .pp-second{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.93fr);gap:12px;margin-top:12px}
+#page-painel .pp-second{grid-template-columns:repeat(2,minmax(0,1fr))}
+#page-painel .pp-card{padding:17px 19px}
+#page-painel .pp-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:11px;margin-bottom:12px}
+#page-painel .pp-card h3{font-size:15px;letter-spacing:-.02em;margin:0 0 3px}
+#page-painel .pp-card p{font-size:11px;color:var(--text2);margin:0;line-height:1.35}
+#page-painel .pp-small-label{font-size:10px;color:var(--text2);font-weight:700;white-space:nowrap}
+#page-painel .pp-chart{display:block;width:100%;height:158px}
+#page-painel .pp-chart .pp-gridline{stroke:var(--line);stroke-width:1;stroke-dasharray:3 5}
+#page-painel .pp-chart .pp-axis{fill:var(--text2);font-size:10px;font-family:inherit}
+#page-painel .pp-chart .pp-bar-f{fill:#3a8058}
+#page-painel .pp-chart .pp-bar-l{fill:#a5db55}
+#page-painel .pp-chart rect{transition:opacity .18s}
+#page-painel .pp-chart rect:hover{opacity:.72}
+#page-painel .pp-legend{display:flex;justify-content:center;gap:17px;font-size:10px;color:var(--text2);margin-top:1px}
+#page-painel .pp-dot{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:5px;background:#3a8058}
+#page-painel .pp-legend .pp-dot.profit{background:#a5db55}
+#page-painel .pp-switch{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+#page-painel .pp-switch button{border:0;border-radius:7px;padding:5px 8px;font-size:10px;font-weight:800;color:var(--text2)}
+#page-painel .pp-switch button.active{background:var(--card);color:var(--blue);box-shadow:0 2px 7px #102d211c}
+#page-painel .pp-ranking{display:grid;gap:10px;margin-top:15px}
+#page-painel .pp-rank-row{display:grid;grid-template-columns:19px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:11px}
+#page-painel .pp-rank-no{font-weight:800;color:var(--text2)}
+#page-painel .pp-rank-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-painel .pp-rank-value{font-size:11px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+#page-painel .pp-track{height:5px;margin-top:5px;background:var(--bg2);border-radius:99px;overflow:hidden}
+#page-painel .pp-track b{height:100%;display:block;background:linear-gradient(90deg,#3d925e,#acd76c);border-radius:99px}
+#page-painel .pp-footnote{font-size:10px;color:var(--text2);margin-top:10px}
+#page-painel .pp-age{display:grid;gap:11px;margin-top:18px}
+#page-painel .pp-age-row{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:9px;align-items:center;font-size:10px}
+#page-painel .pp-age-row .label{color:var(--text2);font-weight:700}
+#page-painel .pp-age-track{height:9px;border-radius:9px;background:var(--bg2);overflow:hidden}
+#page-painel .pp-age-track b{height:100%;display:block;border-radius:9px;background:#75ba77}
+#page-painel .pp-age-row.warn .pp-age-track b{background:#dfb659}
+#page-painel .pp-age-row.danger .pp-age-track b{background:#d58b73}
+#page-painel .pp-age-row .value{font-weight:800;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+#page-painel .pp-age-total{display:flex;justify-content:space-between;gap:8px;padding-top:11px;margin-top:14px;border-top:1px solid var(--line);font-size:10px;color:var(--text2)}
+#page-painel .pp-age-total b{color:var(--text)}
+#page-painel .pp-paybar{display:flex;height:20px;margin:22px 0 16px;border-radius:99px;overflow:hidden;background:var(--bg2)}
+#page-painel .pp-paybar span{display:block;height:100%}
+#page-painel .pp-paylist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+#page-painel .pp-payitem{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--text2)}
+#page-painel .pp-payitem b{color:var(--text);font-variant-numeric:tabular-nums}
+#page-painel .pp-payitem i{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%}
+#page-painel .pp-note{font-size:10px;line-height:1.4;color:var(--text2);background:var(--bg2);padding:9px 11px;border-radius:10px;margin-top:13px}
+#page-painel .pp-empty{padding:25px 10px;text-align:center;color:var(--text2);font-size:12px}
+body.dark #page-painel .pp-chart .pp-bar-f{fill:#67bf8b}
+body.dark #page-painel .pp-chart .pp-bar-l{fill:#bde778}
+body.dark #page-painel .pp-legend .pp-dot{background:#67bf8b}
+body.dark #page-painel .pp-legend .pp-dot.profit{background:#bde778}
+@media(max-width:1023px){#page-painel .pp-main,#page-painel .pp-second{grid-template-columns:1fr;gap:10px;margin-top:10px}#page-painel .pp-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#page-painel .pp-kpi{padding:13px;min-height:100px}#page-painel .pp-kpi strong{font-size:21px}#page-painel .pp-card{padding:15px}#page-painel .pp-chart{height:145px}}
+@media(max-width:430px){#page-painel .pp-header{display:block}#page-painel .pp-controls{margin-top:12px;justify-content:space-between}#page-painel .pp-select{flex:1}#page-painel .pp-kpi strong{font-size:19px}}
 </style>
 </head>
 <body>
@@ -1058,7 +1127,7 @@ function applyLogos(){
 let db, session=null, theme='light';
 let filterEstoque='todos', searchEstoque='';
 let relMesSelecionado=null; // mês escolhido nos relatórios (null = mês atual)
-let painelMes='todos'; // mês escolhido no painel ('todos' = geral)
+let painelMes=todayStr().slice(0,7); // mês atual por padrão; filtro do painel
 let vendaCart={cliente:null, produto:null, produtoId:null, desconto:0, pagamentos:[]};
 let vendaModo='aparelho'; // 'aparelho', 'acessorio' ou 'simulador'
 let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
@@ -1659,136 +1728,137 @@ function svgRosca(fatias){
   return `<svg viewBox="0 0 120 120" style="width:120px;height:120px;flex:0 0 auto">${paths}</svg>`;
 }
 
+let painelRankingModo='qtd';
+function painelBarsSvg(labels,faturamento,lucros,mostrarLucro){
+  if(!faturamento.some(Boolean) && (!mostrarLucro || !lucros.some(Boolean)))
+    return '<div class="pp-empty">As vendas aparecerão aqui quando forem registradas.</div>';
+  const max=Math.max(1,...faturamento,...(mostrarLucro?lucros:[]));
+  const min=Math.min(0,...(mostrarLucro?lucros:[]));
+  const top=13,bottom=126,scale=(bottom-top)/(max-min),zero=top+max*scale;
+  const lines=[.25,.5,.75].map(f=>`<line x1="18" x2="505" y1="${(top+(zero-top)*f).toFixed(1)}" y2="${(top+(zero-top)*f).toFixed(1)}" class="pp-gridline"/>`).join('');
+  const bars=labels.map((label,i)=>{
+    const x=47+i*78, revenue=Math.max(0,faturamento[i]||0),gain=lucros[i]||0;
+    const rf=revenue*scale,lh=Math.abs(gain)*scale;
+    const moneyBar=`<rect class="pp-bar-f" x="${x-10}" y="${(zero-rf).toFixed(1)}" width="18" height="${Math.max(0,rf).toFixed(1)}" rx="4"><title>${label}: faturamento ${money(revenue)}</title></rect>`;
+    const profitBar=mostrarLucro?`<rect class="pp-bar-l" x="${x+10}" y="${(gain>=0?zero-lh:zero).toFixed(1)}" width="13" height="${Math.max(0,lh).toFixed(1)}" rx="4"><title>${label}: lucro ${money(gain)}</title></rect>`:'';
+    return moneyBar+profitBar+`<text class="pp-axis" x="${x+5}" y="151" text-anchor="middle">${label}</text>`;
+  }).join('');
+  return `<svg class="pp-chart" viewBox="0 0 520 158" role="img" aria-label="Faturamento${mostrarLucro?' e lucro':''} dos últimos seis meses" preserveAspectRatio="xMidYMid meet">${lines}${bars}</svg>`;
+}
+
 function renderPainel(){
   const isAdmin=session&&session.role==='Administrador';
-  const hoje=new Date();
-  const base=vendasVisiveis(); // admin vê tudo; vendedor vê só as próprias
-  // meses disponíveis para o seletor
-  const mesesSet=new Set(base.map(v=>v.data.slice(0,7)));
-  for(let i=0;i<6;i++){ const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1); mesesSet.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')); }
-  const mesesOpt=[...mesesSet].sort().reverse();
-  const nomeMesLong=(m)=>{const[a,mm]=m.split('-');const n=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];return n[parseInt(mm)-1]+'/'+a;};
-
-  // conjunto de vendas conforme o filtro de mês
-  const filtraMes=(v)=> painelMes==='todos' ? true : v.data.slice(0,7)===painelMes;
-  const vendas=base.filter(filtraMes);
-
-  // ---------- barras: faturamento e lucro (6 meses) ----------
-  const meses6=[];
-  for(let i=5;i>=0;i--){ const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1); meses6.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')); }
-  const fatMes=meses6.map(m=>base.filter(v=>v.data.slice(0,7)===m).reduce((s,v)=>s+vendaLiquido(v),0));
-  const lucMes=meses6.map(m=>base.filter(v=>v.data.slice(0,7)===m).reduce((s,v)=>s+lucroVenda(v),0));
-  const labels6=meses6.map(nomeMesCurto);
-
-  // ---------- indicadores ----------
-  const nVendas=vendas.length;
-  const faturado=vendas.reduce((s,v)=>s+vendaLiquido(v),0);
-  const lucro=vendas.reduce((s,v)=>s+lucroVenda(v),0);
-  const ticket=nVendas?faturado/nVendas:0;
-  const custoTotal=vendas.reduce((s,v)=>{let c=0;(v.itens||[]).forEach(it=>c+=Number(it.compra)||0);return s+c;},0);
-  const margem=faturado?(lucro/faturado*100):0;
-
-  // ---------- comparativo com mês anterior ----------
-  const mesRef = painelMes==='todos' ? (hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')) : painelMes;
-  const [ra,rm]=mesRef.split('-'); const dPrev=new Date(parseInt(ra),parseInt(rm)-2,1);
-  const mesPrev=dPrev.getFullYear()+'-'+String(dPrev.getMonth()+1).padStart(2,'0');
-  const fatRef=base.filter(v=>v.data.slice(0,7)===mesRef).reduce((s,v)=>s+vendaLiquido(v),0);
-  const fatPrev=base.filter(v=>v.data.slice(0,7)===mesPrev).reduce((s,v)=>s+vendaLiquido(v),0);
-  const variacao = fatPrev>0 ? ((fatRef-fatPrev)/fatPrev*100) : (fatRef>0?100:0);
-
-  // ---------- ranking de mais vendidos ----------
-  const cont={};
-  vendas.forEach(v=>{ (v.itens||[]).forEach(it=>{ const nome=it.nome||'—'; if(!cont[nome])cont[nome]={qtd:0,total:0}; cont[nome].qtd++; cont[nome].total+=Number(it.venda||it.preco||0)||0; }); });
-  const ranking=Object.entries(cont).map(([nome,d])=>({nome,...d})).sort((a,b)=>b.qtd-a.qtd).slice(0,8);
-
-  // ---------- por categoria (contagem de vendas) ----------
-  const catVend={};
-  vendas.forEach(v=>{ (v.itens||[]).forEach(it=>{ const c=it.cat||'Outros'; catVend[c]=(catVend[c]||0)+1; }); });
-  const coresC=['#34c759','#467a3d','#ff9500','#af52de','#ff2d55','#5ac8fa','#ffcc00'];
-  const fatiasCat=Object.entries(catVend).map(([k,v],i)=>({nome:k,valor:v,cor:coresC[i%coresC.length]}));
-
-  // ---------- formas de pagamento ----------
-  const formas={};
-  vendas.forEach(v=>{ (v.pagamentos||[]).forEach(p=>{ formas[p.forma]=(formas[p.forma]||0)+(Number(p.valor)||0); }); });
-  const coresF=['#467a3d','#34c759','#ff9500','#af52de','#ff2d55','#5ac8fa'];
-  const fatiasF=Object.entries(formas).map(([k,v],i)=>({nome:k,valor:v,cor:coresF[i%coresF.length]}));
-
-  // ---------- melhores clientes ----------
-  const cli={};
-  vendas.forEach(v=>{ const nome=v.clienteNome||'—'; if(!cli[nome])cli[nome]={qtd:0,total:0}; cli[nome].qtd++; cli[nome].total+=vendaLiquido(v); });
-  const topCli=Object.entries(cli).map(([nome,d])=>({nome,...d})).sort((a,b)=>b.total-a.total).slice(0,5);
-
-  // ---------- dia da semana de maior movimento ----------
-  const dias=[0,0,0,0,0,0,0]; const nomesDia=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  vendas.forEach(v=>{ const d=new Date(v.data+'T12:00:00'); if(!isNaN(d)) dias[d.getDay()]+=vendaLiquido(v); });
-  const maxDia=Math.max(...dias); const melhorDia=maxDia>0?nomesDia[dias.indexOf(maxDia)]:'—';
-
-  // ---------- tempo médio de venda (dias entre entrada e venda) ----------
-  const vendidos=db.produtos.filter(p=>p.status==='Vendido'&&p.entrada&&p.vendidoEm);
-  let tempoMedio=0;
-  if(vendidos.length){ const soma=vendidos.reduce((s,p)=>s+Math.max(0,(new Date(p.vendidoEm)-new Date(p.entrada))/86400000),0); tempoMedio=Math.round(soma/vendidos.length); }
-
-  const legenda=(fatias,fmt)=>fatias.map(f=>`<div style="display:flex;align-items:center;gap:6px;font-size:12px;margin:2px 0"><span style="width:10px;height:10px;border-radius:2px;background:${f.cor};display:inline-block"></span>${f.nome} · ${fmt?fmt(f.valor):money(f.valor)}</div>`).join('');
-  const seta=variacao>=0?'▲':'▼'; const corVar=variacao>=0?'pos':'neg';
+  const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const nowMonth=todayStr().slice(0,7);
+  const monthKey=(year,month,offset)=>{const d=new Date(year,month-1+offset,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+  const [year,month]=nowMonth.split('-').map(Number);
+  const lastSix=Array.from({length:6},(_,i)=>monthKey(year,month,i-5));
+  const base=vendasVisiveis();
+  const months=new Set([...lastSix,...base.map(v=>String(v.data||'').slice(0,7)).filter(s=>/^\d{4}-\d{2}$/.test(s))]);
+  const monthName=m=>{const [y,mm]=m.split('-');return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][Number(mm)-1]+'/'+y};
+  const currentSelection=/^\d{4}-\d{2}$/.test(painelMes)?painelMes:nowMonth;
+  const chartMonths=Array.from({length:6},(_,i)=>{const [y,m]=currentSelection.split('-').map(Number);return monthKey(y,m,i-5)});
+  const filtered=base.filter(v=>{
+    const m=String(v.data||'').slice(0,7);
+    return painelMes==='todos'||(painelMes==='6m'?lastSix.includes(m):m===painelMes);
+  });
+  const count=filtered.length;
+  const revenue=filtered.reduce((sum,v)=>sum+vendaLiquido(v),0);
+  const profit=filtered.reduce((sum,v)=>sum+lucroVenda(v),0);
+  const margin=revenue?profit/revenue*100:0;
+  const ticket=count?revenue/count:0;
+  const items=filtered.reduce((sum,v)=>sum+(v.itens||[]).reduce((n,it)=>n+(Number(it.qtd)>0?Number(it.qtd):1),0),0);
+  const previous=monthKey(...currentSelection.split('-').map(Number),-1);
+  const prevRevenue=base.filter(v=>String(v.data||'').slice(0,7)===previous).reduce((sum,v)=>sum+vendaLiquido(v),0);
+  const variation=painelMes==='todos'||painelMes==='6m'?'Selecione um mês para comparar':prevRevenue>0
+    ?(revenue>=prevRevenue?'▲ ':'▼ ')+Math.abs((revenue-prevRevenue)/prevRevenue*100).toFixed(1).replace('.',',')+'% ante '+monthName(previous)
+    :'Sem base no mês anterior';
+  const fatMonths=chartMonths.map(m=>base.filter(v=>String(v.data||'').slice(0,7)===m).reduce((sum,v)=>sum+vendaLiquido(v),0));
+  const lucMonths=chartMonths.map(m=>base.filter(v=>String(v.data||'').slice(0,7)===m).reduce((sum,v)=>sum+lucroVenda(v),0));
+  const chartLabels=chartMonths.map(m=>monthName(m).split('/')[0]);
+  const rank=new Map();
+  filtered.forEach(v=>{
+    const lines=v.itens||[];
+    const subtotal=lines.reduce((sum,it)=>sum+(Number(it.venda??it.preco)||0),0);
+    const factor=subtotal>0?vendaLiquido(v)/subtotal:0;
+    lines.forEach(it=>{
+      const name=String(it.nome||'Produto').trim()||'Produto';
+      if(!rank.has(name))rank.set(name,{name,qtd:0,total:0});
+      const row=rank.get(name);
+      row.qtd+=Number(it.qtd)>0?Number(it.qtd):1;
+      row.total+=Math.max(0,(Number(it.venda??it.preco)||0)*factor);
+    });
+  });
+  const ranking=[...rank.values()].sort((a,b)=>b[painelRankingModo]-a[painelRankingModo]).slice(0,5);
+  const maxRank=Math.max(1,...ranking.map(r=>r[painelRankingModo]));
+  const bins=[{name:'Até 30 dias',qtd:0,value:0},{name:'31–45 dias',qtd:0,value:0},{name:'46–90 dias',qtd:0,value:0},{name:'90+ dias',qtd:0,value:0}];
+  let undated=0;
+  (db.produtos||[]).filter(p=>p.status==='Disponível').forEach(p=>{
+    if(!p.entrada){undated++;return}
+    const entered=new Date(String(p.entrada).slice(0,10)+'T12:00:00');
+    if(isNaN(entered.getTime())){undated++;return}
+    const days=Math.max(0,Math.floor((new Date()-entered)/86400000));
+    const index=days<=30?0:days<=45?1:days<=90?2:3;
+    bins[index].qtd++;
+    bins[index].value+=Number(p.compra)||0;
+  });
+  const maxBin=Math.max(1,...bins.map(b=>b.qtd));
+  const slowCount=bins[2].qtd+bins[3].qtd,slowValue=bins[2].value+bins[3].value;
+  const pays=[{name:'Pix',value:0,color:'#318457'},{name:'Cartão',value:0,color:'#78bb6b'},{name:'Dinheiro',value:0,color:'#b3d777'},{name:'Outros',value:0,color:'#d5e5ad'}];
+  filtered.forEach(v=>(v.pagamentos||[]).forEach(p=>{
+    const form=String(p.forma||'').toLowerCase();
+    if(form==='entrada aparelho')return;
+    const index=form.includes('pix')?0:form.includes('cartão')||form.includes('cartao')?1:form.includes('dinheiro')?2:3;
+    pays[index].value+=Math.max(0,Number(p.valor)||0);
+  }));
+  const payTotal=pays.reduce((sum,p)=>sum+p.value,0);
+  const icon=(path)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+  const kpi=(label,value,foot,path)=>`<article class="pp-kpi"><div class="pp-kpi-label"><span>${label}</span><span class="pp-kpi-icon">${icon(path)}</span></div><strong class="money-in">${value}</strong><small>${foot}</small></article>`;
 
   el('page-painel').innerHTML=`
-    <select class="input" onchange="painelMes=this.value;renderPainel()" style="margin-bottom:14px">
-      <option value="todos" ${painelMes==='todos'?'selected':''}>Todos os meses</option>
-      ${mesesOpt.map(m=>`<option value="${m}" ${m===painelMes?'selected':''}>${nomeMesLong(m)}</option>`).join('')}
-    </select>
-
-    <div class="grid2">
-      <div class="stat"><div class="lbl">Vendas</div><div class="val sm">${nVendas}</div></div>
-      <div class="stat"><div class="lbl">Faturado</div><div class="val sm money-in">${money(faturado)}</div></div>
+    <header class="pp-header">
+      <div><div class="pp-eyebrow">Visão de gestão</div><h2>Painel</h2><p>Um olhar claro para as vendas e o estoque.</p></div>
+      <div class="pp-controls"><span class="pp-live">DADOS DA LOJA</span><select class="input pp-select" aria-label="Período do painel" onchange="painelMes=this.value;renderPainel()">
+        <option value="${nowMonth}" ${painelMes===nowMonth?'selected':''}>${monthName(nowMonth)}</option>
+        ${[...months].sort().reverse().filter(m=>m!==nowMonth).map(m=>`<option value="${m}" ${painelMes===m?'selected':''}>${monthName(m)}</option>`).join('')}
+        <option value="6m" ${painelMes==='6m'?'selected':''}>Últimos 6 meses</option>
+        <option value="todos" ${painelMes==='todos'?'selected':''}>Todo o histórico</option>
+      </select></div>
+    </header>
+    <section class="pp-kpis" aria-label="Indicadores principais">
+      ${kpi('Faturamento',money(revenue),esc(variation),'<path d="M3 17l6-6 4 3 8-9M16 5h5v5"/>')}
+      ${isAdmin?kpi('Lucro',money(profit),'Cálculo atual do aplicativo','<path d="M12 2v20M17 5H9a3.5 3.5 0 0 0 0 7h6a3.5 3.5 0 0 1 0 7H6"/>'):kpi('Ticket médio',money(ticket),'Por venda realizada','<path d="M4 5h16v14H4zM8 10h8M8 14h5"/>')}
+      ${isAdmin?kpi('Margem',margin.toFixed(1).replace('.',',')+'%','Lucro ÷ faturamento','<circle cx="12" cy="12" r="9"/><path d="m8 16 8-8M8 8h.01M16 16h.01"/>'):kpi('Itens vendidos',items,'Unidades no período','<path d="M3 6h18v15H3zM3 10h18"/>')}
+      ${kpi('Vendas',count,'Ticket médio '+money(ticket),'<path d="M3 5h18M5 5l2 14h10l2-14M9 10h6M9 14h6"/>')}
+    </section>
+    <div class="pp-main">
+      <section class="pp-card"><div class="pp-card-head"><div><h3>Evolução das vendas</h3><p>${isAdmin?'Faturamento e lucro':'Faturamento'} mês a mês</p></div><span class="pp-small-label">6 meses</span></div>
+        ${painelBarsSvg(chartLabels,fatMonths,lucMonths,isAdmin)}
+        <div class="pp-legend"><span><i class="pp-dot"></i>Faturamento</span>${isAdmin?'<span><i class="pp-dot profit"></i>Lucro</span>':''}</div>
+      </section>
+      <section class="pp-card"><div class="pp-card-head"><div><h3>Produtos em destaque</h3><p>Top 5 do período selecionado</p></div>
+        <div class="pp-switch" role="group" aria-label="Ordenar ranking">
+          <button class="${painelRankingModo==='qtd'?'active':''}" aria-pressed="${painelRankingModo==='qtd'}" onclick="painelRankingModo='qtd';renderPainel()">Unidades</button>
+          <button class="${painelRankingModo==='total'?'active':''}" aria-pressed="${painelRankingModo==='total'}" onclick="painelRankingModo='total';renderPainel()">Valor</button>
+        </div></div>
+        ${ranking.length?`<div class="pp-ranking">${ranking.map((r,i)=>`<div class="pp-rank-row"><span class="pp-rank-no">${String(i+1).padStart(2,'0')}</span><div><div class="pp-rank-name" title="${esc(r.name)}">${esc(r.name)}</div><div class="pp-track"><b style="width:${Math.round(r[painelRankingModo]/maxRank*100)}%"></b></div></div><span class="pp-rank-value money-in">${painelRankingModo==='qtd'?r.qtd+' un.':money(r.total)}</span></div>`).join('')}</div>`:'<div class="pp-empty">Ainda não há produtos vendidos neste período.</div>'}
+        <div class="pp-footnote">${painelRankingModo==='total'?'Valor distribuído proporcionalmente ao total das vendas.':'Alterne para Valor para comparar o faturamento.'}</div>
+      </section>
     </div>
-    <div class="grid2" style="margin-top:12px">
-      <div class="stat"><div class="lbl">Ticket médio</div><div class="val sm money-in">${money(ticket)}</div></div>
-      ${isAdmin?`<div class="stat"><div class="lbl">Margem média</div><div class="val sm money-in ${margem>=0?'pos':'neg'}">${margem.toFixed(1)}%</div></div>`:`<div class="stat"><div class="lbl">—</div><div class="val sm">—</div></div>`}
+    <div class="pp-second">
+      <section class="pp-card"><div class="pp-card-head"><div><h3>Idade do estoque</h3><p>Aparelhos disponíveis por tempo de permanência</p></div><span class="pp-small-label">posição atual</span></div>
+        ${bins.some(b=>b.qtd)?`<div class="pp-age">${bins.map((b,i)=>`<div class="pp-age-row ${i===2?'warn':i===3?'danger':''}"><span class="label">${b.name}</span><div class="pp-age-track"><b style="width:${Math.round(b.qtd/maxBin*100)}%"></b></div><span class="value money-in">${b.qtd} · ${money(b.value)}</span></div>`).join('')}</div><div class="pp-age-total"><span>Parados há mais de 45 dias</span><b class="money-in">${slowCount} aparelhos · ${money(slowValue)}</b></div>`:'<div class="pp-empty">Nenhum aparelho disponível com data de entrada.</div>'}
+        ${undated?`<div class="pp-footnote">${undated} aparelho(s) sem data de entrada ficaram fora das faixas.</div>`:''}
+      </section>
+      <section class="pp-card"><div class="pp-card-head"><div><h3>Como os clientes pagaram</h3><p>Participação no valor recebido</p></div><span class="pp-small-label">período</span></div>
+        ${payTotal?`<div class="pp-paybar" role="img" aria-label="Distribuição dos pagamentos">${pays.map(p=>`<span title="${p.name}: ${money(p.value)}" style="width:${(p.value/payTotal*100).toFixed(2)}%;background:${p.color}"></span>`).join('')}</div>
+          <div class="pp-paylist">${pays.map(p=>`<div class="pp-payitem"><span><i style="background:${p.color}"></i>${p.name}</span><b>${Math.round(p.value/payTotal*100)}%</b></div>`).join('')}</div>`:'<div class="pp-empty">Ainda não há pagamentos registrados neste período.</div>'}
+        <div class="pp-note">Aparelhos recebidos em troca ficam no estoque, fora deste gráfico de pagamentos.</div>
+      </section>
     </div>
-    <div class="card" style="padding:14px;margin-top:12px">
-      <div style="font-size:13px;color:var(--text2)">Faturamento vs mês anterior (${nomeMesCurto(mesPrev)})</div>
-      <div class="money-in ${corVar}" style="font-size:22px;font-weight:700">${seta} ${Math.abs(variacao).toFixed(0)}%</div>
-    </div>
-
-    <div class="sec-title">Faturamento e lucro (6 meses)</div>
-    <div class="card" style="padding:14px">
-      ${svgBarras(labels6,[{nome:'Faturado',cor:'#467a3d',valores:fatMes},{nome:'Lucro',cor:'#34c759',valores:lucMes}])}
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-size:12px">
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#467a3d;display:inline-block"></span>Faturado</span>
-        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#34c759;display:inline-block"></span>Lucro</span>
-      </div>
-    </div>
-
-    <div class="sec-title">Mais vendidos${painelMes!=='todos'?' · '+nomeMesLong(painelMes):''}</div>
-    ${ranking.length?`<div class="list">
-      ${ranking.map((r,i)=>`<div class="row"><div class="thumb">${i+1}º</div><div class="info"><div class="t">${r.nome}</div><div class="s">${r.qtd} vendido(s)</div></div><div class="right"><div class="p money-in">${money(r.total)}</div></div></div>`).join('')}
-    </div>`:`<div class="empty">Sem vendas no período.</div>`}
-
-    ${fatiasCat.length?`<div class="sec-title">Vendas por categoria</div>
-    <div class="card" style="padding:14px;display:flex;align-items:center;gap:14px">
-      ${svgRosca(fatiasCat)}
-      <div style="flex:1">${legenda(fatiasCat,(v)=>v+' venda(s)')}</div>
-    </div>`:''}
-
-    ${fatiasF.length?`<div class="sec-title">Formas de pagamento</div>
-    <div class="card" style="padding:14px;display:flex;align-items:center;gap:14px">
-      ${svgRosca(fatiasF)}
-      <div style="flex:1">${legenda(fatiasF)}</div>
-    </div>`:''}
-
-    ${topCli.length?`<div class="sec-title">Melhores clientes</div>
-    <div class="list">
-      ${topCli.map((c,i)=>`<div class="row"><div class="thumb">${i+1}º</div><div class="info"><div class="t">${c.nome}</div><div class="s">${c.qtd} compra(s)</div></div><div class="right"><div class="p money-in">${money(c.total)}</div></div></div>`).join('')}
-    </div>`:''}
-
-    <div class="grid2" style="margin-top:14px">
-      <div class="stat"><div class="lbl">Melhor dia</div><div class="val sm">${melhorDia}</div></div>
-      <div class="stat"><div class="lbl">Tempo médio p/ vender</div><div class="val sm">${vendidos.length?tempoMedio+' dias':'—'}</div></div>
-    </div>
-
-    <div style="height:20px"></div>
   `;
 }
+
 /* ============ CATÁLOGO ============ */
 let catalogoSel=[]; // ids dos aparelhos escolhidos pro catálogo
 function abrirCatalogo(){
