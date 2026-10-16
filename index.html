@@ -1127,7 +1127,7 @@ function applyLogos(){
 let db, session=null, theme='light';
 let filterEstoque='todos', searchEstoque='';
 let relMesSelecionado=null; // mês escolhido nos relatórios (null = mês atual)
-let painelMes=todayStr().slice(0,7); // mês atual por padrão; filtro do painel
+let painelMes='todos'; // abre o histórico para aproveitar vendas já cadastradas
 let vendaCart={cliente:null, produto:null, produtoId:null, desconto:0, pagamentos:[]};
 let vendaModo='aparelho'; // 'aparelho', 'acessorio' ou 'simulador'
 let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
@@ -1756,13 +1756,15 @@ function renderPainel(){
   const base=vendasVisiveis();
   const months=new Set([...lastSix,...base.map(v=>String(v.data||'').slice(0,7)).filter(s=>/^\d{4}-\d{2}$/.test(s))]);
   const monthName=m=>{const [y,mm]=m.split('-');return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][Number(mm)-1]+'/'+y};
-  const currentSelection=/^\d{4}-\d{2}$/.test(painelMes)?painelMes:nowMonth;
+  const recordedMonths=[...new Set(base.map(v=>String(v.data||'').slice(0,7)).filter(s=>/^\d{4}-\d{2}$/.test(s)))].sort();
+  const currentSelection=/^\d{4}-\d{2}$/.test(painelMes)?painelMes:(painelMes==='todos'&&recordedMonths.length?recordedMonths[recordedMonths.length-1]:nowMonth);
   const chartMonths=Array.from({length:6},(_,i)=>{const [y,m]=currentSelection.split('-').map(Number);return monthKey(y,m,i-5)});
   const filtered=base.filter(v=>{
     const m=String(v.data||'').slice(0,7);
     return painelMes==='todos'||(painelMes==='6m'?lastSix.includes(m):m===painelMes);
   });
   const count=filtered.length;
+  const noSalesText=painelMes==='todos'?'Não há vendas visíveis para este usuário. Confira os Relatórios e a sincronização.':'Não há vendas no período selecionado. Tente “Todo o histórico”.';
   const revenue=filtered.reduce((sum,v)=>sum+vendaLiquido(v),0);
   const profit=filtered.reduce((sum,v)=>sum+lucroVenda(v),0);
   const margin=revenue?profit/revenue*100:0;
@@ -1812,6 +1814,7 @@ function renderPainel(){
     pays[index].value+=Math.max(0,Number(p.valor)||0);
   }));
   const payTotal=pays.reduce((sum,p)=>sum+p.value,0);
+  const noPaymentDetails=filtered.filter(v=>!(v.pagamentos||[]).some(p=>p.forma!=='Entrada aparelho'&&(Number(p.valor)||0)>0)).length;
   const icon=(path)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
   const kpi=(label,value,foot,path)=>`<article class="pp-kpi"><div class="pp-kpi-label"><span>${label}</span><span class="pp-kpi-icon">${icon(path)}</span></div><strong class="money-in">${value}</strong><small>${foot}</small></article>`;
 
@@ -1832,7 +1835,7 @@ function renderPainel(){
       ${kpi('Vendas',count,'Ticket médio '+money(ticket),'<path d="M3 5h18M5 5l2 14h10l2-14M9 10h6M9 14h6"/>')}
     </section>
     <div class="pp-main">
-      <section class="pp-card"><div class="pp-card-head"><div><h3>Evolução das vendas</h3><p>${isAdmin?'Faturamento e lucro':'Faturamento'} mês a mês</p></div><span class="pp-small-label">6 meses</span></div>
+      <section class="pp-card"><div class="pp-card-head"><div><h3>Evolução das vendas</h3><p>${isAdmin?'Faturamento e lucro':'Faturamento'} mês a mês</p></div><span class="pp-small-label">até ${monthName(currentSelection)}</span></div>
         ${painelBarsSvg(chartLabels,fatMonths,lucMonths,isAdmin)}
         <div class="pp-legend"><span><i class="pp-dot"></i>Faturamento</span>${isAdmin?'<span><i class="pp-dot profit"></i>Lucro</span>':''}</div>
       </section>
@@ -1841,7 +1844,7 @@ function renderPainel(){
           <button class="${painelRankingModo==='qtd'?'active':''}" aria-pressed="${painelRankingModo==='qtd'}" onclick="painelRankingModo='qtd';renderPainel()">Unidades</button>
           <button class="${painelRankingModo==='total'?'active':''}" aria-pressed="${painelRankingModo==='total'}" onclick="painelRankingModo='total';renderPainel()">Valor</button>
         </div></div>
-        ${ranking.length?`<div class="pp-ranking">${ranking.map((r,i)=>`<div class="pp-rank-row"><span class="pp-rank-no">${String(i+1).padStart(2,'0')}</span><div><div class="pp-rank-name" title="${esc(r.name)}">${esc(r.name)}</div><div class="pp-track"><b style="width:${Math.round(r[painelRankingModo]/maxRank*100)}%"></b></div></div><span class="pp-rank-value money-in">${painelRankingModo==='qtd'?r.qtd+' un.':money(r.total)}</span></div>`).join('')}</div>`:'<div class="pp-empty">Ainda não há produtos vendidos neste período.</div>'}
+        ${ranking.length?`<div class="pp-ranking">${ranking.map((r,i)=>`<div class="pp-rank-row"><span class="pp-rank-no">${String(i+1).padStart(2,'0')}</span><div><div class="pp-rank-name" title="${esc(r.name)}">${esc(r.name)}</div><div class="pp-track"><b style="width:${Math.round(r[painelRankingModo]/maxRank*100)}%"></b></div></div><span class="pp-rank-value money-in">${painelRankingModo==='qtd'?r.qtd+' un.':money(r.total)}</span></div>`).join('')}</div>`:`<div class="pp-empty">${count?'As vendas deste período não têm produtos detalhados.':noSalesText}</div>`}
         <div class="pp-footnote">${painelRankingModo==='total'?'Valor distribuído proporcionalmente ao total das vendas.':'Alterne para Valor para comparar o faturamento.'}</div>
       </section>
     </div>
@@ -1852,7 +1855,8 @@ function renderPainel(){
       </section>
       <section class="pp-card"><div class="pp-card-head"><div><h3>Como os clientes pagaram</h3><p>Participação no valor recebido</p></div><span class="pp-small-label">período</span></div>
         ${payTotal?`<div class="pp-paybar" role="img" aria-label="Distribuição dos pagamentos">${pays.map(p=>`<span title="${p.name}: ${money(p.value)}" style="width:${(p.value/payTotal*100).toFixed(2)}%;background:${p.color}"></span>`).join('')}</div>
-          <div class="pp-paylist">${pays.map(p=>`<div class="pp-payitem"><span><i style="background:${p.color}"></i>${p.name}</span><b>${Math.round(p.value/payTotal*100)}%</b></div>`).join('')}</div>`:'<div class="pp-empty">Ainda não há pagamentos registrados neste período.</div>'}
+          <div class="pp-paylist">${pays.map(p=>`<div class="pp-payitem"><span><i style="background:${p.color}"></i>${p.name}</span><b>${Math.round(p.value/payTotal*100)}%</b></div>`).join('')}</div>`:`<div class="pp-empty">${count?'Há '+count+' venda(s) neste período, mas nenhuma forma de pagamento em dinheiro foi registrada nos detalhes.':noSalesText}</div>`}
+        ${payTotal&&noPaymentDetails?`<div class="pp-footnote">${noPaymentDetails} venda(s) sem pagamento em dinheiro detalhado ficaram fora das proporções.</div>`:''}
         <div class="pp-note">Aparelhos recebidos em troca ficam no estoque, fora deste gráfico de pagamentos.</div>
       </section>
     </div>
@@ -3222,6 +3226,7 @@ function openProdDetail(id){
     ${p.status==='Reservado'?`<button class="btn secondary" onclick="liberarProduto('${p.id}')" style="margin-top:8px">Liberar reserva</button>`:''}
     ${p.status==='Vendido'?`<button class="btn secondary" onclick="liberarProduto('${p.id}')" style="margin-top:8px">Voltar ao estoque</button>`:''}
     <button class="btn secondary" onclick="editarProduto('${p.id}')" style="margin-top:8px">Editar</button>
+    <button class="btn secondary" onclick="duplicarProduto('${p.id}')" style="margin-top:8px">Duplicar produto</button>
     <button class="btn danger" onclick="delProduto('${p.id}')" style="margin-top:8px">Remover aparelho</button>`:''}
     <div style="height:30px"></div>
   `;
@@ -3358,6 +3363,45 @@ function editarProduto(id){
   const p=db.produtos.find(x=>x.id===id);
   if(!p){ toast('Aparelho não encontrado'); return; }
   openProduto(p);
+}
+function duplicarProduto(id){
+  if(!podeEditar()){ toast('Só o administrador pode duplicar aparelhos'); return; }
+  const p=db.produtos.find(x=>x.id===id);
+  if(!p){ toast('Aparelho não encontrado'); return; }
+  openSheet('Duplicar produto', `
+    <div class="card" style="padding:16px;margin-bottom:16px">
+      <div id="duplicar-modelo" style="font-weight:700;margin-bottom:6px"></div>
+      <div style="color:var(--text2);font-size:13px;line-height:1.5">Cada cópia será uma unidade disponível no estoque. O IMEI e o número de série ficam vazios para você informar os dados de cada aparelho.</div>
+    </div>
+    ${fld('Quantidade de novas unidades','duplicar-qtd',{type:'number',val:1})}
+    <div style="color:var(--text2);font-size:12px;line-height:1.5;margin-top:6px">De 1 a 20 unidades por vez. Confira fotos, bateria, estado e preços de cada cópia antes de vender ou compartilhar.</div>
+  `, 'Adicionar ao estoque', ()=>confirmarDuplicacao(id));
+  el('duplicar-modelo').textContent=[p.marca,p.modelo,p.cor,p.armazenamento].filter(Boolean).join(' · ');
+  const input=el('duplicar-qtd'); input.min='1'; input.max='20'; input.step='1';
+}
+function confirmarDuplicacao(id){
+  if(!podeEditar()){ toast('Só o administrador pode duplicar aparelhos'); return; }
+  const p=db.produtos.find(x=>x.id===id);
+  if(!p){ toast('Aparelho não encontrado'); return; }
+  const qtd=Number(getV('duplicar-qtd'));
+  if(!Number.isInteger(qtd)||qtd<1||qtd>20){ toast('Informe uma quantidade entre 1 e 20'); return; }
+  // Copia apenas os dados de cadastro. Identificadores e histórico de venda/reserva são da unidade original.
+  const campos=['cat','marca','modelo','cor','armazenamento','condicao','bateria','pecas','fornecedor',
+    'compra','venda','obs','troca','trocaTipo','avaria','detalhes','bateriaTipo','tampa','telaTipo','ciclos','fonte'];
+  const modelo={};
+  campos.forEach(c=>{ if(Object.prototype.hasOwnProperty.call(p,c)) modelo[c]=p[c]; });
+  const novos=Array.from({length:qtd},()=>({
+    ...modelo,id:uid(),imei:'',serie:'',entrada:todayStr(),status:'Disponível',fotos:(p.fotos||[]).slice()
+  }));
+  if(JSON.stringify({...db,produtos:db.produtos.concat(novos)}).length>1048000){
+    toast('Estoque perto do limite de armazenamento. Otimize as fotos antes de duplicar.');
+    return;
+  }
+  db.produtos.push(...novos);
+  try{ saveDB(); }
+  catch(e){ db.produtos.splice(-qtd,qtd); toast('Não foi possível salvar as cópias neste dispositivo'); return; }
+  closeSheet(); render(currentTab);
+  toast(qtd===1?'1 aparelho adicionado ao estoque':qtd+' aparelhos adicionados ao estoque');
 }
 function reservarProduto(id){
   const p=db.produtos.find(x=>x.id===id);
