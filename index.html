@@ -569,6 +569,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial
   .tab span{font-size:9px}
   .tab svg{width:18px;height:18px}
 }
+@media (max-width:600px){
+  .tabbar{justify-content:flex-start;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tabbar .tab{flex:0 0 68px;min-width:68px}
+}
 @media (min-width:768px) and (max-width:1023px){
   .page{max-width:820px}
   .topbar{padding-left:max(20px,calc((100% - 820px)/2));padding-right:max(20px,calc((100% - 820px)/2))}
@@ -828,6 +833,72 @@ body #login,body.dark #login{position:fixed;inset:0;display:block;padding:0;over
 #page-painel .pp-payitem i{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%}
 #page-painel .pp-note{font-size:10px;line-height:1.4;color:var(--text2);background:var(--bg2);padding:9px 11px;border-radius:10px;margin-top:13px}
 #page-painel .pp-empty{padding:25px 10px;text-align:center;color:var(--text2);font-size:12px}
+#page-simular .sim-shell{max-width:620px;margin:0 auto}
+#page-simular .sim-alert{padding:12px 14px;border-radius:12px;background:var(--bg2);border:1px solid var(--line);color:var(--red);font-size:13px;line-height:1.4}
+#page-orcamentos .orc-toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
+#page-orcamentos .orc-toolbar .btn{width:auto;margin:0;padding:11px 16px}
+#page-orcamentos .orc-search{width:100%;margin:12px 0 16px}
+#page-orcamentos .orc-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 18px;padding:5px;border-radius:15px;background:var(--bg2);width:max-content;max-width:100%}
+#page-orcamentos .orc-tabs button{border:0;border-radius:11px;background:transparent;color:var(--text2);padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+#page-orcamentos .orc-tabs button.active{background:var(--card);color:var(--text);box-shadow:0 3px 10px rgba(18,44,23,.11)}
+#page-orcamentos .orc-tabs button:focus-visible{outline:2px solid var(--brand-deep);outline-offset:2px}
+#page-orcamentos .orc-cost-intro{font-size:12px;color:var(--text2);line-height:1.55;margin:0 0 14px}
+#page-orcamentos .orc-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#page-orcamentos .orc-cost-field label{display:block;font-size:12px;font-weight:750;margin-bottom:7px}
+#page-orcamentos .orc-cost-field small{display:block;color:var(--text2);font-size:11px;line-height:1.4;margin-top:5px}
+#page-orcamentos .orc-cost-field input{width:100%}
+#page-orcamentos .orc-cost-title{font-weight:800;font-size:14px;margin:15px 0 12px}
+#page-orcamentos .orc-cost-rates{margin:16px 0;border-top:1px solid var(--line);padding-top:12px}
+#page-orcamentos .orc-cost-rates summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px}
+#page-orcamentos .orc-rate-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+#page-orcamentos .orc-cost-list{display:grid;gap:11px;margin:12px 0}
+#page-orcamentos .orc-cost-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,190px);gap:14px;align-items:start}
+#page-orcamentos .orc-cost-row h3{margin:0 0 5px;font-size:15px}
+#page-orcamentos .orc-cost-row .orc-cost-results{font-size:12px;line-height:1.6;margin-top:10px;color:var(--text2)}
+#page-orcamentos .orc-cost-row .orc-cost-results b{color:var(--text)}
+#page-orcamentos .orc-cost-apply{font-size:11px;color:var(--text2);line-height:1.4;margin-top:8px}
+#page-orcamentos .orc-category-head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+#page-orcamentos .orc-category-head h3{margin:0;font-size:12px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)}
+#page-orcamentos .orc-category-head span{font-size:11px;color:var(--text2)}
+#page-orcamentos .orc-cat-row{display:grid;grid-template-columns:minmax(0,1fr) auto 94px;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid var(--line)}
+#page-orcamentos .orc-cat-row:last-child{border-bottom:0}
+#page-orcamentos .orc-cat-name{font-size:13px;font-weight:750;color:var(--text)}
+#page-orcamentos .orc-cat-unit{display:flex;padding:2px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+#page-orcamentos .orc-cat-unit button{border:0;border-radius:8px;background:transparent;color:var(--text2);font-size:11px;font-weight:850;padding:7px 9px;cursor:pointer;min-width:31px}
+#page-orcamentos .orc-cat-unit button.active{background:var(--brand);color:var(--brand-ink)}
+#page-orcamentos .orc-cat-unit button:focus-visible{outline:2px solid var(--brand-deep);outline-offset:1px}
+#page-orcamentos .orc-cat-row .input{width:100%;padding:8px 9px;text-align:center;font-size:13px;font-weight:750}
+#page-orcamentos .orc-meta{font-size:12px;color:var(--text2);margin:8px 0 17px}
+#page-orcamentos .orc-card,.orc-preview{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+#page-orcamentos .orc-card h3{font-size:16px;margin:0 0 5px}
+#page-orcamentos .orc-card small,.orc-preview small{color:var(--text2);font-size:12px}
+#page-orcamentos .orc-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+#page-orcamentos .orc-best{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 8px;padding:13px;border-radius:13px;background:color-mix(in srgb,var(--brand) 17%,var(--card))}
+#page-orcamentos .orc-best-badge{display:inline-flex;align-items:center;border-radius:999px;background:var(--brand);color:var(--brand-ink);padding:5px 10px;margin-bottom:8px;font-size:11px;line-height:1;font-weight:850;letter-spacing:.02em;box-shadow:0 3px 10px rgba(35,87,24,.16)}
+#page-orcamentos .orc-best-value{display:flex;align-items:flex-end;flex-direction:column;gap:8px}
+#page-orcamentos .orc-sim-btn{border:1px solid color-mix(in srgb,var(--brand-deep) 35%,transparent);border-radius:11px;background:var(--card);color:var(--text);padding:8px 11px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(20,45,25,.09);transition:transform .18s,box-shadow .18s}
+#page-orcamentos .orc-sim-btn:hover{transform:translateY(-2px);box-shadow:0 8px 17px rgba(20,45,25,.15)}
+#page-orcamentos .orc-sim-btn:focus-visible{outline:2px solid var(--brand-deep);outline-offset:2px}
+#page-orcamentos .orc-best strong{font-size:19px;color:var(--brand-deep);white-space:nowrap}
+#page-simular .sim-source{padding:13px 15px;margin:0 0 12px;border-radius:13px;background:color-mix(in srgb,var(--brand) 15%,var(--card));border:1px solid color-mix(in srgb,var(--brand) 40%,var(--line));font-size:12px;line-height:1.5;color:var(--text)}
+#page-simular .sim-source b{display:block;font-size:13px;margin-bottom:3px}
+#page-simular .sim-source small{display:block;color:var(--text2);font-size:11px;margin-top:4px}
+#page-orcamentos .orc-rank{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:9px 2px;font-size:12px;color:var(--text2)}
+#page-orcamentos .orc-rank b{color:var(--text);font-size:13px}
+#page-orcamentos .orc-diff{opacity:.68;white-space:nowrap;font-size:11px}
+#page-orcamentos .orc-suppliers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:11px;margin-top:12px}
+#page-orcamentos .orc-suppliers .orc-card{margin:0}
+@media(max-width:600px){.tab[data-tab="orcamentos"] span{font-size:8px}}
+.orc-preview{box-shadow:none;margin-top:12px}
+.orc-preview-row{padding:10px 0;border-top:1px solid var(--line);font-size:12px}
+.orc-preview-row:first-child{border-top:0}
+.orc-preview-row b{display:block;font-size:13px}
+.orc-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.orc-actions button{font-size:12px;color:var(--blue);font-weight:700}
+.orc-review{border-radius:12px;background:var(--bg2);padding:12px;font-size:12px;color:var(--text2);line-height:1.5;margin-top:12px;max-height:190px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.orc-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px}
+.orc-edit-grid .input{min-width:0}
+@media(max-width:540px){.orc-edit-grid,.orc-cost-grid,.orc-cost-row{grid-template-columns:1fr}#page-orcamentos .orc-rate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#page-orcamentos .orc-best{align-items:flex-start;flex-direction:column}#page-orcamentos .orc-best-value{align-items:flex-start}}
 body.dark #page-painel .pp-chart .pp-bar-f{fill:#67bf8b}
 body.dark #page-painel .pp-chart .pp-bar-l{fill:#bde778}
 body.dark #page-painel .pp-legend .pp-dot{background:#67bf8b}
@@ -1035,7 +1106,10 @@ html,body{background:#071b12}
   <div id="page-dash" class="page active"></div>
   <div id="page-painel" class="page"></div>
   <div id="page-estoque" class="page"></div>
+  <div id="page-assistencia" class="page"></div>
   <div id="page-venda" class="page"></div>
+  <div id="page-simular" class="page"></div>
+  <div id="page-orcamentos" class="page"></div>
   <div id="page-clientes" class="page"></div>
   <div id="page-relatorios" class="page"></div>
 
@@ -1055,9 +1129,21 @@ html,body{background:#071b12}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5zM3 7v10l9 5 9-5V7M12 12v10"/></svg>
       <span>Estoque</span>
     </button>
+    <button class="tab" data-tab="assistencia" onclick="go('assistencia')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-3 3-3-3 3-3z"/></svg>
+      <span>Assistência</span>
+    </button>
     <button class="tab" data-tab="venda" onclick="go('venda')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 9h18M15 15h3"/></svg>
       <span>Vender</span>
+    </button>
+    <button class="tab" data-tab="simular" onclick="go('simular')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 8h10M8 13h2m4 0h2m-8 4h2m4 0h2"/></svg>
+      <span>Simular</span>
+    </button>
+    <button class="tab" data-tab="orcamentos" onclick="go('orcamentos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5M8 16h4m4-1 1.5 1.5L20 13"/></svg>
+      <span>Orçamentos</span>
     </button>
     <button class="tab" data-tab="clientes" onclick="go('clientes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1H3zm13-14a3 3 0 0 1 0 6m2 2a5 5 0 0 1 3 5v1h-3"/></svg>
@@ -1129,15 +1215,16 @@ let filterEstoque='todos', searchEstoque='';
 let relMesSelecionado=null; // mês escolhido nos relatórios (null = mês atual)
 let painelMes='todos'; // abre o histórico para aproveitar vendas já cadastradas
 let vendaCart={cliente:null, produto:null, produtoId:null, desconto:0, pagamentos:[]};
-let vendaModo='aparelho'; // 'aparelho', 'acessorio' ou 'simulador'
+let vendaModo='aparelho'; // 'aparelho' ou 'acessorio'
 let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
 // Carrinho unificado: aparelhos e acessórios juntos para uma venda só
 // cada item: {tipo:'aparelho'|'acessorio', id, qtd}
 let carrinho=[];
 const MODELOS_IPHONE=['iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12 mini','iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13 mini','iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max','iPhone 16e','iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','iPhone 17e','iPhone 18','iPhone 18 Pro','iPhone 18 Pro Max','iPhone 18 Fold'];
-let simState={parcCred:1, semTroca:false};
+let simState={parcCred:1, semTroca:false, armNovo:'128 GB', armUsado:'128 GB',
+  modNovo:'iPhone 15',modUsado:'iPhone 14',valNovo:'',valUsado:'',valEntrada:''};
+let simOferta=null;
 let catsAbertas={}; // quais categorias de acessório estão expandidas
-let estoqueModo='aparelho'; // 'aparelho' ou 'servico'
 let catsServAbertas={}; // categorias de serviços expandidas
 let carrinhoServ=[]; // serviços selecionados pro orçamento
 let searchServ=''; let tempFotosServ=[]; let catalogoServSel=[];
@@ -1150,9 +1237,10 @@ let dbLoaded=false, savingToCloud=false, cloudVersion=0, renderPendente=false;
 function defaultDB(){
   return {
     users:[{id:uid(),user:'admin',pass:'1234',nome:'Administrador',role:'Administrador'}],
-    produtos:[], acessorios:[], servicos:[], clientes:[], vendas:[], compras:[], logins:[], contas:[], caixa:[], categorias:['Fornecedor','Aluguel','Retirada','Despesa','Salário','Outros'],
+    produtos:[], acessorios:[], servicos:[], fornecedores:[], clientes:[], vendas:[], compras:[], logins:[], contas:[], caixa:[], categorias:['Fornecedor','Aluguel','Retirada','Despesa','Salário','Outros'],
     condPag:{ parcelasCartao:3, descontoDinheiro:5, mostrarPix:true, mostrarCartao:true, mostrarDinheiro:true },
-    taxasCartao:{ debito:1.5, imposto:0, credito:[3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5] }
+    taxasCartao:{ debito:1.5, imposto:0, credito:[3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5] },
+    custoVenda:{ganhoPadrao:null,pixDesconto:0,ganhos:{}}
   };
 }
 function vendasVisiveis(){
@@ -1196,6 +1284,7 @@ function loadDB(){
   try{ raw=localStorage.getItem(DB_KEY); }catch(error){ console.warn('Armazenamento local indisponível:',error); }
   if(raw){ try{ db = JSON.parse(raw); }catch(e){ db=null; } }
   if(!db) db = defaultDB();
+  if(!Array.isArray(db.fornecedores)) db.fornecedores=[];
   if(!db.acessorios) db.acessorios=[]; if(!db.servicos) db.servicos=[]; if(!db.condPag) db.condPag={parcelasCartao:3,descontoDinheiro:5,mostrarPix:true,mostrarCartao:true,mostrarDinheiro:true}; if(!db.taxasCartao) db.taxasCartao={debito:1.5,imposto:0,credito:[3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5]}; if(db.taxasCartao && db.taxasCartao.imposto===undefined) db.taxasCartao.imposto=0; if(!db.logins) db.logins=[]; if(!db.contas) db.contas=[]; if(!db.caixa) db.caixa=[]; if(!db.categorias) db.categorias=["Fornecedor","Aluguel","Retirada","Despesa","Salário","Outros"];
   reconciliarVendidos();
   try{ theme=localStorage.getItem('itronic_theme') || 'light'; }catch(error){ theme='light'; }
@@ -1210,8 +1299,8 @@ function loadDB(){
           try{
             const parsed = JSON.parse(cloud.json);
             // PROTEÇÃO: se a nuvem veio vazia mas eu tenho dados locais, não deixo apagar.
-            const nuvemVazia = (!parsed.produtos||parsed.produtos.length===0) && (!parsed.clientes||parsed.clientes.length===0) && (!parsed.vendas||parsed.vendas.length===0);
-            const localTemDados = db && ((db.produtos&&db.produtos.length)||(db.clientes&&db.clientes.length)||(db.vendas&&db.vendas.length));
+            const nuvemVazia = (!parsed.produtos||parsed.produtos.length===0) && (!parsed.clientes||parsed.clientes.length===0) && (!parsed.vendas||parsed.vendas.length===0) && (!parsed.fornecedores||parsed.fornecedores.length===0);
+            const localTemDados = db && ((db.produtos&&db.produtos.length)||(db.clientes&&db.clientes.length)||(db.vendas&&db.vendas.length)||(db.fornecedores&&db.fornecedores.length));
             if(nuvemVazia && localTemDados && cloudVersion>0){
               // nuvem zerada por engano — reenvia o que tenho em vez de aceitar o vazio
               pushToCloud();
@@ -1222,6 +1311,7 @@ function loadDB(){
             if(v < cloudVersion){ return; }
             cloudVersion = v;
             db = parsed;
+            if(!Array.isArray(db.fornecedores)) db.fornecedores=[];
             if(!db.acessorios) db.acessorios=[]; if(!db.servicos) db.servicos=[]; if(!db.condPag) db.condPag={parcelasCartao:3,descontoDinheiro:5,mostrarPix:true,mostrarCartao:true,mostrarDinheiro:true}; if(!db.taxasCartao) db.taxasCartao={debito:1.5,imposto:0,credito:[3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5]}; if(db.taxasCartao && db.taxasCartao.imposto===undefined) db.taxasCartao.imposto=0; if(!db.logins) db.logins=[]; if(!db.contas) db.contas=[]; if(!db.caixa) db.caixa=[]; if(!db.categorias) db.categorias=["Fornecedor","Aluguel","Retirada","Despesa","Salário","Outros"];
             reconciliarVendidos();
             localStorage.setItem(DB_KEY, JSON.stringify(db));
@@ -1348,12 +1438,13 @@ function updateUserIdentity(){
   el('side-user-role').textContent=(session?.role||'Equipe')+' · iTronic Rio Verde';
 }
 function aplicarPermissoes(){
-  // esconde as abas Painel e Relatórios se o usuário não pode vê-las
+  // Cotações de compra e indicadores financeiros são reservados ao administrador.
   const ver=podeVerPainel();
   document.querySelectorAll('.tab').forEach(t=>{
     if(t.dataset.tab==='painel'||t.dataset.tab==='relatorios'){
       t.style.display = ver ? '' : 'none';
     }
+    if(t.dataset.tab==='orcamentos') t.style.display=podeEditar()?'':'none';
   });
 }
 function logout(){
@@ -1365,7 +1456,7 @@ function logout(){
 }
 
 /* ============ NAVEGAÇÃO ============ */
-const TITLES={dash:'Início',painel:'Painel',estoque:'Estoque',venda:'Vender',clientes:'Clientes',relatorios:'Relatórios'};
+const TITLES={dash:'Início',painel:'Painel',estoque:'Estoque',assistencia:'Assistência',venda:'Vender',simular:'Simular',orcamentos:'Orçamentos',clientes:'Clientes',relatorios:'Relatórios'};
 let currentTab='dash';
 function syncSidebarCutout(){
   const bar=document.querySelector('.tabbar');
@@ -1373,11 +1464,13 @@ function syncSidebarCutout(){
   if(!bar||!active||!active.offsetHeight) return;
   bar.style.setProperty('--nav-gap-top',Math.max(0,active.offsetTop-4)+'px');
   bar.style.setProperty('--nav-gap-height',(active.offsetHeight+8)+'px');
+  if(window.innerWidth<=600) bar.scrollTo({left:active.offsetLeft-(bar.clientWidth-active.clientWidth)/2,behavior:'smooth'});
 }
 window.addEventListener('resize',syncSidebarCutout);
 function go(tab){
-  // bloqueia painel/relatórios pra quem não tem permissão
   if((tab==='painel'||tab==='relatorios') && !podeVerPainel()){ tab='dash'; }
+  if(tab==='orcamentos' && !podeEditar()){ tab='dash'; }
+  if(currentTab==='simular' && tab!=='simular') simOferta=null;
   currentTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   syncSidebarCutout();
@@ -1393,7 +1486,8 @@ function go(tab){
   window.scrollTo(0,0);
 }
 function fabAction(){
-  if(currentTab==='estoque'){ if(estoqueModo==='servico') openNovoServico(); else openProduto(); }
+  if(currentTab==='estoque') openProduto();
+  else if(currentTab==='assistencia') openNovoServico();
   else if(currentTab==='clientes') openCliente();
 }
 const plusIcon=()=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
@@ -1405,7 +1499,10 @@ function render(tab){
   if(tab==='dash') renderDash();
   if(tab==='painel') renderPainel();
   if(tab==='estoque') renderEstoque();
+  if(tab==='assistencia') renderAssistenciaPage();
   if(tab==='venda') renderVenda();
+  if(tab==='simular') renderSimulador();
+  if(tab==='orcamentos') renderOrcamentos();
   if(tab==='clientes') renderClientes();
   if(tab==='relatorios') renderRelatorios();
   atualizarBadgeCarrinho();
@@ -1953,19 +2050,8 @@ function renderEstoque(){
     lista=lista.filter(p=>(p.modelo||'').toLowerCase().includes(q)||(p.imei||'').toLowerCase().includes(q)||(p.serie||'').toLowerCase().includes(q)||(p.marca||'').toLowerCase().includes(q));
   }
 
-  const toggleEstoque=`
-    <div class="module-heading"><div><div class="eyebrow">PRODUTOS E SERVIÇOS</div><h2>Seu estoque, bem à vista.</h2><p>Encontre aparelhos, serviços e o que precisa de atenção.</p></div></div>
-    <div class="module-switch">
-      <button class="btn ${estoqueModo==='aparelho'?'':'secondary'}" style="flex:1" onclick="estoqueModo='aparelho';renderEstoque()">📱 Aparelhos</button>
-      <button class="btn ${estoqueModo==='servico'?'':'secondary'}" style="flex:1" onclick="estoqueModo='servico';renderEstoque()">🔧 Assistência</button>
-    </div>`;
-
-  if(estoqueModo==='servico'){
-    el('page-estoque').innerHTML = toggleEstoque + renderAssistencia();
-    return;
-  }
-
-  el('page-estoque').innerHTML=toggleEstoque+`
+  el('page-estoque').innerHTML=`
+    <div class="module-heading"><div><div class="eyebrow">ESTOQUE</div><h2>Seu estoque, bem à vista.</h2><p>Encontre aparelhos e veja o que precisa de atenção.</p></div></div>
     <div class="module-metrics">
     <div class="grid2" style="margin-bottom:2px">
       <div class="stat"><div class="lbl">${uiIcon('<path d="M3 8h18v12H3zM3 8l3-5h12l3 5M9 12h6"/>')} Investido</div><div class="val sm money-in">${money(invest)}</div></div>
@@ -2012,6 +2098,11 @@ function ordenarModelo(a,b){
 }
 const SERVICOS_PADRAO=['Troca de Tela','Troca de Bateria','Troca de Vidro Traseiro','Troca de Carcaça','Troca de Vidro de Tela','Troca de Câmeras'];
 
+function renderAssistenciaPage(){
+  el('page-assistencia').innerHTML=`
+    <div class="module-heading"><div><div class="eyebrow">ÁREA DE TRABALHO</div><h2>Assistência</h2><p>Cadastre serviços, confira a disponibilidade de peças e monte seu catálogo.</p></div></div>
+    ${renderAssistencia()}`;
+}
 function renderAssistencia(){
   const isAdmin=session&&session.role==='Administrador';
   let servs=db.servicos||[];
@@ -2064,7 +2155,7 @@ function renderAssistencia(){
     <div class="sec-title">Serviços</div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input placeholder="Pesquisar serviço (ex: tela iPhone 13)" value="${searchServ||''}" oninput="searchServ=this.value;renderEstoque();this.focus()">
+      <input placeholder="Pesquisar serviço (ex: tela iPhone 13)" value="${searchServ||''}" oninput="searchServ=this.value;renderAssistenciaPage();el('page-assistencia').querySelector('.search input')?.focus()">
     </div>
     ${lista}
     <div style="height:20px"></div>
@@ -2085,7 +2176,7 @@ function servRow(s,isAdmin){
   </div>`;
 }
 
-function toggleCatServ(cat){ catsServAbertas[cat]=!catsServAbertas[cat]; renderEstoque(); }
+function toggleCatServ(cat){ catsServAbertas[cat]=!catsServAbertas[cat]; renderAssistenciaPage(); }
 function openNovoServico(){ formServico(null); }
 function editarServico(id){ const s=(db.servicos||[]).find(x=>x.id===id); formServico(s); }
 function formServico(s){
@@ -2133,7 +2224,7 @@ function formServico(s){
       dados.fotos=refs;
       if(s){ Object.assign(s,dados); toast('Serviço atualizado'); }
       else { dados.id=uid(); dados.entrada=todayStr(); db.servicos.push(dados); toast('Serviço cadastrado'); }
-      saveDB(); closeSheet(); renderEstoque();
+      saveDB(); closeSheet(); renderAssistenciaPage();
     });
   });
   setTimeout(renderFotosServ,60);
@@ -2141,7 +2232,7 @@ function formServico(s){
     setTimeout(()=>{
       const body=el('sheet-body');
       if(body){ const b=document.createElement('button'); b.className='btn ghost'; b.style.marginTop='10px'; b.style.color='var(--red)'; b.textContent='Excluir serviço';
-        b.onclick=()=>askConfirm('Excluir este serviço?',()=>{ db.servicos=db.servicos.filter(x=>x.id!==s.id); carrinhoServ=carrinhoServ.filter(x=>x!==s.id); saveDB(); closeSheet(); renderEstoque(); toast('Excluído'); });
+        b.onclick=()=>askConfirm('Excluir este serviço?',()=>{ db.servicos=db.servicos.filter(x=>x.id!==s.id); carrinhoServ=carrinhoServ.filter(x=>x!==s.id); saveDB(); closeSheet(); renderAssistenciaPage(); toast('Excluído'); });
         body.appendChild(b);
       }
     },80);
@@ -2313,7 +2404,6 @@ function renderVenda(){
     <div class="module-switch">
       <button class="btn ${vendaModo==='aparelho'?'':'secondary'}" style="flex:1" onclick="vendaModo='aparelho';renderVenda()">📱 Aparelho</button>
       <button class="btn ${vendaModo==='acessorio'?'':'secondary'}" style="flex:1" onclick="vendaModo='acessorio';renderVenda()">🎧 Acessórios</button>
-      <button class="btn ${vendaModo==='simulador'?'':'secondary'}" style="flex:1" onclick="vendaModo='simulador';renderVenda()">🧮 Simular</button>
     </div>`;
 
   const blocoCliente=`
@@ -2329,12 +2419,6 @@ function renderVenda(){
 
   if(vendaModo==='acessorio'){
     el('page-venda').innerHTML = toggle + blocoCliente + renderCarrinhoAcess(isAdmin);
-    return;
-  }
-
-  if(vendaModo==='simulador'){
-    el('page-venda').innerHTML = toggle + renderSimuladorInline();
-    setTimeout(calcSimTroca,50);
     return;
   }
 
@@ -4047,30 +4131,507 @@ function salvarCompra(){
   saveDB(); closeSheet(); toast(compraItens.length+' aparelho(s) no estoque'); render(currentTab);
 }
 
+/* ============ ORÇAMENTOS / LISTAS DE FORNECEDORES ============ */
+let orcBusca='', orcDraft=null, orcListaGerada='', orcAba='comparar', orcCustoBusca='';
+function orcEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function orcNorm(v){
+  return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()
+    .replace(/\b(1[1-9])\s*PM\b/g,'$1 PRO MAX')
+    .replace(/\b(1[1-9])[-–]+(PRO|PLUS|MINI)/g,'$1 $2')
+    .replace(/(\d)(PRO\s*MAX|PROMAX|PRO|PLUS|MINI)\b/g,'$1 $2')
+    .replace(/PRO[\s-]*MAX/g,'PRO MAX').replace(/\s+/g,' ').trim();
+}
+function orcValor(v){
+  let s=String(v||'').replace(/[^\d,.-]/g,'');
+  if(s.includes(',')) s=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,'');
+  const n=Number(s);
+  return Number.isFinite(n)&&n>0?n:0;
+}
+function orcPrecoNaLinha(linha){
+  const rx=/(?:R\$\s*|\$\s*)?(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d{2,6}(?:,\d{1,2})?)(?![\dA-Za-z])/gi;
+  const achados=[]; let m;
+  while((m=rx.exec(linha))){
+    const resto=linha.slice(m.index+m[0].length);
+    if(/^\s*(?:GB|G\b|TB|T\b|W\b|MM\b|UN\b|X\b|%)/i.test(resto)) continue;
+    const explicito=/^\s*(?:R\$|\$)/i.test(m[0]);
+    const valor=orcValor(m[1]);
+    if(!explicito && (valor<30 || [64,128,256,512,1024].includes(valor))) continue;
+    if(valor<1) continue;
+    achados.push({valor,indice:m.index,fim:m.index+m[0].length,explicito});
+  }
+  const comMoeda=achados.filter(a=>a.explicito);
+  if(comMoeda.length>1||achados.filter(a=>a.valor>=300).length>1) return {ambiguo:true};
+  const escolhido=comMoeda[0]||achados[achados.length-1];
+  return escolhido||null;
+}
+const ORC_CORES=[
+  ['TITANIO NATURAL','Titânio natural'],['TITANIO DESERTO','Titânio deserto'],['TITANIO BRANCO','Titânio branco'],['TITANIO PRETO','Titânio preto'],
+  ['DESERT TITANIUM','Titânio deserto'],['NATURAL TITANIUM','Titânio natural'],['SPACE GRAY','Cinza espacial'],
+  ['CINZA ESPACIAL','Cinza espacial'],['MEIA NOITE','Meia-noite'],['STARLIGHT','Estelar'],
+  ['PRETO','Preto'],['BLACK','Preto'],['BRANCO','Branco'],['WHITE','Branco'],['AZUL','Azul'],['BLUE','Azul'],
+  ['VERDE','Verde'],['GREEN','Verde'],['ROSA','Rosa'],['PINK','Rosa'],['ROXO','Roxo'],['PURPLE','Roxo'],
+  ['PRATA','Prata'],['SILVER','Prata'],['DOURADO','Dourado'],['GOLD','Dourado'],['NATURAL','Natural'],
+  ['DESERTO','Deserto'],['AMARELO','Amarelo'],['YELLOW','Amarelo'],['VERMELHO','Vermelho'],['RED','Vermelho'],
+  ['LARANJA','Laranja'],['ORANGE','Laranja']
+];
+function orcCores(texto){
+  let resto=' '+orcNorm(texto)+' ';
+  const cores=[];
+  ORC_CORES.forEach(([termo,nome])=>{
+    const rx=new RegExp('\\b'+termo.replace(/ /g,'\\s+')+'\\b','g');
+    if(rx.test(resto)){cores.push(nome);resto=resto.replace(rx,' ');}
+  });
+  return [...new Set(cores)];
+}
+function orcArmazenamento(texto){
+  const t=orcNorm(texto);
+  const tera=t.match(/\b1\s*(?:TB|T)\b/);
+  if(tera) return '1 TB';
+  const giga=t.match(/\b(64|128|256|512|1024)\s*(?:GB|G)\b/);
+  if(giga) return giga[1]==='1024'?'1 TB':giga[1]+' GB';
+  const semUnidade=t.match(/\b(64|128|256|512|1024)\b/);
+  return semUnidade?(semUnidade[1]==='1024'?'1 TB':semUnidade[1]+' GB'):'';
+}
+function orcCondicao(texto){
+  const t=orcNorm(texto);
+  if(/\b(CPO|SEMINOVOS?|SEMI NOVOS?|USADOS?|VITRINE|RECONDICIONADOS?)\b/.test(t)) return 'Seminovo';
+  if(/\b(NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/.test(t)) return 'Novo';
+  return '';
+}
+function orcModelo(texto){
+  let t=orcNorm(texto);
+  const acessorio=/\b(CAPINHA|CASE|PELICULA|CABO|FONTE|CARREGADOR|SUPORTE)\b/.test(t);
+  if(!acessorio){
+    const m=t.match(/\b(?:IPHONE\s*|IP\s*HONE\s*)?(1[1-9])\s*(PRO\s*MAX|PRO|PLUS|MINI|E\b)?\b/);
+    if(m && (/(?:IPHONE|IP\s*HONE)/.test(t)||/\b(PRO|PLUS|MINI)\b/.test(t)||/^\s*1[1-9]\b/.test(t))){
+      return 'iPhone '+m[1]+(m[2]?' '+m[2].replace(/\s+/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):'');
+    }
+  }
+  t=t.replace(/\b(?:64|128|256|512|1024)\s*(?:GB|G)?\b|\b1\s*(?:TB|T)\b/g,' ')
+    .replace(/\b(CPO|SEMINOVOS?|SEMI NOVOS?|USADOS?|VITRINE|RECONDICIONADOS?|NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/g,' ')
+    .replace(/\b\d+\s*(?:UN|UNIDADES|PCS)\b/g,' ');
+  ORC_CORES.forEach(([termo])=>{t=t.replace(new RegExp('\\b'+termo.replace(/ /g,'\\s+')+'\\b','g'),' ');});
+  t=t.replace(/[✱*#|•:—–\-\/]/g,' ').replace(/[^A-Z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  if(!/[A-Z]{3}/.test(t)) return '';
+  return t.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())
+    .replace(/\bIphone\b/g,'iPhone').replace(/\bIpad\b/g,'iPad').replace(/\bMacbook\b/g,'MacBook')
+    .replace(/\bAirpods\b/g,'AirPods').replace(/\bApple Watch\b/g,'Apple Watch');
+}
+function orcInterpretar(texto){
+  const ofertas=[], pendentes=[];
+  let contexto={modelo:'',armazenamento:'',condicao:''};
+  let condicaoSecao='';
+  String(texto||'').split(/\r?\n/).forEach((original,numero)=>{
+    const linha=original.trim(); if(!linha) return;
+    const preco=orcPrecoNaLinha(linha);
+    if(preco&&preco.ambiguo){pendentes.push({linha:numero+1,texto:linha,motivo:'Mais de um preço na linha'});return;}
+    const semPreco=preco?linha.slice(0,preco.indice)+' '+linha.slice(preco.fim):linha;
+    const modeloEncontrado=orcModelo(semPreco);
+    const mudouModelo=modeloEncontrado&&orcNorm(modeloEncontrado)!==orcNorm(contexto.modelo);
+    const modelo=modeloEncontrado||contexto.modelo;
+    const armazenamento=orcArmazenamento(semPreco)||(mudouModelo?'':contexto.armazenamento);
+    const condicao=orcCondicao(semPreco)||(mudouModelo?condicaoSecao:contexto.condicao)||condicaoSecao||'Não informada';
+    if(!preco){
+      if(!modeloEncontrado&&/^\s*[*#\s]*(?:(?:NOVOS?|LACRADOS?|LACRADAS?|SEMINOVOS?|USADOS?|CPO)\s*)+[*#\s]*$/i.test(orcNorm(semPreco))){
+        condicaoSecao=orcCondicao(semPreco);contexto.condicao=condicaoSecao;return;
+      }
+      if(modeloEncontrado && /\b(IPHONE|IPAD|MACBOOK|AIRPODS|WATCH|GALAXY|SAMSUNG|STARLINK|CAPINHA|CASE|PELICULA|FONTE|CARREGADOR|CABO)\b|\d/i.test(orcNorm(semPreco)))
+        contexto={modelo:modeloEncontrado,armazenamento:orcArmazenamento(semPreco),condicao:orcCondicao(semPreco)||condicaoSecao};
+      else if(/^\s*[*#\s]*(?:64|128|256|512|1024)\s*(?:GB|G)?\s*[*#\s]*$/i.test(orcNorm(semPreco))) contexto.armazenamento=orcArmazenamento(semPreco);
+      else if(/R\$|\b\d[\d.,]*\s*K\b/i.test(linha)) pendentes.push({linha:numero+1,texto:linha,motivo:'Preço não reconhecido'});
+      return;
+    }
+    if(!modelo){pendentes.push({linha:numero+1,texto:linha,motivo:'Produto não identificado'});return;}
+    const cores=orcCores(semPreco);
+    (cores.length?cores:['Não informada']).forEach(cor=>ofertas.push({id:uid(),modelo,armazenamento:armazenamento||'Não informado',
+      condicao,cor,preco:preco.valor,origem:linha}));
+    if(modeloEncontrado) contexto={modelo:modeloEncontrado,armazenamento:orcArmazenamento(semPreco),condicao:orcCondicao(semPreco)||condicaoSecao};
+  });
+  return {ofertas,pendentes};
+}
+function orcAgrupar(busca=''){
+  const termos=orcNorm(busca).replace(/[^A-Z0-9 ]/g,' ').split(/\s+/).filter(Boolean);
+  const grupos=new Map();
+  (db.fornecedores||[]).forEach(f=>{
+    (f.ofertas||[]).forEach(o=>{
+      if(!o.modelo||!(Number(o.preco)>0)) return;
+      const alvo=orcNorm([o.modelo,o.armazenamento,o.condicao,o.cor].join(' ')).replace(/[^A-Z0-9 ]/g,' ');
+      if(!termos.every(t=>alvo.split(/\s+/).some(p=>p.startsWith(t)))) return;
+      const chave=[o.modelo,o.armazenamento||'Não informado',o.condicao||'Não informada'].map(orcNorm).join('|');
+      if(!grupos.has(chave)) grupos.set(chave,{modelo:o.modelo,armazenamento:o.armazenamento||'Não informado',condicao:o.condicao||'Não informada',porFornecedor:new Map()});
+      const g=grupos.get(chave),atual=g.porFornecedor.get(f.id);
+      if(!atual||Number(o.preco)<Number(atual.preco)) g.porFornecedor.set(f.id,{...o,fornecedor:f.nome,fornecedorId:f.id});
+    });
+  });
+  return [...grupos.values()].map(g=>({
+    modelo:g.modelo,armazenamento:g.armazenamento,condicao:g.condicao,
+    ranking:[...g.porFornecedor.values()].sort((a,b)=>Number(a.preco)-Number(b.preco)||a.fornecedor.localeCompare(b.fornecedor,'pt-BR'))
+  })).sort((a,b)=>a.modelo.localeCompare(b.modelo,'pt-BR',{numeric:true})||a.armazenamento.localeCompare(b.armazenamento,'pt-BR',{numeric:true}));
+}
+function orcResultadosHTML(){
+  if(!orcBusca.trim()) return '<div class="empty" style="margin:16px 0">Pesquise um modelo, como “17 Pro Max”, para comparar os fornecedores.</div>';
+  const grupos=orcAgrupar(orcBusca);
+  if(!grupos.length) return '<div class="empty" style="margin:16px 0">Nenhum preço encontrado. Confira a grafia, o armazenamento ou as linhas pendentes das listas.</div>';
+  return `<div class="orc-meta">${grupos.length} opção(ões) encontrada(s) · menor preço por fornecedor em cada modelo, capacidade e condição</div>
+    ${grupos.map((g,indice)=>{
+      const melhor=g.ranking[0];
+      return `<section class="orc-card">
+        <div class="orc-card-head"><div><h3>${orcEsc(g.modelo)} · ${orcEsc(g.armazenamento)}</h3><small>${orcEsc(g.condicao)} · ${g.ranking.length} fornecedor(es)</small></div></div>
+        <div class="orc-best"><div><span class="orc-best-badge">Melhor Valor</span><br><b>${orcEsc(melhor.fornecedor)}</b><br><small>${orcEsc(melhor.cor)}</small></div><div class="orc-best-value"><strong class="money-in">${money(melhor.preco)}</strong><button type="button" class="orc-sim-btn" onclick="orcSimularOferta(${indice})" aria-label="Simular ${orcEsc(g.modelo)} ${orcEsc(g.armazenamento)}">Simular oferta →</button></div></div>
+        ${g.ranking.slice(1).map((o,i)=>`<div class="orc-rank"><div><b>${i+2}º ${orcEsc(o.fornecedor)}</b><br><small>${orcEsc(o.cor)}</small></div><div style="text-align:right"><b class="money-in">${money(o.preco)}</b><br><span class="orc-diff">+ ${money(o.preco-melhor.preco)}</span></div></div>`).join('')}
+      </section>`;
+    }).join('')}`;
+}
+function orcAtualizarResultados(){
+  orcBusca=getV('orc-busca');
+  const alvo=el('orc-resultados'); if(alvo) alvo.innerHTML=orcResultadosHTML();
+}
+function orcSimularOferta(indice){
+  const grupo=orcAgrupar(orcBusca)[indice], melhor=grupo&&grupo.ranking[0];
+  if(!melhor){toast('Oferta não encontrada. Atualize a pesquisa.');return;}
+  simOferta={modelo:grupo.modelo,armazenamento:grupo.armazenamento,fornecedor:melhor.fornecedor,preco:Number(melhor.preco)};
+  simState.modNovo=grupo.modelo;
+  simState.armNovo=['64 GB','128 GB','256 GB','512 GB','1 TB'].includes(grupo.armazenamento)?grupo.armazenamento:'';
+  simState.semTroca=true;
+  simState.valNovo='';simState.valEntrada='';simState.valUsado='';
+  go('simular');
+}
+function orcChaveCusto(grupo){
+  return [grupo.modelo,grupo.armazenamento,grupo.condicao].map(orcNorm).join('|');
+}
+const ORC_CATEGORIAS=[
+  {id:'iphone',nome:'iPhones',icone:'📱',inicial:700},
+  {id:'ipad',nome:'iPads',icone:'📲',inicial:700},
+  {id:'mac',nome:'Macs',icone:'💻',inicial:1000},
+  {id:'watch',nome:'Apple Watch',icone:'⌚',inicial:400},
+  {id:'airpods',nome:'AirPods',icone:'🎧',inicial:200},
+  {id:'acessorios',nome:'Acessórios',icone:'🔌',inicial:150}
+];
+function orcMargemCategoria(cfg,id){
+  if(cfg.categorias!==undefined)return cfg.categorias?.[id];
+  const inicial=ORC_CATEGORIAS.find(c=>c.id===id)?.inicial;
+  return inicial===undefined?null:{tipo:'valor',valor:inicial};
+}
+function orcCategoriaProduto(modelo){
+  const nome=orcNorm(modelo);
+  if(/\bIPHONE\b/.test(nome))return 'iphone';
+  if(/\bIPAD\b/.test(nome))return 'ipad';
+  if(/\b(MACBOOK|IMAC|MAC MINI|MAC STUDIO|MAC PRO|MAC)\b/.test(nome))return 'mac';
+  if(/\bWATCH\b/.test(nome))return 'watch';
+  if(/\b(AIRPODS|AIRPOD)\b/.test(nome))return 'airpods';
+  if(/\b(CAPINHA|CASE|PELICULA|CABO|FONTE|CARREGADOR|ACESSORIO|SUPORTE|PULSEIRA|CANETA|PENCIL)\b/.test(nome))return 'acessorios';
+  return '';
+}
+function orcGanhoProduto(grupo){
+  const cfg=db.custoVenda||{};
+  const ganhos=cfg.ganhos||{};
+  const chave=orcChaveCusto(grupo);
+  if(Object.prototype.hasOwnProperty.call(ganhos,chave))return {valor:Number(ganhos[chave]),origem:'produto'};
+  const categoria=orcCategoriaProduto(grupo.modelo), margem=orcMargemCategoria(cfg,categoria);
+  if(margem&&margem.valor!==null&&margem.valor!==undefined&&margem.valor!==''){
+    const valor=Number(margem.valor), custo=Number(grupo.ranking[0]?.preco)||0;
+    return {valor:margem.tipo==='percentual'?custo*valor/100:valor,origem:categoria,tipo:margem.tipo};
+  }
+  return cfg.ganhoPadrao===null||cfg.ganhoPadrao===undefined||cfg.ganhoPadrao===''?null:{valor:Number(cfg.ganhoPadrao),origem:'padrão'};
+}
+function orcPrecoSugerido(grupo){
+  const margem=orcGanhoProduto(grupo), ganho=margem?.valor, custo=Number(grupo.ranking[0]?.preco);
+  const cfg=db.custoVenda||{}, tx=db.taxasCartao||{};
+  const imposto=Number(tx.imposto)||0, debito=Number(tx.debito)||0, desconto=Number(cfg.pixDesconto)||0;
+  if(!margem||!Number.isFinite(ganho)||ganho<0||!(custo>0)||imposto+debito>=100||imposto>=100||desconto>=100) return null;
+  const arredonda=v=>Math.ceil((v-1e-9)*100)/100;
+  const liquido=custo+ganho;
+  const referencia=arredonda(liquido/((1-imposto/100)*(1-desconto/100)));
+  const pix=arredonda(referencia*(1-desconto/100));
+  const cartao=n=>{
+    const taxa=Number((tx.credito||[])[n-1])||0;
+    return imposto+taxa>=100?null:arredonda(Math.max(referencia,liquido/(1-(imposto+taxa)/100)));
+  };
+  return {custo,ganho,origem:margem.origem,referencia,pix,debito:arredonda(Math.max(referencia,liquido/(1-(imposto+debito)/100))),cartao};
+}
+function orcNumeroCampo(id){
+  let valor=getV(id).replace(/\s|R\$/gi,'');
+  if(!valor)return null;
+  if(valor.includes(','))valor=valor.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(valor))valor=valor.replace(/\./g,'');
+  if(!/^\d+(?:\.\d{1,2})?$/.test(valor))return NaN;
+  return Number(valor);
+}
+function orcCustoProdutosHTML(){
+  const grupos=orcAgrupar(orcCustoBusca), limite=40;
+  if(!grupos.length)return '<div class="empty">Nenhum produto encontrado nas listas. Cadastre uma lista ou altere a busca.</div>';
+  const cfg=db.custoVenda||{}, ganhos=cfg.ganhos||{};
+  return `<div class="orc-meta">${grupos.length} produto(s) encontrado(s)${grupos.length>limite?' · exibindo os primeiros '+limite:''}. O custo vem da oferta mais barata de cada produto.</div>
+    <div class="orc-cost-list">${grupos.slice(0,limite).map((g,i)=>{
+      const chave=orcChaveCusto(g), individual=Object.prototype.hasOwnProperty.call(ganhos,chave)?ganhos[chave]:null;
+      const preco=orcPrecoSugerido(g), melhor=g.ranking[0];
+      const parcelas=[1,3,10,21].map(n=>{const valor=preco?.cartao(n);return valor===null?'':`${n}x: <b>${money(valor)}</b>`}).filter(Boolean).join(' · ');
+      return `<div class="orc-card orc-cost-row"><div><h3>${orcEsc(g.modelo)} · ${orcEsc(g.armazenamento)}</h3><small>${orcEsc(g.condicao)} · custo ${money(melhor.preco)} em ${orcEsc(melhor.fornecedor)}</small>
+        <div class="orc-cost-results">${preco?`Ganho desejado: <b>${money(preco.ganho)}</b> <small>(${preco.origem==='produto'?'individual':preco.origem==='padrão'?'padrão':'categoria'})</small><br>Preço de referência: <b>${money(preco.referencia)}</b> · Pix: <b>${money(preco.pix)}</b><br>Débito: <b>${money(preco.debito)}</b><br>${parcelas}`:'Defina o ganho por categoria, o ganho padrão ou um ganho individual para ver os preços sugeridos.'}</div></div>
+        <div class="orc-cost-field"><label for="orc-gain-${i}">Ganho neste produto (R$)</label><input class="input" id="orc-gain-${i}" type="text" inputmode="decimal" value="${individual===null?'':orcEsc(String(individual).replace('.',','))}" placeholder="Usar categoria"><button class="orc-sim-btn" type="button" onclick="orcSalvarGanho(${i})" style="margin-top:8px">Salvar ganho</button><div class="orc-cost-apply">Deixe vazio para usar a categoria ou o ganho padrão.</div></div></div>`;
+    }).join('')}</div>`;
+}
+function orcRenderProdutosCusto(){const alvo=el('orc-cost-products');if(alvo)alvo.innerHTML=orcCustoProdutosHTML();}
+function orcTrocarUnidadeCategoria(id,tipo){
+  const input=el('orc-cat-'+id),linha=input?.closest('.orc-cat-row');
+  if(!input||!linha||input.dataset.tipo===tipo)return;
+  input.dataset.tipo=tipo;input.value='';input.placeholder=tipo==='percentual'?'Ex.: 15':'Ex.: '+(ORC_CATEGORIAS.find(c=>c.id===id)?.inicial||'700');
+  linha.querySelectorAll('.orc-cat-unit button').forEach(botao=>{
+    const ativo=botao.dataset.tipo===tipo;botao.classList.toggle('active',ativo);botao.setAttribute('aria-pressed',String(ativo));
+  });
+}
+function renderOrcCustoVenda(){
+  const tx=db.taxasCartao||{}, cfg=db.custoVenda||{};
+  const taxa=v=>orcEsc(String(v??0).replace('.',','));
+  return `<p class="orc-cost-intro">Defina quanto deseja ganhar depois do custo, impostos e taxas. O desconto Pix entra no cálculo do preço de referência. As taxas de cartão são as mesmas da aba Simular.</p>
+    <div class="orc-card"><div class="orc-cost-title">Condições da venda</div><div class="orc-cost-grid">
+      <div class="orc-cost-field"><label for="orc-imposto">Impostos sobre a venda (%)</label><input class="input" id="orc-imposto" type="text" inputmode="decimal" value="${taxa(tx.imposto)}" placeholder="0"><small>Percentual total descontado do valor recebido.</small></div>
+      <div class="orc-cost-field"><label for="orc-debito">Taxa da maquininha no débito (%)</label><input class="input" id="orc-debito" type="text" inputmode="decimal" value="${taxa(tx.debito)}" placeholder="0"></div>
+      <div class="orc-cost-field"><label for="orc-pix-desc">Desconto à vista no Pix (%)</label><input class="input" id="orc-pix-desc" type="text" inputmode="decimal" value="${taxa(cfg.pixDesconto)}" placeholder="0"></div>
+      <div class="orc-cost-field"><label for="orc-ganho-padrao">Ganho padrão para outras categorias (R$)</label><input class="input" id="orc-ganho-padrao" type="text" inputmode="decimal" value="${cfg.ganhoPadrao===null||cfg.ganhoPadrao===undefined?'':orcEsc(String(cfg.ganhoPadrao).replace('.',','))}" placeholder="Opcional"><small>Usado quando a categoria e o produto não têm ganho definido.</small></div>
+    </div><details class="orc-cost-rates"><summary>Taxas da maquininha no crédito · 1x a 21x</summary><div class="orc-rate-grid">${Array.from({length:21},(_,i)=>`<div class="orc-cost-field"><label for="orc-cred-${i}">${i+1}x (%)</label><input class="input" id="orc-cred-${i}" type="text" inputmode="decimal" value="${taxa(tx.credito?.[i])}" placeholder="0"></div>`).join('')}</div></details>
+    </div>
+    <div class="orc-card"><div class="orc-category-head"><h3>Margem por categoria</h3><span>Quanto você quer ganhar em cada tipo de produto</span></div>
+    ${ORC_CATEGORIAS.map(c=>{const salvo=orcMargemCategoria(cfg,c.id)||{};const tipo=salvo.tipo==='percentual'?'percentual':'valor';
+      return `<div class="orc-cat-row"><label class="orc-cat-name" for="orc-cat-${c.id}">${c.icone} ${c.nome}</label><div class="orc-cat-unit" role="group" aria-label="Unidade da margem de ${c.nome}"><button type="button" data-tipo="valor" class="${tipo==='valor'?'active':''}" aria-pressed="${tipo==='valor'}" onclick="orcTrocarUnidadeCategoria('${c.id}','valor')">R$</button><button type="button" data-tipo="percentual" class="${tipo==='percentual'?'active':''}" aria-pressed="${tipo==='percentual'}" onclick="orcTrocarUnidadeCategoria('${c.id}','percentual')">%</button></div><input class="input" id="orc-cat-${c.id}" type="text" inputmode="decimal" data-tipo="${tipo}" value="${salvo.valor===null||salvo.valor===undefined?'':orcEsc(String(salvo.valor).replace('.',','))}" placeholder="Ex.: ${tipo==='valor'?c.inicial:'15'}"></div>`;
+    }).join('')}
+    <p class="orc-cost-intro" style="margin:12px 0 0">Valores iniciais conforme sua referência; ajuste e salve. Em %, o ganho é calculado sobre o custo do fornecedor. Deixe uma categoria vazia para usar o ganho padrão.</p>
+    <button class="btn" type="button" style="max-width:240px;margin-top:13px" onclick="orcSalvarCustoVenda()">Salvar condições e margens</button></div>
+    <div class="sec-title">Ajustes por produto</div><p class="orc-cost-intro">O ganho individual prevalece sobre a categoria. Os preços são estimativas com base na oferta mais barata.</p>
+    <input class="input orc-search" id="orc-cost-search" type="search" placeholder="Buscar produto, como 17 Pro Max 512" value="${orcEsc(orcCustoBusca)}" oninput="orcCustoBusca=this.value;orcRenderProdutosCusto()" aria-label="Buscar produto para definir ganho">
+    <div id="orc-cost-products">${orcCustoProdutosHTML()}</div>`;
+}
+function orcSalvarCustoVenda(){
+  if(!podeEditar())return;
+  const imposto=orcNumeroCampo('orc-imposto'),debito=orcNumeroCampo('orc-debito');
+  const pixDesconto=orcNumeroCampo('orc-pix-desc'),ganhoPadrao=orcNumeroCampo('orc-ganho-padrao');
+  const credito=Array.from({length:21},(_,i)=>orcNumeroCampo('orc-cred-'+i));
+  const categorias={};let categoriaInvalida=false;
+  ORC_CATEGORIAS.forEach(c=>{
+    const input=el('orc-cat-'+c.id),valor=orcNumeroCampo('orc-cat-'+c.id);
+    if(valor!==null){
+      if(!Number.isFinite(valor)||valor<0)categoriaInvalida=true;
+      else categorias[c.id]={tipo:input?.dataset.tipo==='percentual'?'percentual':'valor',valor};
+    }
+  });
+  const taxas=[imposto,debito,pixDesconto,...credito];
+  if(taxas.some(n=>n===null||!Number.isFinite(n)||n<0||n>=100)||ganhoPadrao!==null&&(!Number.isFinite(ganhoPadrao)||ganhoPadrao<0)||categoriaInvalida){
+    toast('Confira os valores: taxas e desconto entre 0 e 99,99%; margens iguais ou maiores que zero.');return;
+  }
+  if([debito,...credito].some(taxa=>imposto+taxa>=100)){
+    toast('A soma do imposto com cada taxa da maquininha precisa ser menor que 100%.');return;
+  }
+  const anteriorTx=db.taxasCartao,anteriorCfg=db.custoVenda;
+  db.taxasCartao={...anteriorTx,imposto,debito,credito};
+  db.custoVenda={...anteriorCfg,ganhoPadrao,pixDesconto,categorias,ganhos:{...(anteriorCfg?.ganhos||{})}};
+  if(JSON.stringify(db).length>1048000){db.taxasCartao=anteriorTx;db.custoVenda=anteriorCfg;toast('Base perto do limite da nuvem. Libere espaço antes de salvar.');return;}
+  try{saveDB();renderOrcamentos();toast('Condições da venda salvas');}
+  catch(e){db.taxasCartao=anteriorTx;db.custoVenda=anteriorCfg;toast('Não foi possível salvar as condições');}
+}
+function orcSalvarGanho(indice){
+  if(!podeEditar())return;
+  const grupo=orcAgrupar(orcCustoBusca)[indice];if(!grupo)return;
+  const ganho=orcNumeroCampo('orc-gain-'+indice);
+  if(ganho!==null&&(!Number.isFinite(ganho)||ganho<0)){toast('Informe um ganho válido, igual ou maior que zero.');return;}
+  const anterior=db.custoVenda;
+  const cfg=anterior||{ganhoPadrao:null,pixDesconto:0,ganhos:{}};
+  const ganhos={...(cfg.ganhos||{})};
+  if(ganho===null)delete ganhos[orcChaveCusto(grupo)];else ganhos[orcChaveCusto(grupo)]=ganho;
+  db.custoVenda={...cfg,ganhos};
+  if(JSON.stringify(db).length>1048000){db.custoVenda=anterior;toast('Base perto do limite da nuvem. Libere espaço antes de salvar.');return;}
+  try{saveDB();orcRenderProdutosCusto();toast('Ganho do produto salvo');}
+  catch(e){db.custoVenda=anterior;toast('Não foi possível salvar o ganho');}
+}
+function orcAbrirAba(aba){orcAba=aba==='custo'?'custo':'comparar';renderOrcamentos();}
+function renderOrcamentos(){
+  if(!podeEditar()){ go('dash'); return; }
+  const fornecedores=db.fornecedores||[];
+  const qtd=fornecedores.reduce((n,f)=>n+(f.ofertas||[]).length,0);
+  el('page-orcamentos').innerHTML=`
+    <div class="module-heading"><div><div class="eyebrow">ÁREA DE TRABALHO</div><h2>Orçamentos</h2><p>Compare fornecedores e planeje o preço de venda.</p></div></div>
+    <div class="orc-tabs" role="tablist" aria-label="Seções de Orçamentos"><button type="button" role="tab" aria-selected="${orcAba==='comparar'}" class="${orcAba==='comparar'?'active':''}" onclick="orcAbrirAba('comparar')">Fornecedores</button><button type="button" role="tab" aria-selected="${orcAba==='custo'}" class="${orcAba==='custo'?'active':''}" onclick="orcAbrirAba('custo')">Custo da Venda</button></div>
+    ${orcAba==='custo'?renderOrcCustoVenda():`
+    <div class="orc-toolbar"><button class="btn" onclick="orcAbrirFornecedor()">+ Criar lista de fornecedor</button><button class="btn secondary" onclick="orcGerarLista()">Gerar lista</button></div>
+    <div class="orc-meta">${fornecedores.length} fornecedor(es) · ${qtd} oferta(s) reconhecida(s). Os preços não são atualizados automaticamente; substitua as listas quando receber novas cotações.</div>
+    <div class="sec-title">Comparar preços</div>
+    <input class="input orc-search" id="orc-busca" type="search" placeholder="Buscar: 17 Pro Max, 256 GB, preto..." value="${orcEsc(orcBusca)}" oninput="orcAtualizarResultados()" aria-label="Pesquisar produtos nas listas">
+    <div id="orc-resultados">${orcResultadosHTML()}</div>
+    <div class="sec-title">Listas cadastradas</div>
+    <div class="orc-suppliers">${fornecedores.length?fornecedores.map(f=>`<div class="orc-card">
+      <h3>${orcEsc(f.nome)}</h3><small>${(f.ofertas||[]).length} oferta(s) · ${(f.pendentes||[]).length} linha(s) para revisar · ${orcEsc(f.atualizado||'')}</small>
+      <div class="orc-actions"><button onclick="orcAbrirFornecedor('${f.id}')">Abrir e editar lista</button><button onclick="orcRemoverFornecedor('${f.id}')" style="color:var(--red)">Remover</button></div>
+    </div>`).join(''):'<div class="empty">Cadastre a primeira lista para começar a comparação.</div>'}</div>`}
+    <div style="height:25px"></div>`;
+}
+function orcAbrirFornecedor(id){
+  if(!podeEditar()){ toast('Somente o administrador pode alterar fornecedores'); return; }
+  const f=(db.fornecedores||[]).find(x=>x.id===id);
+  orcDraft={id:f?f.id:uid(),nome:f?f.nome:'',raw:f?f.raw:'',
+    ofertas:f?(f.ofertas||[]).map(o=>({...o})):[],pendentes:f?(f.pendentes||[]).map(p=>({...p})):[],editando:-1};
+  const html=`
+    ${fld('Nome do fornecedor','orc-nome',{val:orcDraft.nome,ph:'ex: Distribuidora Alfa'})}
+    <div class="field"><label>Lista recebida (texto)</label><textarea class="input" id="orc-raw" rows="9" placeholder="Cole a lista do WhatsApp aqui, com modelo, capacidade, cor e preço.">${orcEsc(orcDraft.raw)}</textarea></div>
+    <input type="file" id="orc-arquivo" accept=".txt,.csv,text/plain,text/csv" style="display:none" onchange="orcLerArquivo(event)">
+    <div class="orc-actions"><button onclick="el('orc-arquivo').click()">Importar TXT/CSV</button><button onclick="orcInterpretarDraft()">Interpretar lista</button></div>
+    <div style="color:var(--text2);font-size:12px;line-height:1.45;margin-top:12px">Cada fornecedor fica separado. Confira a prévia antes de salvar: linhas incertas não entram na comparação. Se alterar o texto, interprete novamente; isso substitui correções anteriores.</div>
+    <div id="orc-preview"></div>`;
+  openSheet(f?'Editar lista do fornecedor':'Criar lista de fornecedor',html,'Salvar lista',orcSalvarFornecedor);
+  orcRenderPreview();
+}
+function orcLerArquivo(e){
+  const file=e.target.files&&e.target.files[0]; if(!file) return;
+  if(file.size>250000){ toast('Arquivo grande demais. Use uma lista de até 250 KB.'); return; }
+  const reader=new FileReader();
+  reader.onload=()=>{ el('orc-raw').value=String(reader.result||''); toast('Arquivo carregado. Clique em Interpretar lista.'); };
+  reader.onerror=()=>toast('Não foi possível ler o arquivo');
+  reader.readAsText(file,'UTF-8');
+}
+function orcInterpretarDraft(){
+  if(!orcDraft) return;
+  orcDraft.nome=getV('orc-nome'); orcDraft.raw=getV('orc-raw');
+  const result=orcInterpretar(orcDraft.raw);
+  orcDraft.ofertas=result.ofertas;orcDraft.pendentes=result.pendentes;orcDraft.editando=-1;
+  orcRenderPreview();
+  toast(result.ofertas.length+' oferta(s) reconhecida(s) · '+result.pendentes.length+' linha(s) para revisar');
+}
+function orcRenderPreview(){
+  const alvo=el('orc-preview'); if(!alvo||!orcDraft) return;
+  const ofertas=orcDraft.ofertas||[],pendentes=orcDraft.pendentes||[];
+  const editor=(o,i)=>`<div class="orc-edit-grid">
+    ${fld('Produto','orc-ed-modelo',{val:o.modelo,ph:'iPhone 17 Pro Max'})}
+    ${fld('Capacidade','orc-ed-arm',{val:o.armazenamento,ph:'256 GB ou Não informado'})}
+    ${fld('Condição','orc-ed-cond',{val:o.condicao,ph:'Novo, Seminovo ou Não informada'})}
+    ${fld('Cor','orc-ed-cor',{val:o.cor,ph:'Preto ou Não informada'})}
+    ${fld('Preço (R$)','orc-ed-preco',{val:o.preco||'',ph:'7.490,00',inputmode:'decimal'})}
+    </div><div class="orc-actions"><button onclick="orcSalvarCorrecao(${i})">Aplicar correção</button><button onclick="orcDraft.editando=-1;orcRenderPreview()">Cancelar</button></div>`;
+  alvo.innerHTML=`<div class="orc-preview"><b>Prévia padronizada</b><br><small>${ofertas.length} oferta(s) · ${pendentes.length} linha(s) em revisão. Preços e dados corrigidos aqui serão usados na busca.</small>
+    <div class="orc-actions"><button onclick="orcAdicionarManual()">+ Adicionar oferta manualmente</button></div>
+    ${ofertas.map((o,i)=>`<div class="orc-preview-row"><b>${orcEsc(o.modelo||'Preencha o produto')} · ${orcEsc(o.armazenamento||'Não informado')}</b>
+      <small>${orcEsc(o.cor||'Não informada')} · ${orcEsc(o.condicao||'Não informada')} · ${money(o.preco||0)}</small>
+      ${orcDraft.editando===i?editor(o,i):`<div class="orc-actions"><button onclick="orcDraft.editando=${i};orcRenderPreview()">Corrigir</button><button onclick="orcExcluirOferta(${i})" style="color:var(--red)">Excluir oferta</button></div>`}
+    </div>`).join('')}
+    ${pendentes.length?`<div class="orc-review"><b>Linhas para revisar (fora da comparação):</b>${pendentes.map((p,i)=>`<div style="margin-top:9px">Linha ${p.linha}: ${orcEsc(p.texto)}<br><small>${orcEsc(p.motivo)}</small><br><button onclick="orcAdicionarPendente(${i})" style="color:var(--blue);font-weight:700">Corrigir e adicionar</button></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function orcAdicionarPendente(i){
+  const p=orcDraft&&orcDraft.pendentes.splice(i,1)[0]; if(!p) return;
+  orcDraft.ofertas.push({id:uid(),modelo:'',armazenamento:'Não informado',condicao:'Não informada',cor:'Não informada',preco:0,origem:p.texto});
+  orcDraft.editando=orcDraft.ofertas.length-1;orcRenderPreview();
+}
+function orcAdicionarManual(){
+  if(!orcDraft)return;
+  orcDraft.ofertas.push({id:uid(),modelo:'',armazenamento:'Não informado',condicao:'Não informada',cor:'Não informada',preco:0,origem:'Adicionada manualmente'});
+  orcDraft.editando=orcDraft.ofertas.length-1;orcRenderPreview();
+}
+function orcSalvarCorrecao(i){
+  const o=orcDraft&&orcDraft.ofertas[i];if(!o)return;
+  const modelo=getV('orc-ed-modelo'),preco=orcValor(getV('orc-ed-preco'));
+  if(!modelo||!preco){toast('Informe produto e preço válido');return;}
+  Object.assign(o,{modelo,armazenamento:getV('orc-ed-arm')||'Não informado',condicao:getV('orc-ed-cond')||'Não informada',cor:getV('orc-ed-cor')||'Não informada',preco});
+  orcDraft.editando=-1;orcRenderPreview();
+}
+function orcExcluirOferta(i){if(!orcDraft)return;orcDraft.ofertas.splice(i,1);orcDraft.editando=-1;orcRenderPreview();}
+function orcGravarFornecedores(novos){
+  const anterior=db.fornecedores||[];
+  db.fornecedores=novos;
+  if(JSON.stringify(db).length>1048000){db.fornecedores=anterior;toast('Base perto do limite da nuvem. Remova listas antigas antes de salvar.');return false;}
+  try{saveDB();return true;}
+  catch(e){db.fornecedores=anterior;toast('Não foi possível salvar as listas neste dispositivo');return false;}
+}
+function orcSalvarFornecedor(){
+  if(!podeEditar()||!orcDraft)return;
+  const nome=getV('orc-nome'),raw=getV('orc-raw');
+  if(!nome){toast('Informe o nome do fornecedor');return;}
+  if(!raw){toast('Cole ou importe uma lista');return;}
+  if(raw!==orcDraft.raw){toast('Clique em Interpretar lista antes de salvar o texto alterado');return;}
+  if(!orcDraft.ofertas.length){toast('Nenhuma oferta válida. Revise as linhas e interprete novamente.');return;}
+  if(orcDraft.editando>=0){toast('Aplique a correção aberta antes de salvar');return;}
+  if(orcDraft.ofertas.some(o=>!o.modelo||!(Number(o.preco)>0))){toast('Corrija ou exclua as ofertas sem produto/preço');return;}
+  const atuais=db.fornecedores||[];
+  if(atuais.some(f=>f.id!==orcDraft.id&&orcNorm(f.nome)===orcNorm(nome))){toast('Já existe uma lista com este nome. Abra-a para atualizar.');return;}
+  const registro={id:orcDraft.id,nome,raw,ofertas:orcDraft.ofertas.map(o=>({...o})),pendentes:orcDraft.pendentes.map(p=>({...p})),atualizado:todayStr()};
+  const novos=atuais.some(f=>f.id===registro.id)?atuais.map(f=>f.id===registro.id?registro:f):[...atuais,registro];
+  if(!orcGravarFornecedores(novos))return;
+  orcDraft=null;closeSheet();renderOrcamentos();toast('Lista de '+nome+' salva');
+}
+function orcRemoverFornecedor(id){
+  if(!podeEditar())return;
+  const f=(db.fornecedores||[]).find(x=>x.id===id);if(!f)return;
+  askConfirm('Remover a lista de '+f.nome+' e todos os preços dela?',()=>{
+    if(orcGravarFornecedores(db.fornecedores.filter(x=>x.id!==id))){renderOrcamentos();toast('Lista removida');}
+  });
+}
+function orcGerarLista(){
+  if(!podeEditar())return;
+  const grupos=orcAgrupar(orcBusca);
+  if(!grupos.length){toast('Cadastre ofertas ou limpe a busca para gerar a lista');return;}
+  const escopo=orcBusca.trim()?'Busca: '+orcBusca.trim():'Todos os produtos';
+  orcListaGerada=['ITRONIC RIO VERDE — MELHORES PREÇOS','Gerada em '+new Date().toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}),escopo,'',
+    ...grupos.map(g=>`${g.modelo} · ${g.armazenamento} · ${g.condicao}\n${money(g.ranking[0].preco)} — ${g.ranking[0].fornecedor} (${g.ranking[0].cor})`),'',
+    'Confira disponibilidade e preço com o fornecedor antes da compra.'].join('\n');
+  openSheet('Lista de melhores fornecedores',`
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">${grupos.length} produto(s). ${orcBusca.trim()?'Inclui apenas a busca atual.':'Inclui todas as ofertas reconhecidas.'}</div>
+    <textarea class="input" rows="17" readonly style="white-space:pre-wrap">${orcEsc(orcListaGerada)}</textarea>
+    <button class="btn" onclick="orcCopiarLista()" style="margin-top:12px">Copiar lista</button>
+    <button class="btn secondary" onclick="orcBaixarLista()" style="margin-top:8px">Baixar TXT</button>`);
+}
+function orcCopiarLista(){
+  const done=()=>toast('Lista copiada');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(orcListaGerada).then(done).catch(()=>copiarFallback(orcListaGerada,done));
+  else copiarFallback(orcListaGerada,done);
+}
+function orcBaixarLista(){
+  const blob=new Blob(['\uFEFF',orcListaGerada],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='itronic-melhores-fornecedores-'+todayStr()+'.txt';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 /* ============ SIMULADOR ============ */
-function openSimulador(){ closeSheet(); vendaModo='simulador'; go('venda'); }
+function openSimulador(){ closeSheet(); go('simular'); }
+function renderSimulador(){
+  el('page-simular').innerHTML=`
+    <div class="sim-shell">
+      <div class="module-heading"><div><div class="eyebrow">ÁREA DE TRABALHO</div><h2>Simular venda</h2><p>Compare valores com ou sem aparelho na troca e prepare um orçamento.</p></div></div>
+      ${renderSimuladorInline()}
+    </div>`;
+  calcSimTroca();
+}
 function renderSimuladorInline(){
-  const opt=(sel)=>MODELOS_IPHONE.map(m=>`<option value="${m}" ${m===sel?'selected':''}>${m}</option>`).join('');
+  const opt=(sel)=>[...new Set([...MODELOS_IPHONE,sel].filter(Boolean))].map(m=>`<option value="${orcEsc(m)}" ${m===sel?'selected':''}>${orcEsc(m)}</option>`).join('');
+  const capacidades=['64 GB','128 GB','256 GB','512 GB','1 TB'];
+  const opArmazenamento=(selecionado)=>`${selecionado?'':'<option value="" selected>Selecionar armazenamento</option>'}${capacidades.map(c=>`<option value="${c}" ${c===selecionado?'selected':''}>${c}</option>`).join('')}`;
+  const attr=v=>String(v||'').replace(/[&"<>]/g,c=>({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'}[c]));
   return `
+    ${simOferta?`<div class="sim-source"><b>Oferta selecionada: ${orcEsc(simOferta.modelo)} · ${orcEsc(simOferta.armazenamento)}</b>Cotação de ${orcEsc(simOferta.fornecedor)}: <strong>${money(simOferta.preco)}</strong><small>Este é o custo do fornecedor. Informe abaixo o preço de venda ao cliente para calcular a simulação.</small></div>`:''}
     <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="btn ${simState.semTroca?'secondary':''}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=false;renderVenda()">🔄 Com troca</button>
-      <button class="btn ${simState.semTroca?'':'secondary'}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=true;renderVenda()">📱 Só o aparelho</button>
+      <button class="btn ${simState.semTroca?'secondary':''}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=false;renderSimulador()">🔄 Com troca</button>
+      <button class="btn ${simState.semTroca?'':'secondary'}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=true;renderSimulador()">📱 Só o aparelho</button>
     </div>
 
     <div class="sim-card">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px">📲 iPhone novo <span style="color:var(--text2);font-weight:400;font-size:13px">(que o cliente leva)</span></div>
-      <select class="input" id="sim-mod-novo">${opt('iPhone 15')}</select>
-      <input class="input" id="sim-val-novo" type="text" inputmode="decimal" placeholder="Valor do novo (R$)" oninput="calcSimTroca()" style="margin-top:10px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px">📲 Aparelho novo <span style="color:var(--text2);font-weight:400;font-size:13px">(que o cliente leva)</span></div>
+      <select class="input" id="sim-mod-novo" onchange="simState.modNovo=this.value;simOferta=null;document.querySelector('#page-simular .sim-source')?.remove()">${opt(simState.modNovo)}</select>
+      <label class="mini-lbl" for="sim-arm-novo" style="display:block;margin:12px 0 7px">Armazenamento</label>
+      <select class="input" id="sim-arm-novo" onchange="simState.armNovo=this.value;simOferta=null;document.querySelector('#page-simular .sim-source')?.remove()">${opArmazenamento(simState.armNovo)}</select>
+      <input class="input" id="sim-val-novo" type="text" inputmode="decimal" placeholder="Valor do novo (R$)" value="${attr(simState.valNovo)}" oninput="simState.valNovo=this.value;calcSimTroca()" style="margin-top:10px">
+      <label class="mini-lbl" for="sim-val-entrada" style="display:block;margin:12px 0 7px">Entrada em dinheiro ou Pix</label>
+      <input class="input" id="sim-val-entrada" type="text" inputmode="decimal" placeholder="Valor da entrada (R$)" value="${attr(simState.valEntrada)}" oninput="simState.valEntrada=this.value;calcSimTroca()">
     </div>
 
     ${simState.semTroca?'':`<div class="sim-card">
-      <div style="font-weight:700;font-size:15px;margin-bottom:12px">🔄 iPhone usado <span style="color:var(--text2);font-weight:400;font-size:13px">(entra na troca)</span></div>
-      <select class="input" id="sim-mod-usado">${opt('iPhone 14')}</select>
-      <input class="input" id="sim-val-usado" type="text" inputmode="decimal" placeholder="Valor que você paga no usado (R$)" oninput="calcSimTroca()" style="margin-top:10px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:12px">🔄 Aparelho usado <span style="color:var(--text2);font-weight:400;font-size:13px">(entra na troca)</span></div>
+      <select class="input" id="sim-mod-usado" onchange="simState.modUsado=this.value">${opt(simState.modUsado)}</select>
+      <label class="mini-lbl" for="sim-arm-usado" style="display:block;margin:12px 0 7px">Armazenamento</label>
+      <select class="input" id="sim-arm-usado" onchange="simState.armUsado=this.value">${opArmazenamento(simState.armUsado)}</select>
+      <input class="input" id="sim-val-usado" type="text" inputmode="decimal" placeholder="Valor que você paga no usado (R$)" value="${attr(simState.valUsado)}" oninput="simState.valUsado=this.value;calcSimTroca()" style="margin-top:10px">
     </div>`}
 
     <div class="sim-difer-box">
-      <span class="k">${simState.semTroca?'Valor a pagar':'Diferença a pagar'}</span>
+      <span class="k">Saldo após a entrada</span>
       <span class="v" id="sim-difer">R$ 0,00</span>
     </div>
 
@@ -4087,26 +4648,42 @@ function renderSimuladorInline(){
     <div style="height:20px"></div>
   `;
 }
+function valorSim(id){
+  let texto=String(getV(id)||'').replace(/[^\d,.-]/g,'');
+  if(texto.includes(',')) texto=texto.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(texto)) texto=texto.replace(/\./g,'');
+  const valor=Number(texto);
+  return Number.isFinite(valor)?Math.max(0,valor):0;
+}
+function valoresSimTroca(){
+  const novo=valorSim('sim-val-novo');
+  const usado=simState.semTroca?0:valorSim('sim-val-usado');
+  const entrada=valorSim('sim-val-entrada');
+  const antesEntrada=Math.max(0,novo-usado);
+  return {novo,usado,entrada,saldo:Math.max(0,antesEntrada-entrada),entradaExcedente:entrada>antesEntrada};
+}
 function calcSimTroca(){
-  const vNovo=parseFloat(String(getV('sim-val-novo')).replace(',','.'))||0;
-  const vUsado=simState.semTroca?0:(parseFloat(String(getV('sim-val-usado')).replace(',','.'))||0);
-  const difer=Math.max(0,vNovo-vUsado);
-  const eldif=el('sim-difer'); if(eldif) eldif.textContent=money(difer);
+  const {saldo,entradaExcedente}=valoresSimTroca();
+  const eldif=el('sim-difer'); if(eldif) eldif.textContent=money(saldo);
+  const out=el('sim-out');
+  if(entradaExcedente){
+    if(out) out.innerHTML='<div class="sim-alert" role="alert">A entrada não pode ser maior que o valor restante da compra. Ajuste o valor para continuar.</div>';
+    return;
+  }
   const tx=db.taxasCartao||{debito:1.5,imposto:0,credito:[]};
   const imposto=Number(tx.imposto)||0;
   const parc=simState.parcCred||1;
   // taxa + imposto repassados pro cliente: valor / (1 - (taxa+imposto)%)
   const comTaxa=(base,taxa)=>{ const t=taxa+imposto; return t>0 ? base/(1-t/100) : base; };
   const taxaCred=(tx.credito&&tx.credito[parc-1])||0;
-  const vDebito=comTaxa(difer,tx.debito);
-  const vCredito=comTaxa(difer,taxaCred);
-  const out=el('sim-out');
+  const vDebito=comTaxa(saldo,tx.debito);
+  const vCredito=comTaxa(saldo,taxaCred);
   if(out){
     out.innerHTML=`
       <div class="pay-opt pay-pix">
         <div class="pay-ico">💠</div>
         <div class="pay-mid"><div class="pay-nome">À vista no Pix</div><div class="pay-sub">Sem taxa</div></div>
-        <div class="pay-val">${money(difer)}</div>
+        <div class="pay-val">${money(saldo)}</div>
       </div>
       <div class="pay-opt pay-deb">
         <div class="pay-ico">💳</div>
@@ -4123,32 +4700,31 @@ function calcSimTroca(){
 }
 function textoSimTroca(){
   const semTroca=simState.semTroca;
-  const vNovo=parseFloat(String(getV('sim-val-novo')).replace(',','.'))||0;
-  const vUsado=semTroca?0:(parseFloat(String(getV('sim-val-usado')).replace(',','.'))||0);
+  const {novo:vNovo,usado:vUsado,entrada,saldo,entradaExcedente}=valoresSimTroca();
+  if(entradaExcedente) return '';
   const modNovo=getV('sim-mod-novo'), modUsado=semTroca?'':getV('sim-mod-usado');
-  const difer=Math.max(0,vNovo-vUsado);
+  const armNovo=getV('sim-arm-novo')||simState.armNovo;
+  const armUsado=semTroca?'':(getV('sim-arm-usado')||simState.armUsado);
   const tx=db.taxasCartao||{debito:1.5,imposto:0,credito:[]};
   const imposto=Number(tx.imposto)||0;
   const parc=simState.parcCred||1;
   const comTaxa=(base,taxa)=>{ const t=taxa+imposto; return t>0 ? base/(1-t/100) : base; };
   const taxaCred=(tx.credito&&tx.credito[parc-1])||0;
-  const vDebito=comTaxa(difer,tx.debito);
-  const vCredito=comTaxa(difer,taxaCred);
+  const vDebito=comTaxa(saldo,tx.debito);
+  const vCredito=comTaxa(saldo,taxaCred);
   const L=[];
   L.push('📱 *'+(semTroca?'Orçamento':'Proposta de troca')+' — iTronic Rio Verde*');
   L.push('');
-  L.push((semTroca?'Aparelho: *':'Novo: *')+modNovo+'* — '+money(vNovo));
+  L.push((semTroca?'Aparelho: *':'Novo: *')+[modNovo,armNovo].filter(Boolean).join(' ')+'* — '+money(vNovo));
   if(!semTroca){
-    L.push('Seu usado: '+modUsado+' — '+money(vUsado));
-    L.push('');
-    L.push('*Diferença a pagar: '+money(difer)+'*');
-  }else{
-    L.push('');
-    L.push('*Valor a pagar: '+money(difer)+'*');
+    L.push('Seu usado: '+[modUsado,armUsado].filter(Boolean).join(' ')+' — '+money(vUsado));
   }
+  if(entrada>0) L.push('Entrada em dinheiro ou Pix: '+money(entrada));
   L.push('');
-  L.push('*Formas de pagamento:*');
-  L.push('💠 À vista Pix: '+money(difer));
+  L.push('*Saldo a pagar: '+money(saldo)+'*');
+  L.push('');
+  L.push('*Formas de pagamento do saldo:*');
+  L.push('💠 À vista Pix: '+money(saldo));
   L.push('💳 Débito: '+money(vDebito));
   L.push('💳 Crédito '+parc+'x: '+parc+'x de '+money(vCredito/parc)+' (total '+money(vCredito)+')');
   L.push('');
@@ -4157,6 +4733,7 @@ function textoSimTroca(){
 }
 function copiarSimTroca(){
   const texto=textoSimTroca();
+  if(!texto){ toast('A entrada não pode ser maior que o valor restante da compra'); return; }
   const ok=()=>toast('Orçamento copiado');
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok).catch(()=>copiarFallback(texto,ok));
   else copiarFallback(texto,ok);
