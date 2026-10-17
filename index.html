@@ -1162,6 +1162,28 @@ body.dark .rp-page .rp-tab.active{background:var(--brand);color:var(--brand-ink)
 @media(max-width:560px){#page-relatorios.rp-page{padding:12px 12px 100px}.rp-page .rp-top{display:block}.rp-page .rp-title{font-size:28px}.rp-page .rp-tools{justify-content:flex-start;margin-top:14px}.rp-page .rp-filterbox{padding:13px}.rp-page .rp-filtergroup,.rp-page .rp-filtergroup.wide{flex:1 1 calc(50% - 7px)}.rp-page .rp-filterrow .rp-filtergroup:first-child{flex-basis:100%}.rp-page .rp-kpis{gap:9px}.rp-page .rp-kpi{padding:14px;min-height:113px}.rp-page .rp-kpi>strong{font-size:20px}.rp-page .rp-panel{padding:15px}.rp-page .rp-graph{height:175px}.rp-page .rp-btn{padding:9px 11px}}
 @media print{body,body.dark,body:not(.dark){background:#fff!important;color:#111!important}.tabbar,.topbar,.fab,.rp-page .rp-tools,.rp-page .rp-filterbox,.rp-page .rp-tabs,.toast,#login{display:none!important}#app{display:block!important;padding:0!important;margin:0!important;width:100%!important;border-radius:0!important;box-shadow:none!important;background:#fff!important}.page{display:none!important}#page-relatorios.rp-page{display:block!important;padding:10px!important;max-width:none!important}.rp-page .rp-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.rp-page .rp-layout,.rp-page .rp-layout.equal{grid-template-columns:1fr 1fr}.rp-page .rp-panel,.rp-page .rp-kpi{break-inside:avoid;background:#fff!important;box-shadow:none!important;border-color:#ddd!important}.rp-page .rp-title{color:#111}.rp-page .rp-tablewrap{overflow:visible}.rp-page table.rp-table{min-width:0}.rp-page table.rp-table th,.rp-page table.rp-table td{font-size:9px;padding:7px}}
 
+
+/* iTronic · cotação exata e CRM comercial ampliado */
+.sim-quote{margin:13px 0 4px;padding:13px;border:1px solid color-mix(in srgb,var(--brand) 48%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--brand) 6%,var(--card))}
+.sim-quote-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.sim-quote-head b{font-size:13px;color:var(--text)}.sim-quote-head small{font-size:10px;color:var(--text2)}
+.sim-quote-empty{padding:12px;border-radius:10px;background:var(--card);border:1px dashed var(--line);font-size:12px;line-height:1.5;color:var(--text2)}
+.sim-quote-best{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(115deg,#193f2d,#326345);color:#f6ffec;border-radius:12px;padding:16px 14px}
+.sim-quote-best small{display:block;font-size:10px;letter-spacing:.09em;color:#cdecb7;font-weight:800}
+.sim-quote-best strong{display:block;font-size:25px;letter-spacing:-.045em;margin:3px 0}
+.sim-quote-best span{display:block;font-size:11px;color:#dcebdc}.sim-quote-count{white-space:nowrap;font-size:11px!important;color:#f5fff2!important}
+.sim-quote-caption{font-size:11px;color:var(--text2);line-height:1.5;margin:9px 0}
+.sim-quote-rank{display:flex;justify-content:space-between;gap:12px;padding:10px 3px;border-bottom:1px solid var(--line);font-size:12px;color:var(--text2)}
+.sim-quote-rank b{color:var(--text)}.sim-quote-rank:last-child{border-bottom:0}
+.crm-v2 .crm-extra-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 9px}
+.crm-v2 .crm-extra-tags span{font-size:10px;padding:4px 7px;background:color-mix(in srgb,var(--brand) 15%,var(--card));border-radius:20px;color:var(--text)}
+.crm-v2 .crm-lead-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.crm-v2 .crm-lead-actions button{background:var(--bg2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:10px;font-weight:750}
+.crm-v2 .crm-recovery-intro{display:flex;justify-content:space-between;gap:15px;align-items:center;border-radius:13px;background:color-mix(in srgb,var(--brand) 11%,var(--card));border:1px solid var(--line);padding:14px;margin-bottom:12px;flex-wrap:wrap}
+.crm-v2 .crm-recovery-intro strong{font-size:13px}.crm-v2 .crm-recovery-intro span{font-size:11px;color:var(--text2);max-width:540px}
+.crm-v2 .crm-health-no{float:right;color:var(--blue)}.crm-v2 .crm-health-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 0;font-size:12px}
+@media(max-width:640px){.sim-quote-best{align-items:flex-start;flex-direction:column}.crm-v2 .crm-recovery-intro{display:block}.crm-v2 .crm-recovery-intro span{display:block;margin-top:6px}}
+
 </style>
 </head>
 <body>
@@ -1497,7 +1519,7 @@ let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
 // cada item: {tipo:'aparelho'|'acessorio', id, qtd}
 let carrinho=[];
 const MODELOS_IPHONE=['iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12 mini','iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13 mini','iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max','iPhone 16e','iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','iPhone 17e','iPhone 18','iPhone 18 Pro','iPhone 18 Pro Max','iPhone 18 Fold'];
-let simState={parcCred:1, semTroca:false, armNovo:'128 GB', armUsado:'128 GB',
+let simState={parcCred:1, semTroca:false, armNovo:'', corNovo:'', condNovo:'', armUsado:'128 GB',
   modNovo:'iPhone 15',modUsado:'iPhone 14',valNovo:'',valUsado:'',valEntrada:''};
 let simOferta=null;
 let catsAbertas={}; // quais categorias de acessório estão expandidas
@@ -1893,6 +1915,7 @@ function crmNorm(x){
  r.createdAt=String(x.createdAt||'');r.updatedAt=String(x.updatedAt||'');
  r.history=Array.isArray(x.history)?x.history.filter(e=>e&&typeof e==='object').map(e=>({...e,text:String(e.text||''),at:String(e.at||''),direction:String(e.direction||'')})):[];
  r.note=String(x.note||'');r.lostReason=String(x.lostReason||'');r.optIn=x.optIn===true;
+ r.tags=String(x.tags||'');r.storage=String(x.storage||'');r.color=String(x.color||'');r.tradeIn=String(x.tradeIn||'');r.budget=Number(x.budget)||0;r.payment=String(x.payment||'');r.nextAction=String(x.nextAction||'');
  return r;
 }
 function crmData(){try{const d=JSON.parse(localStorage.getItem('itronic_crm_native_v1')||'[]');return Array.isArray(d)?d.map(crmNorm).filter(Boolean):[]}catch(_){return []}}
@@ -1905,8 +1928,12 @@ function crmToday(x){if(!crmIsOpen(x)||!x.nextAt)return false;return x.nextAt.sl
 function crmNeedTeam(x){return crmIsOpen(x)&&x.lastDirection==='cliente'}
 function crmWaiting(x){return crmIsOpen(x)&&x.lastDirection==='loja'}
 function crmNeedClient(x){return crmIsOpen(x)&&x.lastDirection==='loja'&&crmAt(x)>0&&Date.now()-crmAt(x)>=86400000}
+function crmNeedsRecovery(x){return x.stage==='perdido' && x.lostReason==='Sem resposta' || (crmIsOpen(x)&&(crmDue(x)||crmNeedClient(x)&&crmAt(x)>0&&Date.now()-crmAt(x)>=172800000));}
+function crmUnassigned(x){return crmIsOpen(x)&&!String(x.owner||'').trim()}
+function crmMissingNext(x){return crmIsOpen(x)&&!x.nextAt}
+function crmStale(x){return crmIsOpen(x)&&crmAt(x)>0&&Date.now()-crmAt(x)>=259200000}
 function crmStatus(x){if(!crmIsOpen(x))return x.stage==='fechado'?'Concluída':'Não fechou';if(crmNeedTeam(x))return 'Responder cliente';if(crmNeedClient(x))return 'Sem resposta há 24h+';if(x.lastDirection==='loja')return 'Aguardando cliente';return 'Aguardando registro'}
-function crmBadge(x){if(crmDue(x))return '<span class="crm-v2-pill late">Retorno vencido</span>';if(crmNeedTeam(x))return '<span class="crm-v2-pill incoming">Cliente respondeu · agir</span>';if(crmNeedClient(x))return '<span class="crm-v2-pill late">Cliente sem resposta</span>';if(x.lastDirection==='loja')return '<span class="crm-v2-pill outgoing">Aguardando cliente</span>';if(x.stage==='fechado')return '<span class="crm-v2-pill good">Venda fechada</span>';return '<span class="crm-v2-pill">'+crmEsc(crmLabel(x.stage))+'</span>'}
+function crmBadge(x){if(x.stage==='fechado')return '<span class="crm-v2-pill good">Venda fechada</span>';if(x.stage==='perdido')return '<span class="crm-v2-pill late">Não fechou</span>';if(crmDue(x))return '<span class="crm-v2-pill late">Retorno vencido</span>';if(crmNeedTeam(x))return '<span class="crm-v2-pill incoming">Cliente respondeu · agir</span>';if(crmNeedClient(x))return '<span class="crm-v2-pill late">Cliente sem resposta</span>';if(x.lastDirection==='loja')return '<span class="crm-v2-pill outgoing">Aguardando cliente</span>';if(x.stage==='fechado')return '<span class="crm-v2-pill good">Venda fechada</span>';return '<span class="crm-v2-pill">'+crmEsc(crmLabel(x.stage))+'</span>'}
 function crmDate(v){if(!v)return 'Não agendado';const d=new Date(v.length===10?v+'T12:00:00':v);return isNaN(d.getTime())?'Não agendado':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function crmMoney(v){return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2})}
 function crmWaNumber(x){let p=String(x.phone||'').replace(/\D/g,'');if(p.startsWith('00'))p=p.slice(2);if(!p.startsWith('55')&&p.length>=10)p='55'+p;return p.length>=12&&p.length<=13?p:''}
@@ -1922,7 +1949,9 @@ function crmStageOptions(current){return CRM_STAGES.map(([k,n])=>`<option value=
 function crmStageFilter(){return `<option value="">Todas as etapas</option>`+CRM_STAGES.map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}
 function crmRenderLead(x,compact){const id=crmToken(x.id);return `<article class="crm-v2-lead" role="button" tabindex="0" onclick="crmOpen(decodeURIComponent('${id}'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();crmOpen(decodeURIComponent('${id}'))}" ${compact?`draggable="true" ondragstart="crmStartDrag(event,decodeURIComponent('${id}'))"`:''}>
  <div class="crm-v2-lead-head"><h3>${crmEsc(x.name||'Sem nome')}</h3>${crmBadge(x)}</div><p>${crmEsc(x.device||x.type||'Atendimento')} · ${crmEsc(x.owner||'Sem responsável')}${x.value?' · '+crmMoney(x.value):''}</p>
- <div class="crm-v2-lead-bottom"><span>${crmEsc(crmLabel(x.stage))}</span><b>${x.nextAt?'Retorno '+crmDate(x.nextAt):'Abrir ficha →'}</b></div></article>`}
+ ${x.tags?`<div class="crm-extra-tags">${x.tags.split(',').map(t=>t.trim()).filter(Boolean).slice(0,3).map(t=>`<span>${crmEsc(t)}</span>`).join('')}</div>`:''}
+ <div class="crm-v2-lead-bottom"><span>${crmEsc(crmLabel(x.stage))}${crmUnassigned(x)?' · Sem vendedor':''}</span><b>${x.nextAt?'Retorno '+crmDate(x.nextAt):'Sem retorno agendado'}</b></div>
+ ${!compact&&crmPodeEditar()&&crmIsOpen(x)?`<div class="crm-lead-actions"><button type="button" onclick="event.stopPropagation();crmQuickSchedule(decodeURIComponent('${id}'),1)">Retorno amanhã</button><button type="button" onclick="event.stopPropagation();crmQuickSchedule(decodeURIComponent('${id}'),3)">Em 3 dias</button></div>`:''}</article>`}
 function crmSorted(arr){return arr.slice().sort((a,b)=>{
  const rank=x=>(crmDue(x)?900:0)+(crmNeedTeam(x)?500:0)+(crmNeedClient(x)?280:0)+(x.priority==='alta'?100:0);
  return rank(b)-rank(a)||(crmAt(b)-crmAt(a));
@@ -1931,8 +1960,8 @@ function renderCrm(){const p=el('page-crm');if(!p)return;if(p.dataset.ready==='v
  p.classList.add('crm-v2');p.dataset.ready='v2';p.innerHTML=`
  <header class="crm-v2-head"><div><div class="crm-v2-eyebrow">iTronic / Central comercial</div><h2>CRM · Atendimento e vendas</h2><p>Saiba quem precisa de retorno, acompanhe orçamentos e recupere oportunidades antes que esfriem.</p></div><div class="crm-v2-toolbar"><button class="crm-v2-btn primary" onclick="crmOpenNew()">+ Novo atendimento</button><button class="crm-v2-btn" onclick="crmExport()">Exportar</button><label class="crm-v2-btn" for="crm-import-file" style="cursor:pointer">Importar <input id="crm-import-file" type="file" accept="application/json,.json" style="display:none" onchange="crmImport(event)"></label></div></header>
  <div class="crm-v2-kpis" id="crm-v2-kpis"></div>
- <div class="crm-v2-main"><div class="crm-v2-bar"><div class="crm-v2-tabs" id="crm-v2-tabs"><button data-crmview="attention" onclick="crmSetView('attention')">Prioridades</button><button data-crmview="funnel" onclick="crmSetView('funnel')">Funil</button><button data-crmview="agenda" onclick="crmSetView('agenda')">Agenda</button><button data-crmview="insights" onclick="crmSetView('insights')">Resultados</button></div><div class="crm-v2-filters"><input class="crm-v2-search" id="crm-v2-search" placeholder="Buscar nome, telefone, produto..." oninput="crmRefresh()"><select class="crm-v2-select" id="crm-v2-stage" onchange="crmRefresh()">${crmStageFilter()}</select><select class="crm-v2-select" id="crm-v2-owner" onchange="crmRefresh()"><option value="">Todos os vendedores</option></select></div></div><p class="crm-v2-summary" id="crm-v2-summary"></p><div id="crm-v2-body"></div></div>
- <div class="crm-v2-api"><span style="font-size:21px">◉</span><div><b>WhatsApp · preparação para API oficial</b><p>Por enquanto, respostas e envios são registrados manualmente. O botão abre o WhatsApp com mensagem pronta, mas não envia nem confirma entrega automaticamente.</p></div><span class="crm-v2-pill">Não conectado</span></div>
+ <div class="crm-v2-main"><div class="crm-v2-bar"><div class="crm-v2-tabs" id="crm-v2-tabs"><button data-crmview="attention" onclick="crmSetView('attention')">Prioridades</button><button data-crmview="funnel" onclick="crmSetView('funnel')">Funil</button><button data-crmview="agenda" onclick="crmSetView('agenda')">Agenda</button><button data-crmview="recovery" onclick="crmSetView('recovery')">Recuperação</button><button data-crmview="insights" onclick="crmSetView('insights')">Resultados</button><button data-crmview="health" onclick="crmSetView('health')">Qualidade</button></div><div class="crm-v2-filters"><input class="crm-v2-search" id="crm-v2-search" placeholder="Buscar nome, telefone, produto..." oninput="crmRefresh()"><select class="crm-v2-select" id="crm-v2-stage" onchange="crmRefresh()">${crmStageFilter()}</select><select class="crm-v2-select" id="crm-v2-owner" onchange="crmRefresh()"><option value="">Todos os vendedores</option></select></div></div><p class="crm-v2-summary" id="crm-v2-summary"></p><div id="crm-v2-body"></div></div>
+ <div class="crm-v2-api"><span style="font-size:21px">◉</span><div><b>WhatsApp · preparação para API oficial</b><p>Fluxo pronto para integração: cliente → conversa → responsável → negociação → follow-up. Mensagens, respostas e status ainda exigem registro manual. A API oficial e o webhook serão conectados na última etapa.</p></div><span class="crm-v2-pill">Não conectado</span></div>
  <div class="crm-v2-overlay" id="crm-v2-overlay" onclick="if(event.target===this)crmClose()"><div class="crm-v2-drawer" role="dialog" aria-modal="true" aria-label="Ficha de atendimento"><div class="crm-v2-drawer-head" id="crm-v2-drawer-head"></div><div class="crm-v2-drawer-content" id="crm-v2-drawer-content"></div><div class="crm-v2-drawer-foot" id="crm-v2-drawer-foot"></div></div></div>`;
  if(!window._crmKeyBound){window._crmKeyBound=true;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('crm-v2-overlay')?.classList.contains('open'))crmClose()})}
  crmRefresh();
@@ -1940,11 +1969,11 @@ function renderCrm(){const p=el('page-crm');if(!p)return;if(p.dataset.ready==='v
 function crmSetView(v){crmView=v;crmAttentionType='all';crmRefresh()}
 function crmFocus(k){crmView='attention';crmAttentionType=k;crmRefresh()}
 function crmFiltered(){const q=String(el('crm-v2-search')?.value||'').toLowerCase().trim(),s=el('crm-v2-stage')?.value||'',o=el('crm-v2-owner')?.value||'';
- return crmData().filter(x=>(!s||x.stage===s)&&(!o||x.owner===o)&&(!q||[x.name,x.phone,x.device,x.type,x.origin,x.owner,x.note,x.lostReason].join(' ').toLowerCase().includes(q)));
+ return crmData().filter(x=>(!s||x.stage===s)&&(!o||x.owner===o)&&(!q||[x.name,x.phone,x.device,x.type,x.origin,x.owner,x.note,x.lostReason,x.tags,x.color,x.storage,x.tradeIn,x.payment].join(' ').toLowerCase().includes(q)));
 }
 function crmRefresh(){const p=el('page-crm');if(!p||p.dataset.ready!=='v2')return;
  const all=crmData(),active=all.filter(crmIsOpen),arr=crmFiltered();
- const nums=[['Oportunidades abertas',active.length,'all','Negociações em andamento',''],['Responder cliente',active.filter(crmNeedTeam).length,'inbox','Cliente respondeu; equipe precisa agir','warn'],['Aguardando cliente',active.filter(crmWaiting).length,'waiting','Loja respondeu; cliente ainda não',''],['Sem resposta há 24h+',active.filter(crmNeedClient).length,'noanswer','Cliente não respondeu novamente','warn'],['Follow-ups vencidos',active.filter(crmDue).length,'overdue','Retornos atrasados','alert'],['Vendas concluídas',all.filter(x=>x.stage==='fechado').length,'closed','Negócios fechados','']];
+ const nums=[['Oportunidades abertas',active.length,'all','Negociações em andamento',''],['Responder cliente',active.filter(crmNeedTeam).length,'inbox','Cliente respondeu; equipe precisa agir','warn'],['Aguardando cliente',active.filter(crmWaiting).length,'waiting','Loja respondeu; cliente ainda não',''],['Sem resposta há 24h+',active.filter(crmNeedClient).length,'noanswer','Cliente não respondeu novamente','warn'],['Follow-ups vencidos',active.filter(crmDue).length,'overdue','Retornos atrasados','alert'],['Vendas concluídas',all.filter(x=>x.stage==='fechado').length,'closed','Negócios fechados',''],['Recuperar negociações',all.filter(crmNeedsRecovery).length,'recovery','Orçamentos parados e retornos atrasados','warn'],['Sem vendedor',all.filter(crmUnassigned).length,'unassigned','Oportunidades sem responsável','']];
  el('crm-v2-kpis').innerHTML=nums.map(([n,v,k,sub,c])=>`<button class="crm-v2-kpi ${c}" onclick="crmFocus('${k}')"><span>${n}</span><strong>${v}</strong><small>${sub}</small></button>`).join('');
  const ow=el('crm-v2-owner');if(ow){const cur=ow.value;const owners=[...new Set(all.map(x=>x.owner).filter(Boolean))].sort();ow.innerHTML='<option value="">Todos os vendedores</option>'+owners.map(n=>`<option value="${crmEsc(n)}">${crmEsc(n)}</option>`).join('');ow.value=cur;}
  document.querySelectorAll('#crm-v2-tabs [data-crmview]').forEach(b=>{b.classList.toggle('active',b.dataset.crmview===crmView);b.setAttribute('aria-pressed',String(b.dataset.crmview===crmView))});
@@ -1954,12 +1983,21 @@ function crmRefresh(){const p=el('page-crm');if(!p||p.dataset.ready!=='v2')retur
   html='<div class="crm-v2-kanban">'+CRM_STAGES.map(([k,n])=>{const xs=crmSorted(arr.filter(x=>x.stage===k));return `<section class="crm-v2-column" ondragover="event.preventDefault();this.classList.add('crm-v2-col-drop')" ondragleave="this.classList.remove('crm-v2-col-drop')" ondrop="crmDrop(event,'${k}')"><h3>${n}<span>${xs.length}</span></h3>${xs.map(x=>crmRenderLead(x,true)).join('')||'<div style="font-size:11px;color:var(--text2);padding:8px">Arraste uma oportunidade para cá</div>'}</section>`}).join('')+'</div>';
  }else if(crmView==='attention'){
   let matching=arr.filter(x=>{
-    if(crmAttentionType==='closed')return x.stage==='fechado';if(crmAttentionType==='all')return crmIsOpen(x);
+    if(crmAttentionType==='closed')return x.stage==='fechado';if(crmAttentionType==='unassigned')return crmUnassigned(x);if(crmAttentionType==='recovery')return crmNeedsRecovery(x);if(crmAttentionType==='all')return crmIsOpen(x);
     return crmAttentionType==='inbox'?crmNeedTeam(x):crmAttentionType==='waiting'?crmWaiting(x):crmAttentionType==='noanswer'?crmNeedClient(x):crmAttentionType==='overdue'?crmDue(x):crmIsOpen(x)
   });matching=crmSorted(matching);
-  const labels={all:'Oportunidades ativas',inbox:'Cliente respondeu: equipe precisa agir',waiting:'Aguardando resposta do cliente',noanswer:'Clientes sem resposta há mais de 24 horas',overdue:'Follow-ups vencidos',closed:'Vendas concluídas'};
+  const labels={all:'Oportunidades ativas',inbox:'Cliente respondeu: equipe precisa agir',waiting:'Aguardando resposta do cliente',noanswer:'Clientes sem resposta há mais de 24 horas',overdue:'Follow-ups vencidos',unassigned:'Oportunidades sem responsável',recovery:'Negócios a recuperar',closed:'Vendas concluídas'};
   descr=`${labels[crmAttentionType]||'Oportunidades'} · ${matching.length} registro(s). As situações de conversa dependem de registro manual enquanto a API não estiver conectada.`;
   html=matching.length?'<div class="crm-v2-list">'+matching.map(x=>crmRenderLead(x,false)).join('')+'</div>':'<div class="crm-v2-empty"><strong>Nenhum atendimento nesta fila.</strong>Altere os filtros ou cadastre uma nova oportunidade.</div>';
+ }else if(crmView==='recovery'){
+  const recover=crmSorted(arr.filter(crmNeedsRecovery));
+  descr='Fila de recuperação: follow-ups atrasados, respostas pendentes há 48h e vendas perdidas por falta de resposta. Priorize contatos consentidos e revise cada caso.';
+  html=`<div class="crm-recovery-intro"><strong>${recover.length} oportunidades para revisar</strong><span>Abandono e atraso não significam consentimento para mensagens automáticas. Atualize o histórico manualmente até conectar a API.</span></div>`+(recover.length?'<div class="crm-v2-list">'+recover.map(x=>crmRenderLead(x,false)).join('')+'</div>':'<div class="crm-v2-empty"><strong>Nenhuma oportunidade parada.</strong>Os próximos retornos aparecerão aqui automaticamente com base nos registros.</div>');
+ }else if(crmView==='health'){
+  const noschedule=arr.filter(crmMissingNext),unassigned=arr.filter(crmUnassigned),noPhone=arr.filter(x=>crmIsOpen(x)&&!crmWaNumber(x)),noOptIn=arr.filter(x=>crmIsOpen(x)&&!x.optIn);
+  descr='Auditoria da qualidade dos cadastros; identificação de melhorias antes da conexão oficial ao WhatsApp.';
+  const panel=(title,records,subtitle)=>`<section class="crm-v2-stat-panel"><h3>${title} <span class="crm-health-no">${records.length}</span></h3><p class="crm-v2-meta">${subtitle}</p>${records.slice(0,12).map(x=>`<div class="crm-health-row"><span>${crmEsc(x.name)}</span><button class="crm-v2-btn tiny" onclick="crmOpen(decodeURIComponent('${crmToken(x.id)}'))">Corrigir</button></div>`).join('')||'<p class="crm-v2-meta">Tudo certo nesta verificação.</p>'}</section>`;
+  html='<div class="crm-v2-stat-grid">'+panel('Sem próximo contato',noschedule,'Atendimentos abertos sem tarefa agendada.')+panel('Sem responsável',unassigned,'Oportunidades sem vendedor designado.')+panel('WhatsApp inválido ou ausente',noPhone,'Cadastros com número que não pode ser aberto via WhatsApp.')+panel('Sem consentimento registrado',noOptIn,'Não habilite disparos proativos sem autorização documentada.')+'</div>';
  }else if(crmView==='agenda'){
   descr='Próximos contatos ordenados por prazo. Clique em uma ficha para reagendar ou concluir a tarefa.';
   const tasks=arr.filter(x=>crmIsOpen(x)&&x.nextAt).sort((a,b)=>a.nextAt.localeCompare(b.nextAt));
@@ -1996,6 +2034,13 @@ function crmDrawer(x){const overlay=el('crm-v2-overlay');if(!overlay)return;cons
  <div class="crm-v2-field"><label>Prioridade</label><select id="crm-e-priority" ${editable?'':'disabled'}>${opt(rec.priority,[['normal','Normal'],['alta','Alta'],['baixa','Baixa']])}</select></div>
  <div class="crm-v2-field"><label>Próximo follow-up</label><input id="crm-e-next" type="datetime-local" value="${crmEsc(rec.nextAt.slice(0,16))}" ${editable?'':'disabled'}></div>
  <div class="crm-v2-field" id="crm-e-loss-wrap"><label>Motivo de não fechamento *</label><select id="crm-e-loss" ${editable?'':'disabled'}><option value="">Selecione o motivo</option>${opt(rec.lostReason,CRM_LOSS.map(k=>[k,k]))}</select></div>
+ <div class="crm-v2-field"><label>Armazenamento desejado</label><select id="crm-e-storage" ${editable?'':'disabled'}>${opt(rec.storage,[['','Não informado'],['64 GB','64 GB'],['128 GB','128 GB'],['256 GB','256 GB'],['512 GB','512 GB'],['1 TB','1 TB'],['2 TB','2 TB']])}</select></div>
+ <div class="crm-v2-field"><label>Cor preferida</label><input id="crm-e-color" maxlength="50" value="${crmEsc(rec.color)}" placeholder="Ex.: Titânio natural" ${editable?'':'disabled'}></div>
+ <div class="crm-v2-field"><label>Orçamento máximo do cliente (R$)</label><input id="crm-e-budget" type="number" min="0" step="0.01" value="${rec.budget||''}" placeholder="0,00" ${editable?'':'disabled'}></div>
+ <div class="crm-v2-field"><label>Forma de pagamento</label><select id="crm-e-payment" ${editable?'':'disabled'}>${opt(rec.payment,[['','Não informado'],['Pix','Pix'],['Cartão','Cartão'],['Parcelado','Parcelado'],['Financiamento','Financiamento'],['Troca + volta','Troca + volta']])}</select></div>
+ <div class="crm-v2-field wide"><label>Aparelho oferecido na troca (se houver)</label><input id="crm-e-tradein" maxlength="140" value="${crmEsc(rec.tradeIn)}" placeholder="Ex.: iPhone 14 Pro 128 GB" ${editable?'':'disabled'}></div>
+ <div class="crm-v2-field wide"><label>Etiquetas (separe com vírgula)</label><input id="crm-e-tags" maxlength="160" value="${crmEsc(rec.tags)}" placeholder="Ex.: Cliente quente, iPhone, Aguardando estoque" ${editable?'':'disabled'}></div>
+ <div class="crm-v2-field wide"><label>Próxima ação do vendedor</label><input id="crm-e-nextaction" maxlength="170" value="${crmEsc(rec.nextAction)}" placeholder="Ex.: Confirmar iPhone 17 preto com o fornecedor" ${editable?'':'disabled'}></div>
  <div class="crm-v2-field wide"><label>Resumo do atendimento / necessidades do cliente</label><textarea id="crm-e-note" ${editable?'':'disabled'} placeholder="Ex.: busca iPhone 16 Pro Max; prefere cor preta; aceitou simulação de 12x...">${crmEsc(rec.note)}</textarea></div>
  <div class="crm-v2-field wide"><label style="display:flex;gap:9px;align-items:center;font-size:12px"><input id="crm-e-optin" type="checkbox" ${rec.optIn?'checked':''} ${editable?'':'disabled'} style="width:17px;height:17px">Cliente autorizou receber mensagens proativas pelo WhatsApp</label><small style="color:var(--text2);font-size:11px">A autorização deve ser real e documentada; esta opção não dispara mensagens.</small></div>
  </div>
@@ -2016,13 +2061,26 @@ function crmSave(){if(!crmPodeEditar()){toast('Sem permissão para editar CRM.')
  const data=crmData(),isNew=!crmSelectedId,x=(isNew?null:data.find(y=>y.id===crmSelectedId)),now=new Date().toISOString();
  if(!isNew&&!x){toast('Atendimento não encontrado.');return}
  const target=x||crmNorm({id:uid(),name,stage,createdAt:now,history:[]});let before=target.stage;
- Object.assign(target,{name,phone:el('crm-e-phone').value.trim(),device:el('crm-e-device').value.trim(),type:el('crm-e-type').value,stage,owner:el('crm-e-owner').value,origin:el('crm-e-origin').value,value:Math.max(0,Number(el('crm-e-value').value)||0),priority:el('crm-e-priority').value,nextAt:el('crm-e-next').value,returnDate:el('crm-e-next').value.slice(0,10),lostReason:stage==='perdido'?reason:'',note:el('crm-e-note').value.trim(),optIn:el('crm-e-optin').checked,updatedAt:now});
+ Object.assign(target,{name,phone:el('crm-e-phone').value.trim(),device:el('crm-e-device').value.trim(),type:el('crm-e-type').value,stage,owner:el('crm-e-owner').value,origin:el('crm-e-origin').value,value:Math.max(0,Number(el('crm-e-value').value)||0),priority:el('crm-e-priority').value,nextAt:el('crm-e-next').value,returnDate:el('crm-e-next').value.slice(0,10),lostReason:stage==='perdido'?reason:'',note:el('crm-e-note').value.trim(),storage:el('crm-e-storage').value,color:el('crm-e-color').value.trim(),budget:Math.max(0,Number(el('crm-e-budget').value)||0),payment:el('crm-e-payment').value,tradeIn:el('crm-e-tradein').value.trim(),tags:el('crm-e-tags').value.trim(),nextAction:el('crm-e-nextaction').value.trim(),optIn:el('crm-e-optin').checked,updatedAt:now});
  if(isNew){target.history.unshift({at:now,type:'criado',text:'Atendimento cadastrado',by:session?.nome||''});data.unshift(target)}else if(before!==stage)target.history.unshift({at:now,type:'etapa',text:`${crmLabel(before)} → ${crmLabel(stage)}`,by:session?.nome||''});
+ if(isNew&&crmWaNumber(target)){
+ const other=data.filter(z=>z.id!==target.id&&crmWaNumber(z)===crmWaNumber(target));
+ if(other.length&&!confirm('Já existe '+other.length+' atendimento(s) com este WhatsApp. Deseja cadastrar uma nova oportunidade mesmo assim?'))return;
+ }
  if(!crmStore(data))return;crmSelectedId=target.id;crmRefresh();crmOpen(target.id);toast(isNew?'Atendimento cadastrado.':'Ficha atualizada.');
 }
 function crmDelete(){if(!crmPodeEditar()||!crmSelectedId)return;if(!confirm('Excluir este atendimento do CRM? Esta ação não pode ser desfeita.'))return;const data=crmData().filter(x=>x.id!==crmSelectedId);if(crmStore(data)){crmClose();crmRefresh();toast('Ficha excluída.')}}
 function crmLog(direction){if(!crmPodeEditar()||!crmSelectedId)return;let data=crmData(),x=data.find(y=>y.id===crmSelectedId);if(!x)return;
  const txt=el('crm-e-event-text')?.value.trim()|| (direction==='cliente'?'Cliente entrou em contato com a loja.':'A equipe entrou em contato com o cliente.');let at=new Date().toISOString();x.lastDirection=direction;x.lastInteractionAt=at;x.updatedAt=at;x.history.unshift({at,type:'mensagem',direction,text:txt,by:session?.nome||''});if(crmStore(data)){crmRefresh();crmOpen(x.id);toast('Interação registrada manualmente.')}}
+function crmQuickSchedule(id,days){
+ if(!crmPodeEditar())return toast('Sem permissão para agendar retornos.');
+ const data=crmData(),x=data.find(z=>z.id===String(id));if(!x||!crmIsOpen(x))return;
+ const d=new Date();d.setDate(d.getDate()+Number(days||1));d.setHours(10,0,0,0);
+ const stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T10:00`;
+ x.nextAt=stamp;x.returnDate=stamp.slice(0,10);x.updatedAt=new Date().toISOString();
+ x.history.unshift({at:x.updatedAt,type:'agenda',text:`Retorno agendado para ${crmDate(stamp)}.`,by:session?.nome||''});
+ if(crmStore(data)){crmRefresh();toast('Retorno agendado para '+crmDate(stamp)+'.')}
+}
 function crmCompleteNext(id,encoded=false){if(!crmPodeEditar()){toast('Sem permissão para concluir retorno.');return}if(encoded)id=decodeURIComponent(id);let data=crmData(),x=data.find(y=>y.id===String(id));if(!x)return;
  let at=new Date().toISOString();x.nextAt='';x.returnDate='';x.updatedAt=at;x.history.unshift({at,type:'followup',text:'Follow-up concluído manualmente.',by:session?.nome||''});if(crmStore(data)){crmRefresh();if(crmSelectedId)crmOpen(x.id);toast('Retorno concluído.')}}
 function crmUseTemplate(){let x=crmData().find(y=>y.id===crmSelectedId),a=el('crm-e-template'),t=el('crm-e-compose');if(x&&a&&t)t.value=crmMsgPreset(x,a.value)}
@@ -4937,9 +4995,10 @@ function orcAtualizarResultados(){
 function orcSimularOferta(indice){
   const grupo=orcAgrupar(orcBusca)[indice], melhor=grupo&&grupo.ranking[0];
   if(!melhor){toast('Oferta não encontrada. Atualize a pesquisa.');return;}
-  simOferta={modelo:grupo.modelo,armazenamento:grupo.armazenamento,fornecedor:melhor.fornecedor,preco:Number(melhor.preco)};
+  simOferta=null; // obrigar a conferência da cor no Simulador, sem aproveitar o vencedor de outra cor
   simState.modNovo=grupo.modelo;
   simState.armNovo=['64 GB','128 GB','256 GB','512 GB','1 TB'].includes(grupo.armazenamento)?grupo.armazenamento:'';
+  simState.corNovo='';simState.condNovo='';
   simState.semTroca=true;
   simState.valNovo='';simState.valEntrada='';simState.valUsado='';
   go('simular');
@@ -5235,6 +5294,49 @@ function orcBaixarLista(){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+/* Cotação correta: fornecedor só participa se modelo, capacidade e cor coincidirem.
+   Condições distintas nunca disputam o mesmo primeiro lugar. Nenhuma venda é precificada automaticamente. */
+const SIM_CORES_GERAIS=['Preto','Branco','Azul','Verde','Rosa','Roxo','Prata','Dourado','Natural','Deserto','Amarelo','Vermelho','Laranja','Titânio natural','Titânio deserto','Titânio branco','Titânio preto','Cinza espacial','Meia-noite','Estelar'];
+function simOfertasBase(){
+  const modelo=orcNorm(simState.modNovo),arm=orcNorm(simState.armNovo);
+  if(!modelo||!arm)return [];
+  return (db.fornecedores||[]).flatMap(f=>(f.ofertas||[]).filter(o=>orcNorm(o.modelo)===modelo&&orcNorm(o.armazenamento)===arm&&Number(o.preco)>0).map(o=>({...o,fornecedor:f.nome||'Fornecedor',fornecedorId:f.id,atualizado:f.atualizado||''})));
+}
+function simCoresDisponiveis(){
+ const cores=simOfertasBase().map(o=>o.cor).filter(c=>c&&orcNorm(c)!=='NAO INFORMADA');
+ return [...new Map([...cores,...SIM_CORES_GERAIS].map(c=>[orcNorm(c),c])).values()].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+function simOfertasExatas(){
+ if(!simState.armNovo||!simState.corNovo)return [];
+ const alvo=orcNorm(simState.corNovo);
+ const precos=simOfertasBase().filter(o=>orcNorm(o.cor)===alvo);
+ const disponiveis=[...new Set(precos.map(o=>orcNorm(o.condicao||'Não informada')))];
+ if(simState.condNovo && !disponiveis.includes(orcNorm(simState.condNovo)))simState.condNovo='';
+ if(disponiveis.length===1&&!simState.condNovo)simState.condNovo=precos[0].condicao||'Não informada';
+ return precos;
+}
+function simResultadoCotacao(){
+ if(!simState.armNovo||!simState.corNovo)return `<div class="sim-quote-empty">Selecione <b>armazenamento e cor</b> para consultar o menor custo dos fornecedores.</div>`;
+ const todas=simOfertasExatas();
+ if(!todas.length)return `<div class="sim-quote-empty">Nenhuma cotação exata para <b>${orcEsc(simState.modNovo)} · ${orcEsc(simState.armNovo)} · ${orcEsc(simState.corNovo)}</b>. Confira as listas em Orçamentos. Você ainda pode informar manualmente o valor da venda.</div>`;
+ const condicoes=[...new Map(todas.map(o=>[orcNorm(o.condicao||'Não informada'),o.condicao||'Não informada'])).values()].sort();
+ let escolha=simState.condNovo||'';
+ if(condicoes.length===1)escolha=simState.condNovo=condicoes[0];
+ const condSelect=condicoes.length>1?`<label class="mini-lbl" for="sim-cond-novo" style="display:block;margin:0 0 6px">Condição do aparelho</label><select id="sim-cond-novo" class="input" onchange="simState.condNovo=this.value;simAtualizarCotacoes()"><option value="">Escolher Novo, Seminovo ou outra condição</option>${condicoes.map(c=>`<option value="${orcEsc(c)}" ${orcNorm(c)===orcNorm(escolha)?'selected':''}>${orcEsc(c)}</option>`).join('')}</select>`:'';
+ if(!escolha)return condSelect+`<div class="sim-quote-empty" style="margin-top:10px">Selecione também a <b>condição</b>: existem cotações de tipos diferentes, que não devem ser comparados entre si.</div>`;
+ const exatas=todas.filter(o=>orcNorm(o.condicao||'Não informada')===orcNorm(escolha));
+ const unicas=new Map();
+ for(const o of exatas){const k=String(o.fornecedorId||o.fornecedor);if(!unicas.has(k)||Number(o.preco)<Number(unicas.get(k).preco))unicas.set(k,o)}
+ const lista=[...unicas.values()].sort((a,b)=>Number(a.preco)-Number(b.preco));
+ const melhor=lista[0];
+ if(!melhor)return condSelect+'<div class="sim-quote-empty">Sem cotações compatíveis.</div>';
+ return condSelect+`<div class="sim-quote-best"><div><small>MENOR CUSTO · ${orcEsc(escolha)}</small><strong>${money(melhor.preco)}</strong><span>${orcEsc(melhor.fornecedor)} · ${orcEsc(simState.corNovo)} · ${orcEsc(simState.armNovo)}</span></div><span class="sim-quote-count">${lista.length} fornecedor(es)</span></div><p class="sim-quote-caption">Valor de compra informado pelo fornecedor, <b>não é o preço de venda</b>. Listas não atualizadas automaticamente.</p>${lista.slice(1,5).map(o=>`<div class="sim-quote-rank"><span>${orcEsc(o.fornecedor)}</span><b>${money(o.preco)}</b></div>`).join('')}`;
+}
+function simAtualizarCotacoes(){const slot=el('sim-quote-results');if(slot)slot.innerHTML=simResultadoCotacao();}
+function simMudarModelo(v){simState.modNovo=v;simState.armNovo='';simState.corNovo='';simState.condNovo='';simOferta=null;renderSimulador()}
+function simMudarArm(v){simState.armNovo=v;simState.corNovo='';simState.condNovo='';simOferta=null;renderSimulador()}
+function simMudarCor(v){simState.corNovo=v;simState.condNovo='';simOferta=null;simAtualizarCotacoes()}
+
 /* ============ SIMULADOR ============ */
 function openSimulador(){ closeSheet(); go('simular'); }
 function renderSimulador(){
@@ -5252,16 +5354,20 @@ function renderSimuladorInline(){
   const opArmazenamento=(selecionado)=>`${selecionado?'':'<option value="" selected>Selecionar armazenamento</option>'}${capacidades.map(c=>`<option value="${c}" ${c===selecionado?'selected':''}>${c}</option>`).join('')}`;
   const attr=v=>String(v||'').replace(/[&"<>]/g,c=>({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'}[c]));
   return `
-    ${simOferta?`<div class="sim-source"><b>Oferta selecionada: ${orcEsc(simOferta.modelo)} · ${orcEsc(simOferta.armazenamento)}</b>Cotação de ${orcEsc(simOferta.fornecedor)}: <strong>${money(simOferta.preco)}</strong><small>Este é o custo do fornecedor. Informe abaixo o preço de venda ao cliente para calcular a simulação.</small></div>`:''}
+    ${simOferta && simState.corNovo?`<div class="sim-source"><b>Oferta selecionada: ${orcEsc(simOferta.modelo)} · ${orcEsc(simOferta.armazenamento)}</b>Cotação de ${orcEsc(simOferta.fornecedor)}: <strong>${money(simOferta.preco)}</strong><small>Este é o custo do fornecedor. Informe abaixo o preço de venda ao cliente para calcular a simulação.</small></div>`:''}
     <div class="sim-top-options">
       <button class="btn ${simState.semTroca?'secondary':''}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=false;renderSimulador()">${vectorIcon('swap')} Com troca</button>
       <button class="btn ${simState.semTroca?'':'secondary'}" style="flex:1;padding:12px;font-size:14px" onclick="simState.semTroca=true;renderSimulador()">${vectorIcon('phone')} Só o aparelho</button>
     </div>
     <div class="sim-layout"><div class="sim-main-col"><div class="sim-card">
       <div style="font-weight:700;font-size:15px;margin-bottom:12px">${vectorIcon('phone')} Aparelho novo <span style="color:var(--text2);font-weight:400;font-size:13px">(que o cliente leva)</span></div>
-      <select class="input" id="sim-mod-novo" onchange="simState.modNovo=this.value;simOferta=null;document.querySelector('#page-simular .sim-source')?.remove()">${opt(simState.modNovo)}</select>
+      <select class="input" id="sim-mod-novo" onchange="simMudarModelo(this.value)">${opt(simState.modNovo)}</select>
       <label class="mini-lbl" for="sim-arm-novo" style="display:block;margin:12px 0 7px">Armazenamento</label>
-      <select class="input" id="sim-arm-novo" onchange="simState.armNovo=this.value;simOferta=null;document.querySelector('#page-simular .sim-source')?.remove()">${opArmazenamento(simState.armNovo)}</select>
+      <select class="input" id="sim-arm-novo" onchange="simMudarArm(this.value)">${opArmazenamento(simState.armNovo)}</select>
+      <label class="mini-lbl" for="sim-cor-novo" style="display:block;margin:12px 0 7px">Cor do aparelho</label>
+      <select class="input" id="sim-cor-novo" onchange="simMudarCor(this.value)" ${!simState.armNovo?'disabled':''}><option value="">Selecione a cor para comparar preços</option>${simCoresDisponiveis().map(c=>`<option value="${orcEsc(c)}" ${orcNorm(c)===orcNorm(simState.corNovo)?'selected':''}>${orcEsc(c)}</option>`).join('')}</select>
+      <div class="sim-quote" aria-live="polite"><div class="sim-quote-head"><b>Comparador de fornecedores</b><small>Modelo + armazenamento + cor</small></div><div id="sim-quote-results">${simResultadoCotacao()}</div></div>
+      <label class="mini-lbl" for="sim-val-novo" style="display:block;margin:15px 0 7px">Valor de venda para o cliente</label>
       <input class="input" id="sim-val-novo" type="text" inputmode="decimal" placeholder="Valor do novo (R$)" value="${attr(simState.valNovo)}" oninput="simState.valNovo=this.value;calcSimTroca()" style="margin-top:10px">
       <label class="mini-lbl" for="sim-val-entrada" style="display:block;margin:12px 0 7px">Entrada em dinheiro ou Pix</label>
       <input class="input" id="sim-val-entrada" type="text" inputmode="decimal" placeholder="Valor da entrada (R$)" value="${attr(simState.valEntrada)}" oninput="simState.valEntrada=this.value;calcSimTroca()">
