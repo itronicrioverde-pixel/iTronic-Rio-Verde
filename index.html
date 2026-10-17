@@ -1621,6 +1621,98 @@ body.dark #page-assistencia .assist-quality.paralela{background:#534029;color:#f
 }
 @media(max-width:390px){body #app .topbar .user-chip{display:none}}
 
+
+/* ===== iTronic · Mixer de áudio (preferências locais por dispositivo) ===== */
+.ia-mix-card{overflow:hidden;position:relative}
+.ia-mix-head{align-items:center}
+.ia-mix-icon{width:43px;height:43px;display:grid;place-items:center;background:color-mix(in srgb,var(--brand) 22%,var(--card));border:1px solid var(--line);border-radius:13px;color:var(--brand-deep);flex:none}
+.ia-mix-head-left{display:flex;align-items:center;gap:12px;min-width:0}
+.ia-mix-head-left h3{margin:0}
+.ia-mix-switch{display:inline-flex;gap:9px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:750;font-size:12px;cursor:pointer;white-space:nowrap}
+.ia-mix-switch input{accent-color:#6da52d;width:17px;height:17px}
+.ia-mix-deck{background:linear-gradient(145deg,#173e30,#244c3a 65%,#315b41);color:#f0f9eb;border:1px solid #43634a;border-radius:19px;padding:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:opacity .16s}
+.ia-mix-deck.is-muted .ia-mix-faders{opacity:.35}
+.ia-mix-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid rgba(233,255,212,.15);padding-bottom:13px}
+.ia-mix-brand{font-weight:900;font-size:11px;letter-spacing:.16em;color:#cdeb8c;text-transform:uppercase}
+.ia-mix-subbrand{font-weight:500;font-size:11px;color:#d8e7d6;opacity:.75;letter-spacing:0;margin-left:7px}
+.ia-mix-meter{display:flex;align-items:center;gap:3px;height:21px}
+.ia-mix-meter i{display:block;width:5px;height:clamp(4px,var(--h,12px),20px);background:#a7de38;border-radius:5px;opacity:.5;transition:height .12s,opacity .12s}
+.ia-mix-meter.playing i{animation:itronic-vu .22s ease-in-out alternate 3;opacity:1;animation-delay:calc(var(--n,0) * 20ms)}
+@keyframes itronic-vu{from{height:5px;opacity:.35}to{height:var(--h,18px);opacity:1}}
+.ia-mix-faders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;min-width:0;padding:17px 5px 13px}
+.ia-mix-strip{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.ia-mix-strip>label{font-size:11px;font-weight:750;color:#d8ead4;white-space:nowrap}
+.ia-mix-value{display:block;min-width:63px;max-width:100%;padding:6px 9px;border-radius:9px;border:1px solid rgba(214,250,169,.25);background:rgba(0,0,0,.16);text-align:center;font-weight:850;font-size:12px;font-variant-numeric:tabular-nums;color:#e8ffba}
+.ia-mix-slot{position:relative;width:100%;height:122px;display:flex;justify-content:center;align-items:center;background:linear-gradient(90deg,transparent 48%,rgba(178,224,144,.22) 48%,rgba(178,224,144,.22) 52%,transparent 52%);border-radius:12px;touch-action:none}
+.ia-mix-slot input[type=range]{display:block;writing-mode:vertical-lr;direction:rtl;width:32px;height:116px;padding:0;cursor:ns-resize;touch-action:none;accent-color:#b0e842;background:none}
+.ia-mix-slot input[type=range]::-webkit-slider-thumb{border:2px solid #f2ffdb;border-radius:5px;background:#b1e543;box-shadow:0 3px 10px #081d0c8c}
+.ia-mix-strip small{font-size:10px;text-align:center;color:#bad0bd;line-height:1.35}
+.ia-mix-config{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;padding-top:13px;border-top:1px solid rgba(233,255,212,.15)}
+.ia-mix-config .ia-mix-select-wrap{flex:1;min-width:160px}
+.ia-mix-config label{display:block;font-size:11px;font-weight:750;color:#d8ead4;margin-bottom:5px}
+.ia-mix-config select{width:100%;border:1px solid #537b5b;border-radius:10px;padding:11px;background:#193828;color:#f3ffed;font-size:13px;font-weight:700;outline:none}
+.ia-mix-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ia-mix-actions button{border:1px solid rgba(209,247,190,.35);padding:11px 14px;border-radius:11px;font-weight:800;font-size:12px;white-space:nowrap;color:#f0ffe5;background:rgba(255,255,255,.08)}
+.ia-mix-actions .ia-mix-test{color:#17331d;background:#b4e44d;border-color:#b4e44d}
+.ia-mix-foot{display:flex;align-items:flex-start;gap:7px;color:var(--text2);font-size:11px;line-height:1.55;margin-top:12px}
+.ia-mix-foot svg{flex:none;margin-top:1px;color:var(--brand-deep)}
+.ia-mix-card button:focus-visible,.ia-mix-card input:focus-visible,.ia-mix-card select:focus-visible{outline:2px solid #b4ed64;outline-offset:3px}
+@media(max-width:540px){.ia-mix-deck{padding:14px 11px}.ia-mix-faders{gap:4px;padding:14px 0}.ia-mix-strip>label{font-size:10px}.ia-mix-value{min-width:0;width:100%;font-size:11px;padding:5px 3px}.ia-mix-strip small{font-size:9px}.ia-mix-config{align-items:stretch}.ia-mix-actions{width:100%}.ia-mix-actions button{flex:1;padding:11px 7px}.ia-mix-subbrand{display:none}.ia-mix-head-left{gap:9px}.ia-mix-switch{padding:8px 9px}}
+
+
+/* ITRONIC_AI_COPILOTO_V1 · Assistente analítico baseado nos registros do sistema */
+.it-ai-root{display:none;position:fixed;z-index:89}
+body.it-ai-ready .it-ai-root{display:block}
+.it-ai-launch{position:fixed;right:clamp(14px,2.3vw,30px);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:61px;height:61px;border:1px solid rgba(255,255,255,.46);border-radius:21px;background:linear-gradient(145deg,#bcf42e,#91d500);color:#173d22;box-shadow:0 15px 36px rgba(32,81,22,.25),inset 0 2px 4px rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;z-index:92}
+.it-ai-launch:hover{transform:translateY(-3px);box-shadow:0 19px 42px rgba(32,81,22,.3)}
+.it-ai-launch svg{width:30px;height:30px;stroke-width:1.8}
+.it-ai-launch-label{position:absolute;right:72px;top:50%;transform:translateY(-50%);background:#163d2d;color:#efffea;border-radius:14px;padding:9px 12px;white-space:nowrap;font-size:12px;font-weight:800;box-shadow:0 12px 22px #162f2338}
+.it-ai-launch-dot{position:absolute;right:-3px;top:-3px;width:13px;height:13px;border-radius:50%;background:#0aab70;border:2.5px solid var(--card)}
+.it-ai-window{position:fixed;right:clamp(14px,2.3vw,30px);bottom:calc(89px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100vw - 24px));height:min(710px,calc(100dvh - 119px));display:flex;flex-direction:column;border:1px solid color-mix(in srgb,var(--line) 90%,transparent);border-radius:25px;background:var(--card);box-shadow:0 28px 90px rgba(11,47,23,.26);overflow:hidden;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(12px) scale(.985);transition:transform .2s ease,opacity .2s ease,visibility .2s;z-index:93}
+.it-ai-root.open .it-ai-window{visibility:visible;opacity:1;pointer-events:auto;transform:none}
+.it-ai-header{display:flex;align-items:center;gap:11px;padding:17px 16px;background:linear-gradient(105deg,#173c2d,#296748);color:#f5fff0;flex:none}
+.it-ai-head-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:15px;background:#b6eb47;color:#163720}
+.it-ai-head-icon svg{width:25px;height:25px}
+.it-ai-title{font-size:16px;font-weight:850;line-height:1.15;letter-spacing:-.02em}
+.it-ai-tagline{font-size:10px;color:#cfdfcd;margin-top:4px;line-height:1.3}
+.it-ai-hr-btn{height:34px;width:34px;border-radius:11px;display:grid;place-items:center;color:#e4f3df;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:18px}
+.it-ai-hr-btn:hover{background:rgba(255,255,255,.18)}
+.it-ai-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:10px 12px 8px;border-bottom:1px solid var(--line);flex:none;background:var(--card)}
+.it-ai-tabs button{padding:10px 6px;border-radius:10px;font-size:11px;font-weight:800;color:var(--text2);transition:background .15s}
+.it-ai-tabs button.active{background:color-mix(in srgb,var(--brand) 23%,var(--card));color:var(--brand-deep)}
+.dark .it-ai-tabs button.active{color:#d2f49b}
+.it-ai-body{flex:1;overflow:auto;padding:14px 15px 20px;overscroll-behavior:contain;background:color-mix(in srgb,var(--bg2) 61%,var(--card))}
+.it-ai-intro{padding:14px;border-radius:17px;background:linear-gradient(120deg,#eefbe8,#d9f6d2);color:#21482a;border:1px solid #d0e9c6;margin-bottom:13px}
+.it-ai-intro b{display:block;font-size:14px;margin-bottom:5px}.it-ai-intro p{font-size:12px;line-height:1.5;margin:0}
+.dark .it-ai-intro{background:#254a34;color:#edfaeb;border-color:#4f7958}
+.it-ai-section-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:14px 0 9px}.it-ai-section-head b{font-size:12px}.it-ai-section-head span{font-size:10px;color:var(--text2)}
+.it-ai-kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.it-ai-kpi{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px;min-width:0}
+.it-ai-kpi small{display:block;color:var(--text2);font-size:10px;line-height:1.4}.it-ai-kpi strong{display:block;font-size:18px;line-height:1.15;letter-spacing:-.035em;margin:7px 0 5px;overflow-wrap:anywhere}.it-ai-kpi em{display:block;color:var(--text2);font-size:10px;font-style:normal}
+.it-ai-notice{display:flex;gap:9px;align-items:start;border:1px solid var(--line);background:var(--card);padding:11px;border-radius:13px;margin:7px 0}
+.it-ai-notice-mark{width:8px;height:8px;border-radius:50%;margin:5px 0 0;background:#739c78;flex:none}.it-ai-notice.urgent .it-ai-notice-mark{background:#d66b57}.it-ai-notice.warning .it-ai-notice-mark{background:#e0b354}
+.it-ai-notice-content{min-width:0;flex:1}.it-ai-notice-content b{display:block;font-size:11px;margin-bottom:3px}.it-ai-notice-content p{font-size:10.5px;color:var(--text2);line-height:1.45;margin:0}.it-ai-notice button{border:1px solid var(--line);background:var(--bg2);border-radius:9px;padding:7px;font-size:10px;font-weight:750;white-space:nowrap;flex:none}
+.it-ai-chart{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 10px 8px;display:flex;gap:5px;align-items:end;height:124px}
+.it-ai-bar-col{min-width:0;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}.it-ai-bar{width:min(25px,75%);min-height:3px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#b6e34f,#35794d)}.it-ai-bar-col small{font-size:9px;color:var(--text2);white-space:nowrap}
+.it-ai-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.it-ai-quick{border:1px solid var(--line);background:var(--card);padding:10px 9px;text-align:left;border-radius:11px;color:var(--text);font-size:11px;font-weight:700;min-height:43px}.it-ai-quick:hover{background:color-mix(in srgb,var(--brand) 12%,var(--card))}
+.it-ai-actions{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 3px}.it-ai-small-btn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:11px;font-weight:750;color:var(--text)}.it-ai-small-btn.primary{background:var(--brand);color:var(--brand-ink);border-color:transparent}
+.it-ai-sources{border-top:1px solid var(--line);padding:10px 0 0;font-size:10px;line-height:1.5;color:var(--text2);margin-top:14px}
+.it-ai-messages{display:flex;flex-direction:column;gap:11px;padding-bottom:14px}
+.it-ai-message{max-width:94%;font-size:12px;line-height:1.53;white-space:pre-line;padding:12px 13px;border-radius:15px;background:var(--card);border:1px solid var(--line);overflow-wrap:anywhere}
+.it-ai-message.user{align-self:flex-end;color:#173323;background:#d5f2b3;border-color:#b9df8b;border-bottom-right-radius:5px;max-width:87%}
+.it-ai-message.assistant{align-self:flex-start;border-bottom-left-radius:5px;box-shadow:0 2px 8px rgba(12,45,24,.035)}
+.it-ai-message.assistant small{display:block;margin-top:9px;color:var(--text2);font-size:9px}
+.it-ai-input-wrap{padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--card);flex:none}
+.it-ai-input-line{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid var(--line);background:var(--bg2);border-radius:15px}
+.it-ai-input-line input{min-width:0;flex:1;border:0;outline:0;background:transparent;padding:9px 8px;font-size:13px;color:var(--text)}
+.it-ai-send{background:var(--brand);color:var(--brand-ink);width:35px;height:35px;display:grid;place-items:center;border-radius:11px;flex:none}.it-ai-send svg{width:18px;height:18px}
+.it-ai-mic{color:var(--text2);width:35px;height:35px;display:grid;place-items:center;border-radius:11px;flex:none}.it-ai-mic svg{width:18px;height:18px}
+.it-ai-disclaimer{text-align:center;font-size:9px;color:var(--text2);padding-top:7px;line-height:1.3}
+.it-ai-muted{color:var(--text2);font-size:11px;line-height:1.5}.it-ai-empty{padding:17px 12px;text-align:center;color:var(--text2);font-size:11px;border:1px dashed var(--line);border-radius:13px;background:var(--card)}
+@media(max-width:680px){.it-ai-launch{right:14px;bottom:calc(13px + env(safe-area-inset-bottom,0px));height:55px;width:55px;border-radius:18px}.it-ai-launch-label{display:none}.it-ai-window{right:8px;left:8px;bottom:calc(78px + env(safe-area-inset-bottom,0px));width:auto;height:min(700px,calc(100dvh - 101px));border-radius:21px}.it-ai-root.open .it-ai-launch{opacity:0;pointer-events:none}.it-ai-header{padding:14px}}
+@media(max-width:359px){.it-ai-quick-grid{grid-template-columns:1fr}.it-ai-kpi strong{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.it-ai-window,.it-ai-launch{transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -1903,6 +1995,24 @@ html,body{background:#a5d900}
   <button class="fab" id="fab" onclick="fabAction()"></button>
 </div>
 
+
+<!-- iTronic AI · copiloto de dados (não envia dados para serviços externos) -->
+<div id="it-ai-root" class="it-ai-root" aria-label="Assistente iTronic AI">
+ <button type="button" id="it-ai-launch" class="it-ai-launch" onclick="itAiToggle()" aria-label="Abrir iTronic AI" aria-expanded="false" aria-controls="it-ai-window">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="4"/><path d="M12 3v3M7 3h10M8 12h.01M16 12h.01M8 16c2.5 2 5.5 2 8 0"/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+  <span class="it-ai-launch-label">iTronic AI · Análises</span><span class="it-ai-launch-dot" aria-hidden="true"></span>
+ </button>
+ <section id="it-ai-window" class="it-ai-window" role="dialog" aria-modal="false" aria-label="iTronic AI" aria-hidden="true">
+  <div class="it-ai-header"><div class="it-ai-head-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="4"/><path d="M12 3v3M8 12h.01M16 12h.01M9 16q3 3 6 0"/></svg></div>
+   <div style="flex:1;min-width:0"><div class="it-ai-title">iTronic AI <span style="font-size:11px;font-weight:500;color:#bee694">●</span></div><div class="it-ai-tagline">Copiloto de gestão · dados do sistema</div></div>
+   <button type="button" class="it-ai-hr-btn" onclick="itAiRefresh()" aria-label="Atualizar análises" title="Atualizar dados">↻</button><button type="button" class="it-ai-hr-btn" onclick="itAiToggle(false)" aria-label="Fechar assistente">×</button>
+  </div>
+  <div class="it-ai-tabs" role="tablist"><button type="button" id="it-ai-tab-resumo" onclick="itAiSetTab('resumo')">Visão geral</button><button type="button" id="it-ai-tab-alertas" onclick="itAiSetTab('alertas')">Prioridades</button><button type="button" id="it-ai-tab-chat" onclick="itAiSetTab('chat')">Perguntar</button></div>
+  <div id="it-ai-body" class="it-ai-body" aria-live="polite"></div>
+  <form id="it-ai-form" class="it-ai-input-wrap" onsubmit="itAiSend(event)"><div class="it-ai-input-line"><input id="it-ai-input" type="text" maxlength="320" autocomplete="off" placeholder="Ex.: Como foram as vendas deste mês?" aria-label="Faça uma pergunta sobre a loja"><button type="button" class="it-ai-mic" onclick="itAiVoice()" title="Ditado de voz, se disponível" aria-label="Falar pergunta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/></svg></button><button type="submit" class="it-ai-send" aria-label="Enviar pergunta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5 12 7-7 7 7M12 5v14"/></svg></button></div><div class="it-ai-disclaimer">Análises locais com dados cadastrados · nenhum envio automático</div></form>
+ </section>
+</div>
+
 <!-- SHEET -->
 <div class="sheet-bg" id="sheet-bg" onclick="closeSheet(event)"></div>
 <div class="sheet" id="sheet">
@@ -2077,6 +2187,7 @@ function loadDB(){
 function saveDB(){
   localStorage.setItem(DB_KEY, JSON.stringify(db));
   pushToCloud();
+  if(typeof itAiState!=="undefined" && session && itAiState.opened && itAiState.tab!=="chat")itAiSetTab(itAiState.tab);
 }
 function pushToCloud(){
   if(!fbReady || !fbDoc) return;
@@ -2161,6 +2272,7 @@ function doLogin(){
   aplicarPermissoes();
   updateUserIdentity();
   go('dash');
+  itAiOnLogin();
   if(saveError) toast('Aviso: não foi possível salvar os dados neste navegador.');
   return true;
 }
@@ -2188,6 +2300,7 @@ function aplicarPermissoes(){
   if(typeof currentTab!=='undefined' && session && !podeAcessarModulo(currentTab) && document.getElementById('page-'+currentTab)) go('dash');
 }
 function logout(){
+  itAiReset();
   closeMobileNav();
   session=null;
   el('app').style.display='none';
@@ -2201,12 +2314,34 @@ function logout(){
 /* iTronic · Feedback imediato no pointerdown (Web Audio de baixa latência).
    O toque sonoro é curto e suave; acessibilidade: prefere reduzir movimento.
    Não usamos autoplay: o contexto nasce apenas depois de interação real. */
-let itronicAudioContext=null;
+
+/* Feedback sonoro do aplicativo: parâmetros editáveis no Administrador.
+   Preferências persistidas neste navegador; nunca adicionadas ao banco da loja. */
+const ITRONIC_AUDIO_KEY='itronic_audio_mix_v1';
+const ITRONIC_AUDIO_DEFAULTS=Object.freeze({enabled:true,master:36,click:34,pitch:43,duration:30,preset:'suave'});
+function itronicAudioClamp(n,min,max,fallback){n=Number(n);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):fallback;}
+function itronicLoadAudioSettings(){
+  let stored={};try{stored=JSON.parse(localStorage.getItem(ITRONIC_AUDIO_KEY)||'{}')||{};}catch(_){ }
+  return {
+    enabled:stored.enabled!==false,
+    master:itronicAudioClamp(stored.master,0,100,36),
+    click:itronicAudioClamp(stored.click,0,100,34),
+    pitch:itronicAudioClamp(stored.pitch,0,100,43),
+    duration:itronicAudioClamp(stored.duration,0,100,30),
+    preset:['suave','seco','digital','mecanico'].includes(stored.preset)?stored.preset:'suave'
+  };
+}
+let itronicAudioSettings=itronicLoadAudioSettings();
+let itronicAudioContext=null, itronicNoiseBuffer=null;
 let lastClickSound=-Infinity;
 const clickFeedbackDocs=new WeakSet();
 const clickTargetSelector='button,a[href],input,select,textarea,label,summary,[role="button"],[role="tab"],[onclick]';
+function itronicSaveAudioSettings(){
+  try{localStorage.setItem(ITRONIC_AUDIO_KEY,JSON.stringify(itronicAudioSettings));}
+  catch(_){/* Ajustes seguem válidos até a página fechar. */}
+}
 function clickFeedbackTarget(event){
-  const origin=event.target?.nodeType===1 ? event.target : event.target?.parentElement;
+  const origin=event.target?.nodeType===1?event.target:event.target?.parentElement;
   if(!origin)return null;
   let target=origin.closest(clickTargetSelector);
   if(!target){
@@ -2224,37 +2359,111 @@ function drawClickWaves(event,target){
   const x=Number.isFinite(event.clientX)?event.clientX:rect.left+rect.width/2;
   const y=Number.isFinite(event.clientY)?event.clientY:rect.top+rect.height/2;
   for(let i=0;i<2;i++){
-    const wave=doc.createElement('i');
-    wave.className='global-click-wave'+(i?' second':'');
-    wave.setAttribute('aria-hidden','true');
-    wave.style.left=x+'px';wave.style.top=y+'px';
+    const wave=doc.createElement('i');wave.className='global-click-wave'+(i?' second':'');
+    wave.setAttribute('aria-hidden','true');wave.style.left=x+'px';wave.style.top=y+'px';
     doc.body.appendChild(wave);
     wave.addEventListener('animationend',()=>wave.remove(),{once:true});
     setTimeout(()=>wave.remove(),690);
   }
 }
-function playClickSound(){
+function itronicGetAudioContext(){
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return null;
+  if(!itronicAudioContext){
+    itronicAudioContext=new Ctx({latencyHint:'interactive'});
+    // Ruído breve para textura tátil, criado uma única vez e reutilizado.
+    const ctx=itronicAudioContext;
+    itronicNoiseBuffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*.09),ctx.sampleRate);
+    const samples=itronicNoiseBuffer.getChannelData(0);
+    for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1);
+  }
+  return itronicAudioContext;
+}
+function playClickSound(options={}){
+  const settings=itronicAudioSettings;
+  if(!settings.enabled||settings.master<=0||settings.click<=0)return false;
   const now=performance.now();
-  if(now-lastClickSound<78)return;
+  if(!options.force&&now-lastClickSound<73)return false;
   lastClickSound=now;
   try{
-    const AudioCtx=window.AudioContext||window.webkitAudioContext;
-    if(!AudioCtx)return;
-    if(!itronicAudioContext)itronicAudioContext=new AudioCtx({latencyHint:'interactive'});
-    const ctx=itronicAudioContext;
+    const ctx=itronicGetAudioContext();if(!ctx)return false;
     if(ctx.state==='suspended')ctx.resume().catch(()=>{});
     const t=ctx.currentTime;
-    const osc=ctx.createOscillator();const gain=ctx.createGain();
-    osc.type='sine';
-    osc.frequency.setValueAtTime(780,t);
-    osc.frequency.exponentialRampToValueAtTime(450,t+.029);
-    gain.gain.setValueAtTime(.0001,t);
-    gain.gain.exponentialRampToValueAtTime(.024,t+.002);
-    gain.gain.exponentialRampToValueAtTime(.0001,t+.043);
+    // O tom foi redesenhado: ataque instantâneo e decaimento curto (sem "bipe").
+    const preset=settings.preset;
+    const length=(.014+settings.duration*.00036)*(preset==='digital'?1.22:1);
+    const freq=(preset==='digital'?930:preset==='mecanico'?510:preset==='seco'?690:390)*(0.65+settings.pitch/115);
+    const level=.062*(settings.master/100)*(settings.click/100);
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type=preset==='digital'?'sine':preset==='mecanico'?'triangle':'sine';
+    osc.frequency.setValueAtTime(freq,t);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(80,freq*(preset==='digital'?.69:.36)),t+length);
+    gain.gain.setValueAtTime(Math.max(.00001,level),t);
+    gain.gain.exponentialRampToValueAtTime(.00001,t+length);
     osc.connect(gain);gain.connect(ctx.destination);
-    osc.start(t);osc.stop(t+.048);
-    osc.onended=()=>{osc.disconnect();gain.disconnect()};
-  }catch(_){/* Sem som quando o navegador não permite áudio; a onda permanece. */}
+    osc.start(t);osc.stop(t+length+.002);
+    osc.onended=()=>{try{osc.disconnect();gain.disconnect();}catch(_){}};
+    if(preset==='seco'||preset==='mecanico'||preset==='suave'){
+      const noise=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),noiseGain=ctx.createGain();
+      noise.buffer=itronicNoiseBuffer;
+      filter.type='highpass';filter.frequency.value=preset==='mecanico'?1000:preset==='seco'?2100:750;
+      noiseGain.gain.setValueAtTime(Math.max(.00001,level*(preset==='mecanico'?.40:preset==='seco'?.24:.13)),t);
+      noiseGain.gain.exponentialRampToValueAtTime(.00001,t+Math.min(length*.62,.025));
+      noise.connect(filter);filter.connect(noiseGain);noiseGain.connect(ctx.destination);
+      noise.start(t);noise.stop(t+Math.min(length*.7,.032));
+      noise.onended=()=>{try{noise.disconnect();filter.disconnect();noiseGain.disconnect();}catch(_){}};
+    }
+    return true;
+  }catch(_){return false;}
+}
+function itronicAudioMixerHTML(){
+ const a=itronicAudioSettings;
+ const strips=[
+  ['master','Geral','Volume total',a.master,'%'],
+  ['click','Clique','Volume do toque',a.click,'%'],
+  ['pitch','Timbre','Grave → agudo',a.pitch,'%'],
+  ['duration','Duração','Curto → longo',a.duration,'%']
+ ];
+ const faders=strips.map(([key,name,sub,value,unit])=>`<div class="ia-mix-strip">
+ <label for="ia-mix-${key}">${name}</label><output id="ia-mix-out-${key}" class="ia-mix-value" for="ia-mix-${key}">${value}${unit}</output>
+ <div class="ia-mix-slot"><input id="ia-mix-${key}" type="range" min="0" max="100" step="1" value="${value}" aria-label="${name} do som" oninput="itronicAudioMixChange('${key}',this.value)"></div><small>${sub}</small></div>`).join('');
+ return `<section class="ia-panel ia-mix-card" id="ia-audio-mixer">
+ <div class="ia-panel-h ia-mix-head"><div class="ia-mix-head-left"><div class="ia-mix-icon"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-4a9 9 0 0 1 18 0v4"/><rect x="2" y="12" width="4" height="8" rx="2"/><rect x="18" y="12" width="4" height="8" rx="2"/></svg></div><div><h3>Mixer de áudio</h3><p>Personalize o clique e escute o resultado em tempo real.</p></div></div>
+ <label class="ia-mix-switch"><input type="checkbox" id="ia-mix-enabled" ${a.enabled?'checked':''} onchange="itronicAudioMixEnabled(this.checked)"><span id="ia-mix-enabled-label">${a.enabled?'Som ligado':'Sem som'}</span></label></div>
+ <div class="ia-mix-deck ${a.enabled?'':'is-muted'}" id="ia-mix-deck">
+ <div class="ia-mix-top"><div class="ia-mix-brand">iTronic Audio <span class="ia-mix-subbrand">/ MIXER STUDIO</span></div><div class="ia-mix-meter" id="ia-mix-meter" aria-hidden="true">${[6,11,16,9,19,14,7,17,10,5].map((h,i)=>`<i style="--h:${h}px;--n:${i}"></i>`).join('')}</div></div>
+ <div class="ia-mix-faders">${faders}</div>
+ <div class="ia-mix-config"><div class="ia-mix-select-wrap"><label for="ia-mix-preset">Estilo do som</label><select id="ia-mix-preset" onchange="itronicAudioMixChange('preset',this.value)"><option value="suave" ${a.preset==='suave'?'selected':''}>Suave / discreto</option><option value="seco" ${a.preset==='seco'?'selected':''}>Seco / minimalista</option><option value="digital" ${a.preset==='digital'?'selected':''}>Digital / leve</option><option value="mecanico" ${a.preset==='mecanico'?'selected':''}>Mecânico / tátil</option></select></div>
+ <div class="ia-mix-actions"><button type="button" class="ia-mix-test" onclick="itronicAudioMixTest()">▶ Ouvir teste</button><button type="button" onclick="itronicAudioMixReset()">Restaurar padrão</button></div></div></div>
+ <div class="ia-mix-foot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><span>Preferências salvas automaticamente neste aparelho. O volume final também depende do iPhone, computador e navegador. Ajuste sem modificar o áudio dos outros funcionários.</span></div>
+ </section>`;
+}
+function itronicAudioMixChange(key,value){
+ if(!['master','click','pitch','duration','preset'].includes(key))return;
+ if(key==='preset'){
+   if(!['suave','seco','digital','mecanico'].includes(value))return;
+   itronicAudioSettings.preset=value;
+ }else{
+   const n=itronicAudioClamp(value,0,100,ITRONIC_AUDIO_DEFAULTS[key]);
+   itronicAudioSettings[key]=n;
+   const out=document.getElementById('ia-mix-out-'+key);if(out)out.textContent=n+'%';
+ }
+ itronicSaveAudioSettings();
+}
+function itronicAudioMixEnabled(value){
+ itronicAudioSettings.enabled=!!value;itronicSaveAudioSettings();
+ const deck=document.getElementById('ia-mix-deck');if(deck)deck.classList.toggle('is-muted',!value);
+ const label=document.getElementById('ia-mix-enabled-label');if(label)label.textContent=value?'Som ligado':'Sem som';
+}
+function itronicAudioMixTest(){
+ if(!itronicAudioSettings.enabled){toast('Ative o som para ouvir o teste.');return;}
+ if(itronicAudioSettings.master===0||itronicAudioSettings.click===0){toast('Aumente o volume geral e o volume do clique.');return;}
+ playClickSound({force:true});
+ const meter=document.getElementById('ia-mix-meter');if(meter){meter.classList.remove('playing');void meter.offsetWidth;meter.classList.add('playing');}
+}
+function itronicAudioMixReset(){
+ itronicAudioSettings={...ITRONIC_AUDIO_DEFAULTS};itronicSaveAudioSettings();
+ const view=document.getElementById('ia-audio-mixer');if(view)view.outerHTML=itronicAudioMixerHTML();
+ toast('Som restaurado. Ajustes salvos neste aparelho.');
 }
 function installClickFeedback(doc){
   if(!doc||clickFeedbackDocs.has(doc))return;
@@ -2267,12 +2476,12 @@ function installClickFeedback(doc){
   doc.addEventListener('pointerdown',event=>{
     if(event.isPrimary===false)return;
     const target=clickFeedbackTarget(event);
-    if(target){drawClickWaves(event,target);playClickSound();}
+    if(target){drawClickWaves(event,target);if(!target.closest('#ia-audio-mixer'))playClickSound();}
   },{capture:true,passive:true});
   doc.addEventListener('click',event=>{
     if(!event.isTrusted||event.detail!==0)return;
     const target=clickFeedbackTarget(event);
-    if(target){drawClickWaves(event,target);playClickSound();}
+    if(target){drawClickWaves(event,target);if(!target.closest('#ia-audio-mixer'))playClickSound();}
   },true);
 }
 installClickFeedback(document);
@@ -6796,6 +7005,7 @@ function renderAdministrador(){
  <div class="ia-cards"><div class="ia-card"><small>Usuários cadastrados</small><strong>${usuarios.length}</strong></div><div class="ia-card"><small>Contas ativas</small><strong>${ativos}</strong></div><div class="ia-card"><small>Contas bloqueadas</small><strong>${usuarios.length-ativos}</strong></div></div>
  <section class="ia-panel"><div class="ia-panel-h"><div><h3>Funcionários e acessos</h3><p>Edite o perfil, a foto, o cargo e as permissões individuais.</p></div><input class="ia-search" id="ia-busca" value="${iaEsc(iaBusca)}" placeholder="Buscar funcionário..." oninput="iaBuscar(this.value)" autocomplete="off" aria-label="Buscar usuário"></div><div id="ia-lista"></div>
  <div class="ia-footnote">Os usuários existentes são preservados. Contas desativadas não conseguem entrar no sistema por esta tela de login.</div></section>
+ ${itronicAudioMixerHTML()}
  <section class="ia-panel"><div class="ia-panel-h"><div><h3>Controle de permissões</h3><p>Você pode liberar abas específicas e operações especiais para cada funcionário. Administradores possuem acesso integral.</p></div></div><div class="ia-footnote">Atenção: esta versão aplica permissões na interface. A proteção real dos dados em vários dispositivos exige configurar Firebase Authentication e regras no Firestore; o banco de dados atual compartilha os registros entre clientes.</div></section>`;
  iaRenderLista();
 }
@@ -7019,6 +7229,130 @@ function askConfirm(msg, onYes, yesLabel){
 }
 function confirmYes(){ el('confirm-bg').classList.remove('show'); if(confirmFn){const f=confirmFn;confirmFn=null;f();} }
 function confirmNo(){ el('confirm-bg').classList.remove('show'); confirmFn=null; }
+
+
+/* ITRONIC_AI_COPILOTO_V1
+ * Motor explicável de consultas aos dados JÁ CARREGADOS no ERP.
+ * Não é um LLM e não envia clientes/vendas a terceiros.
+ * Um LLM real exigirá endpoint seguro, autenticação no servidor e escopo de permissão por usuário.
+ */
+const IT_AI_ICON={money:'R$',stock:'◈',customer:'◉',alert:'!'};
+const itAiState={tab:'resumo',messages:[],opened:false};
+const itAiEsc=x=>String(x??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]));
+const itAiMoney=n=>money(Number(n)||0);
+const itAiN=n=>(Number(n)||0).toLocaleString('pt-BR');
+const itAiText=n=>String(n||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const itAiDate=()=>todayStr();
+const itAiAllowed=mod=>!!session&&podeAcessarModulo(mod);
+const itAiCanSales=()=>itAiAllowed('venda')||itAiAllowed('painel')||itAiAllowed('relatorios');
+const itAiCanProfit=()=>!!session&&session.role==='Administrador';
+const itAiCanFinance=()=>!!session&&(session.role==='Administrador'||podeAcao('financeiro'));
+const itAiCanCrm=()=>itAiAllowed('crm');
+const itAiCanClient=()=>itAiAllowed('clientes');
+const itAiCanStock=()=>itAiAllowed('estoque');
+const itAiCanService=()=>itAiAllowed('assistencia');
+const itAiSales=()=>itAiCanSales()?vendasVisiveis():[];
+const itAiLeadList=()=>itAiCanCrm()?(crmData()||[]).filter(x=>podeAcao('todasVendas')||x.owner===(session?.nome||'')):[];
+const itAiCash=x=>Array.isArray(x)?x:[];
+const itAiISO=d=>String(d||'').slice(0,10);
+function itAiCutoff(days){const dt=new Date(itAiDate()+'T12:00:00');dt.setDate(dt.getDate()-days);return [dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');}
+function itAiMonthShift(m,offset){const [y,mo]=m.split('-').map(Number);const d=new Date(y,mo-1+offset,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function itAiPeriod(name){const d=itAiDate();if(name==='hoje')return {from:d,to:d,label:'hoje'};if(name==='ontem'){const o=itAiCutoff(1);return {from:o,to:o,label:'ontem'};}if(name==='7d')return {from:itAiCutoff(6),to:d,label:'últimos 7 dias'};if(name==='30d')return {from:itAiCutoff(29),to:d,label:'últimos 30 dias'};if(name==='todos')return {from:'',to:d,label:'todo o histórico'};return {from:d.slice(0,7)+'-01',to:d,label:'este mês'};}
+function itAiSalesStats(period){const p=itAiPeriod(period),v=itAiSales().filter(x=>{const d=itAiISO(x.data);return d&&d>=p.from&&d<=p.to;});const revenue=v.reduce((s,x)=>s+vendaLiquido(x),0),profit=itAiCanProfit()?v.reduce((s,x)=>s+lucroVenda(x),0):null;return {period:p,v,revenue,profit,ticket:v.length?revenue/v.length:0,receivable:v.reduce((s,x)=>s+(Number(x.aReceber)||0),0)};}
+function itAiStockStats(){if(!itAiCanStock())return null;const products=Array.isArray(db?.produtos)?db.produtos:[],unsold=products.filter(x=>x.status!=='Vendido'),available=unsold.filter(x=>x.status==='Disponível'),reserved=unsold.filter(x=>x.status==='Reservado'),accessories=Array.isArray(db?.acessorios)?db.acessorios:[],low=accessories.filter(x=>Number(x.qtd||0)<=3),stale=available.filter(x=>{const d=Date.parse(String(x.entrada||'').slice(0,10)+'T12:00:00');return Number.isFinite(d)&&Date.now()-d>60*86400000;});return {unsold,available,reserved,accessories,low,stale,capital:itAiCanProfit()?unsold.reduce((s,x)=>s+(Number(x.compra)||0),0):null};}
+function itAiCrmStats(){if(!itAiCanCrm())return null;const leads=itAiLeadList(),open=leads.filter(crmIsOpen),late=open.filter(crmDue),incoming=open.filter(crmNeedTeam),waiting=open.filter(crmWaiting),quiet=open.filter(crmNeedClient),recover=leads.filter(crmNeedsRecovery),closed=leads.filter(x=>x.stage==='fechado'),missing=open.filter(crmMissingNext);return {leads,open,late,incoming,waiting,quiet,recover,closed,missing};}
+function itAiFinanceStats(){if(!itAiCanFinance())return null;const pending=itAiCash(db?.contas).filter(x=>x.status!=='pago'),toPay=pending.filter(x=>x.tipo==='pagar'),toReceive=pending.filter(x=>x.tipo==='receber'),late=toPay.filter(x=>itAiISO(x.venc)&&itAiISO(x.venc)<itAiDate());return {pending,toPay,toReceive,late,payTotal:toPay.reduce((s,x)=>s+(Number(x.valor)||0),0),receiveTotal:toReceive.reduce((s,x)=>s+(Number(x.valor)||0),0),lateTotal:late.reduce((s,x)=>s+(Number(x.valor)||0),0)};}
+function itAiCustomersStats(){if(!itAiCanClient())return null;const c=itAiCash(db?.clientes).filter(x=>!x.arquivado),st=clAllStats(),records=[...st.values()].filter(x=>!x.cliente.arquivado).sort((a,b)=>b.total-a.total),vip=records.filter(x=>clStatus(x).vip),inactive=records.filter(x=>clStatus(x).inactive);return {total:c.length,records,vip,inactive,top:records.find(x=>x.count>0)||null,registeredWithoutPurchase:records.filter(x=>!x.count).length};}
+function itAiAlerts(){const a=[],stock=itAiStockStats(),crm=itAiCrmStats(),fin=itAiFinanceStats(),clients=itAiCustomersStats();
+ if(crm?.incoming.length)a.push({tone:'urgent',title:`${crm.incoming.length} cliente(s) aguardando resposta da equipe`,text:'A última interação foi registrada como mensagem do cliente. Verifique os atendimentos.',mod:'crm',rank:1});
+ if(crm?.late.length)a.push({tone:'urgent',title:`${crm.late.length} follow-up(s) vencido(s)`,text:'Retornos agendados que já passaram do prazo no CRM local.',mod:'crm',rank:2});
+ if(fin?.late.length)a.push({tone:'urgent',title:`${fin.late.length} conta(s) a pagar vencida(s)`,text:`Total registrado como vencido: ${itAiMoney(fin.lateTotal)}.`,mod:'relatorios',rank:3});
+ if(stock?.low.length)a.push({tone:'warning',title:`${stock.low.length} acessório(s) com estoque baixo`,text:'Itens com 3 unidades ou menos, conforme o saldo cadastrado.',mod:'estoque',rank:4});
+ if(stock?.stale.length)a.push({tone:'warning',title:`${stock.stale.length} aparelho(s) parado(s) há mais de 60 dias`,text:'Aparelhos disponíveis com data de entrada registrada.',mod:'estoque',rank:5});
+ if(crm?.quiet.length)a.push({tone:'warning',title:`${crm.quiet.length} cliente(s) sem resposta há 24h+`,text:'Registros manuais: a loja respondeu e não registrou nova resposta do cliente.',mod:'crm',rank:6});
+ if(crm?.missing.length)a.push({tone:'neutral',title:`${crm.missing.length} oportunidade(s) sem próxima ação`,text:'Negociações abertas sem retorno agendado.',mod:'crm',rank:7});
+ if(clients?.inactive.length)a.push({tone:'neutral',title:`${clients.inactive.length} cliente(s) inativo(s)`,text:'Classificação baseada no histórico de compras cadastrado.',mod:'clientes',rank:8});
+ return a.sort((x,y)=>x.rank-y.rank);
+}
+function itAiLink(text,mod){return itAiAllowed(mod)?`<button class="it-ai-small-btn primary" type="button" onclick="itAiGo('${mod}')">${itAiEsc(text)} →</button>`:'';}
+function itAiGo(mod){if(!itAiAllowed(mod))return toast('Acesso restrito para este usuário.');itAiToggle(false);go(mod);}
+function itAiSources(){return `<div class="it-ai-sources"><b>Fontes:</b> registros carregados no ERP (vendas, estoque, clientes e contas) e CRM neste navegador. ${fbReady?'O Firebase está configurado; isso não confirma sincronização atual.':'O Firebase não está disponível nesta sessão.'}<br>As respostas são análises locais. WhatsApp e IA generativa ainda não estão conectados. Sem dados cadastrados, os indicadores aparecem zerados.</div>`;}
+function itAiKpi(label,value,note){return `<div class="it-ai-kpi"><small>${itAiEsc(label)}</small><strong>${itAiEsc(value)}</strong><em>${itAiEsc(note)}</em></div>`;}
+function itAiNotice(x){return `<div class="it-ai-notice ${itAiEsc(x.tone)}"><span class="it-ai-notice-mark"></span><div class="it-ai-notice-content"><b>${itAiEsc(x.title)}</b><p>${itAiEsc(x.text)}</p></div>${itAiAllowed(x.mod)?`<button type="button" onclick="itAiGo('${x.mod}')">Abrir</button>`:''}</div>`;}
+function itAiChart(){if(!itAiCanSales())return '';const month=itAiDate().slice(0,7),keys=Array.from({length:6},(_,i)=>itAiMonthShift(month,i-5)),all=itAiSales(),data=keys.map(k=>all.filter(x=>itAiISO(x.data).slice(0,7)===k).reduce((v,x)=>v+vendaLiquido(x),0)),max=Math.max(1,...data);return `<div class="it-ai-section-head"><b>Faturamento registrado</b><span>Últimos 6 meses</span></div><div class="it-ai-chart" role="img" aria-label="Evolução do faturamento em seis meses">${keys.map((k,i)=>`<div class="it-ai-bar-col" title="${itAiEsc(k)}: ${itAiEsc(itAiMoney(data[i]))}"><div class="it-ai-bar" style="height:${Math.max(3,data[i]/max*75)}px"></div><small>${k.slice(5,7)}/${k.slice(2,4)}</small></div>`).join('')}</div><div class="it-ai-muted" style="margin-top:7px">Valores de vendas concluídas; não é fluxo de caixa.</div>`;}
+function itAiOverview(){const sales=itAiCanSales()?itAiSalesStats('mes'):null,crm=itAiCrmStats(),stock=itAiStockStats(),fin=itAiFinanceStats(),a=itAiAlerts();let cards=[];
+ if(sales){cards.push(itAiKpi('Vendas deste mês',itAiMoney(sales.revenue),`${itAiN(sales.v.length)} venda(s) registradas`));cards.push(itAiKpi('Ticket médio',itAiMoney(sales.ticket),'Média por venda do mês'));}
+ if(crm)cards.push(itAiKpi('Retornos vencidos',itAiN(crm.late.length),'CRM deste navegador'));
+ if(stock)cards.push(itAiKpi('Acessórios em alerta',itAiN(stock.low.length),'3 unidades ou menos'));
+ if(fin&&!stock)cards.push(itAiKpi('A pagar',itAiMoney(fin.payTotal),'Contas pendentes'));
+ if(itAiCanProfit()&&sales)cards.push(itAiKpi('Lucro das vendas',itAiMoney(sales.profit),'Antes de despesas da loja'));
+ const quick=itAiPrompts();return `<div class="it-ai-intro"><b>Seus dados, sem adivinhação.</b><p>Resumo atualizado dos registros carregados. Vou mostrar prioridades e explicar cada indicador. Nenhuma operação é feita sem sua ação.</p></div><div class="it-ai-section-head"><b>Visão atual</b><span>${itAiEsc(itAiDate().split('-').reverse().join('/'))}</span></div>${cards.length?`<div class="it-ai-kpi-grid">${cards.join('')}</div>`:'<div class="it-ai-empty">Nenhum módulo analítico autorizado para seu perfil.</div>'}${itAiChart()}<div class="it-ai-section-head"><b>Precisa de atenção</b><span>${a.length} alerta(s)</span></div>${a.length?a.slice(0,3).map(itAiNotice).join(''):'<div class="it-ai-empty">Não encontrei alertas nos registros disponíveis.</div>'}<div class="it-ai-section-head"><b>Pergunte à iTronic AI</b><span>Respostas com dados</span></div><div class="it-ai-quick-grid">${quick.slice(0,6).map(x=>`<button class="it-ai-quick" type="button" onclick="itAiAsk('${x.id}')">${itAiEsc(x.title)}</button>`).join('')}</div>${itAiSources()}`;}
+function itAiPriorities(){const a=itAiAlerts();return `<div class="it-ai-intro"><b>Plano de ação da loja</b><p>As prioridades abaixo são calculadas a partir dos dados acessíveis para seu perfil. Toque em Abrir para conferir os registros na área correspondente.</p></div><div class="it-ai-section-head"><b>Fila de atenção</b><span>${itAiN(a.length)} ocorrência(s)</span></div>${a.length?a.map(itAiNotice).join(''):'<div class="it-ai-empty">Nenhuma pendência identificada nas fontes consultadas.</div>'}<div class="it-ai-actions"><button class="it-ai-small-btn" type="button" onclick="itAiRefresh()">↻ Atualizar dados</button>${itAiCanCrm()?itAiLink('CRM','crm'):''}${itAiAllowed('relatorios')?itAiLink('Relatórios','relatorios'):''}</div>${itAiSources()}`;}
+function itAiPrompts(){return [
+ ...(itAiCanSales()?[{id:'vendas',title:'Como foram minhas vendas?'},{id:'ticket',title:'Qual meu ticket médio?'}]:[]),
+ ...(itAiCanProfit()?[{id:'lucro',title:'Quanto lucrei este mês?'}]:[]),
+ ...(itAiCanCrm()?[{id:'crm',title:'Quais clientes preciso responder?'},{id:'followup',title:'Há follow-ups atrasados?'}]:[]),
+ ...(itAiCanStock()?[{id:'estoque',title:'O que preciso repor?'},{id:'parados',title:'Quais produtos estão parados?'}]:[]),
+ ...(itAiCanClient()?[{id:'clientes',title:'Quem são meus melhores clientes?'}]:[]),
+ ...(itAiCanFinance()?[{id:'financeiro',title:'Quais contas estão vencidas?'}]:[]),
+ ...(itAiCanService()?[{id:'assistencia',title:'Como está a Assistência?'}]:[]),
+ {id:'prioridades',title:'Quais são as prioridades da loja?'}
+ ];}
+function itAiRecognizePeriod(q){if(/\bhoje\b/.test(q))return 'hoje';if(/\bontem\b/.test(q))return 'ontem';if(/7\s*dias|ultima semana|esta semana/.test(q))return '7d';if(/30\s*dias|ultimo mes/.test(q))return '30d';if(/todas? as vendas|historico inteiro|todo o historico/.test(q))return 'todos';return 'mes';}
+function itAiAnswer(raw){const q=itAiText(raw).replace(/[^\p{L}\p{N}\s]/gu,' '),p=itAiRecognizePeriod(q),moneyFmt=itAiMoney;
+ const reply=(text,source,mod)=>({text,source,mod});
+ const n=(x)=>itAiN(x);
+ if(/\b(lucro|lucrei|lucrou|ganho|ganhei|margem|rentabilidade|lucratividade|custo de venda)\b/.test(q)){
+  if(!itAiCanProfit())return reply('O cálculo de lucro e margem é restrito ao perfil Administrador. Para consultar, peça acesso autorizado ao administrador.','Permissões do Administrador');
+  const s=itAiSalesStats(p),margin=s.revenue?s.profit/s.revenue*100:0;
+  return reply(`Lucro das vendas em ${s.period.label}: ${moneyFmt(s.profit)}.\nFaturamento: ${moneyFmt(s.revenue)} em ${n(s.v.length)} venda(s).\nMargem sobre vendas: ${margin.toFixed(1).replace('.',',')}%.\nImportante: mantenho a fórmula original do sistema, considerando produtos e aparelhos recebidos na troca. Isto NÃO é lucro líquido: ainda não desconta despesas fixas, tributos não registrados e demais obrigações.`, 'Vendas registradas e fórmula lucroVenda()', 'relatorios');
+ }
+ if(/(conta|pagar|receber|caixa|financeir|despesa|vencimento)/.test(q)){
+  if(!itAiCanFinance())return reply('Dados financeiros restritos ao Administrador ou a quem recebeu permissão financeira.','Permissões do Administrador');
+  const f=itAiFinanceStats(),sales=itAiCanSales()?itAiSalesStats('mes'):null;
+  return reply(`Contas a pagar pendentes: ${n(f.toPay.length)} · ${moneyFmt(f.payTotal)}.\nVencidas a pagar: ${n(f.late.length)} · ${moneyFmt(f.lateTotal)}.\nContas a receber pendentes: ${n(f.toReceive.length)} · ${moneyFmt(f.receiveTotal)}.${sales?`\nValores a receber vinculados às vendas do mês: ${moneyFmt(sales.receivable)}.`:''}\nEstes totais vêm dos lançamentos atuais e não são uma demonstração de lucro líquido.`, 'Contas a pagar/receber e vendas registradas','relatorios');
+ }
+ if(/(cliente.*(responde|resposta|retorno)|responder cliente|sem resposta|whatsapp|follow ?up|negociac|crm|orcamento.*(parad|pend)|recuper)/.test(q)){
+  if(!itAiCanCrm())return reply('A análise de negociações só aparece para perfis com acesso ao CRM.','Permissões do Administrador');
+  const c=itAiCrmStats(),names=c.incoming.slice(0,3).map(x=>x.name||'Sem nome');
+  return reply(`CRM acessível neste navegador:\n• ${n(c.open.length)} oportunidade(s) abertas.\n• ${n(c.incoming.length)} cliente(s) esperando resposta da equipe.\n• ${n(c.waiting.length)} aguardando resposta do cliente.\n• ${n(c.quiet.length)} sem resposta do cliente há 24h+.\n• ${n(c.late.length)} follow-up(s) vencido(s).\n• ${n(c.recover.length)} negociação(ões) com chance de recuperação.${names.length?`\nPrioridade para retorno: ${names.join(', ')}.`:''}\nObservação: o CRM registra as respostas manualmente; ainda NÃO lê mensagens reais do WhatsApp.`, 'itronic_crm_native_v1 · dados locais do CRM', 'crm');
+ }
+ if(/(repor|estoque|produto|acessorio|parad|encalhad|quantidade|ruptura)/.test(q)){
+  if(!itAiCanStock())return reply('Seu perfil não tem permissão para consultar o estoque.','Permissões do Administrador');
+  const x=itAiStockStats(),lowNames=x.low.slice(0,5).map(a=>`${a.nome||a.modelo||a.descricao||'Acessório'} (${n(a.qtd)} un.)`);
+  return reply(`Estoque registrado:\n• ${n(x.available.length)} aparelho(s) disponíveis e ${n(x.reserved.length)} reservado(s).\n• ${n(x.low.length)} tipo(s) de acessório com até 3 unidades.\n• ${n(x.stale.length)} aparelho(s) disponível(is) há mais de 60 dias.${lowNames.length?`\nReposição a conferir: ${lowNames.join('; ')}.`:''}${itAiCanProfit()?`\nCapital cadastrado em aparelhos não vendidos: ${moneyFmt(x.capital)}.`:''}\nAs sugestões consideram saldos e datas cadastrados, não uma previsão de demanda.`, 'Produtos e acessórios do estoque','estoque');
+ }
+ if(/(melhor.*cliente|cliente.*(mais (compr|gast)|vip|inativ|fiel)|ranking.*cliente|ticket.*cliente)/.test(q)){
+  if(!itAiCanClient())return reply('Seus acessos não incluem a área Clientes.','Permissões do Administrador');
+  const c=itAiCustomersStats(),top=c.records.filter(x=>x.count).slice(0,5);
+  return reply(`Carteira: ${n(c.total)} cliente(s) não arquivado(s), ${n(c.vip.length)} VIP e ${n(c.inactive.length)} inativo(s).\n${top.length?'Clientes com maiores gastos registrados:\n'+top.map((x,i)=>`${i+1}. ${x.cliente.nome||'Sem nome'}: ${moneyFmt(x.total)} (${n(x.count)} compras)`).join('\n'):'Ainda não há compras identificadas para montar o ranking.'}\nO ranking considera apenas vendas visíveis e associadas aos cadastros; vendas sem identificação não são atribuídas a clientes.`, 'Cadastros de clientes e vendas vinculadas','clientes');
+ }
+ if(/(assistenc|servico|reparo|bateria|tela)/.test(q)){
+  if(!itAiCanService())return reply('Seu perfil não tem acesso à Assistência.','Permissões do Administrador');
+  const services=itAiCash(db?.servicos);
+  return reply(`A Assistência possui ${n(services.length)} serviço(s) cadastrados no catálogo.\nPosso direcionar você aos serviços e valores registrados. Não posso calcular faturamento técnico, tempo médio de reparo ou garantias executadas porque a versão atual ainda não possui ordens de serviço completas vinculadas ao resultado de cada atendimento.`, 'Catálogo de serviços da Assistência','assistencia');
+ }
+ if(/(venda|fatura|receita|ticket|vendedor|desempenho comercial|mais vend)/.test(q)){
+  if(!itAiCanSales())return reply('Seu perfil não tem acesso às informações de vendas.','Permissões do Administrador');
+  const s=itAiSalesStats(p),sellers={};s.v.forEach(x=>{const k=x.vendedor||'Não informado';sellers[k]=(sellers[k]||0)+vendaLiquido(x);});const top=Object.entries(sellers).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  return reply(`Vendas em ${s.period.label}: ${moneyFmt(s.revenue)}.\nQuantidade: ${n(s.v.length)} venda(s).\nTicket médio: ${moneyFmt(s.ticket)}.\nValor a receber vinculado a essas vendas: ${moneyFmt(s.receivable)}.${/vendedor|equipe|ranking/.test(q)&&top.length?'\nVendedores no período: '+top.map(([name,v])=>`${name}: ${moneyFmt(v)}`).join('; '):''}\nFaturamento representa vendas registradas; o dinheiro recebido em caixa pode ser diferente.`, 'Vendas registradas visíveis ao usuário','relatorios');
+ }
+ if(/(prioridade|resumo|situacao|status|loja|hoje precisa)/.test(q)){
+  const a=itAiAlerts().slice(0,5);return reply(a.length?`Prioridades identificadas nos registros:\n${a.map((x,i)=>`${i+1}. ${x.title}. ${x.text}`).join('\n')}\nAbra a aba Prioridades para conferir cada caso.`:'Nos dados acessíveis ao seu perfil não há alertas prioritários identificados agora. Isso não significa que todos os lançamentos estejam completos.', 'Alertas calculados com base nos registros atuais');
+ }
+ return reply('Posso consultar vendas, ticket médio, clientes, estoque, CRM, contas e assistência, conforme suas permissões.\nExperimente: “Quanto vendi este mês?”, “Quais follow-ups estão atrasados?” ou “Quem são meus melhores clientes?”.\nAinda não sou uma IA generativa conectada à internet: respondo por consultas reais aos dados disponíveis, sem inventar números.', 'Guia de consultas disponíveis');
+}
+function itAiSetTab(tab){if(!session)return;itAiState.tab=['resumo','alertas','chat'].includes(tab)?tab:'resumo';document.querySelectorAll('.it-ai-tabs button').forEach(x=>x.classList.toggle('active',x.id==='it-ai-tab-'+itAiState.tab));const area=el('it-ai-body');if(!area)return;if(itAiState.tab==='resumo')area.innerHTML=itAiOverview();else if(itAiState.tab==='alertas')area.innerHTML=itAiPriorities();else{area.innerHTML=`<div class="it-ai-intro"><b>Pergunte sobre a operação.</b><p>Uso somente os dados disponíveis para seu usuário e explico a origem de cada resposta. As conversas não são salvas na nuvem.</p></div><div class="it-ai-messages" id="it-ai-messages"></div>${!itAiState.messages.length?`<div class="it-ai-section-head"><b>Experimente perguntar</b></div><div class="it-ai-quick-grid">${itAiPrompts().slice(0,8).map(x=>`<button class="it-ai-quick" type="button" onclick="itAiAsk('${x.id}')">${itAiEsc(x.title)}</button>`).join('')}</div>`:''}`;itAiMessages();}area.scrollTop=0;}
+function itAiMessages(){const box=el('it-ai-messages');if(!box)return;box.innerHTML=itAiState.messages.map(x=>`<div class="it-ai-message ${x.who==='user'?'user':'assistant'}">${itAiEsc(x.text)}${x.who==='assistant'?`<small>Fonte: ${itAiEsc(x.source||'registros do sistema')}</small>${x.mod&&itAiAllowed(x.mod)?`<div class="it-ai-actions">${itAiLink('Abrir '+(x.mod==='crm'?'CRM':x.mod),x.mod)}</div>`:''}`:''}</div>`).join('');box.scrollIntoView({block:'end'});}
+function itAiQuestion(question){if(!session)return;const q=String(question||'').trim().slice(0,320);if(!q)return;itAiState.messages.push({who:'user',text:q});let ans;try{ans=itAiAnswer(q)}catch(e){console.error('iTronic AI: erro na consulta',e);ans={text:'Não consegui consultar essa informação. Verifique os registros e tente novamente.',source:'Consulta indisponível'};}itAiState.messages.push({who:'assistant',...ans});itAiState.messages=itAiState.messages.slice(-30);itAiSetTab('chat');const area=el('it-ai-body');if(area)area.scrollTop=area.scrollHeight;}
+function itAiAsk(id){const item=itAiPrompts().find(x=>x.id===id);if(item)itAiQuestion(item.title);}
+function itAiSend(e){if(e)e.preventDefault();const input=el('it-ai-input');if(!input)return;const q=input.value;input.value='';itAiQuestion(q);input.focus();}
+function itAiRefresh(){if(!session)return;itAiSetTab(itAiState.tab);toast('Análises atualizadas com os dados disponíveis.');}
+function itAiToggle(force){if(!session)return;const root=el('it-ai-root');if(!root)return;const open=typeof force==='boolean'?force:!root.classList.contains('open');root.classList.toggle('open',open);itAiState.opened=open;el('it-ai-window').setAttribute('aria-hidden',String(!open));el('it-ai-launch').setAttribute('aria-expanded',String(open));if(open){itAiSetTab(itAiState.tab);if(itAiState.tab==='chat')el('it-ai-input').focus();}}
+function itAiReset(){itAiState.messages=[];itAiState.tab='resumo';itAiState.opened=false;document.body.classList.remove('it-ai-ready');el('it-ai-root')?.classList.remove('open');el('it-ai-window')?.setAttribute('aria-hidden','true');const area=el('it-ai-body');if(area)area.innerHTML='';}
+function itAiOnLogin(){itAiState.messages=[];itAiState.tab='resumo';document.body.classList.add('it-ai-ready');}
+function itAiVoice(){const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){toast('Ditado indisponível neste navegador. Use o teclado.');return;}try{const rec=new Recognition();rec.lang='pt-BR';rec.interimResults=false;rec.maxAlternatives=1;rec.onresult=e=>{const v=e.results?.[0]?.[0]?.transcript||'';const input=el('it-ai-input');if(input){input.value=v;input.focus();}itAiSetTab('chat');};rec.onerror=()=>toast('Não foi possível usar o microfone.');rec.start();toast('Pode falar a pergunta.');}catch(_){toast('Ditado não disponível neste dispositivo.');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('it-ai-root')?.classList.contains('open'))itAiToggle(false);});
 
 /* ============ INIT ============ */
 loadDB();
