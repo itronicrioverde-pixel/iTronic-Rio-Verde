@@ -1713,6 +1713,29 @@ body.it-ai-ready .it-ai-root{display:block}
 @media(max-width:359px){.it-ai-quick-grid{grid-template-columns:1fr}.it-ai-kpi strong{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.it-ai-window,.it-ai-launch{transition:none!important}}
 
+
+/* ========== ITRONIC | IMPORTAÇÃO INTELIGENTE + CÂMERA ========== */
+.it-import-welcome{padding:14px 16px;border:1px solid color-mix(in srgb,var(--brand) 34%,var(--line));background:color-mix(in srgb,var(--brand) 8%,var(--card));border-radius:15px;margin-bottom:15px}
+.it-import-welcome strong{display:block;font-size:14px;margin-bottom:5px}
+.it-import-welcome p,.it-import-note{font-size:12px;color:var(--text2);line-height:1.55}
+.it-import-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:10px 0}
+.it-import-field{min-width:0}.it-import-field label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.it-import-field .input{min-width:0;padding:11px 12px}
+.it-import-file{border:1.5px dashed color-mix(in srgb,var(--brand-deep) 36%,var(--line));border-radius:15px;padding:18px;background:var(--card);text-align:center;margin:15px 0;cursor:pointer}
+.it-import-file b{display:block;margin-bottom:5px;font-size:13px}.it-import-file small{display:block;color:var(--text2);font-size:11px}
+.it-import-stats{display:flex;gap:7px;flex-wrap:wrap;margin:11px 0}.it-import-stat{background:var(--bg2);border:1px solid var(--line);padding:6px 9px;font-size:11px;border-radius:20px;font-weight:700}
+.it-import-preview{overflow:auto;border:1px solid var(--line);border-radius:14px;margin:12px 0;max-height:240px}
+.it-import-preview table{border-collapse:collapse;width:100%;font-size:12px;min-width:460px}
+.it-import-preview th,.it-import-preview td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.it-import-preview th{background:var(--bg2);color:var(--text2);position:sticky;top:0;z-index:1}
+.it-import-preview tr:last-child td{border:0}.it-import-preview tr.it-import-invalid{opacity:.6}.it-import-preview small{color:var(--text2)}
+.it-import-card-action{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.it-import-card-action .btn{width:auto;padding:11px 14px;margin:0;font-size:12px}
+.it-photo-help{margin:10px 0;padding:12px;border:1px dashed var(--line);border-radius:13px;background:var(--bg2);display:flex;align-items:flex-start;gap:10px}
+.it-photo-help p{font-size:11px;color:var(--text2);line-height:1.5;margin-top:4px}
+.it-photo-help button{width:auto;flex:none;padding:8px 10px;font-size:11px}
+.it-photo-help .it-photo-status{font-size:11px;color:var(--brand-deep);margin-top:5px}
+@media(max-width:590px){.it-import-grid{grid-template-columns:1fr}.it-import-card-action .btn{flex:1}.it-photo-help{flex-wrap:wrap}}
+
 </style>
 </head>
 <body>
@@ -3429,7 +3452,7 @@ function renderEstoque(){
   });
   if(searchEstoque){
     const q=searchEstoque.toLowerCase();
-    lista=lista.filter(p=>(p.modelo||'').toLowerCase().includes(q)||(p.imei||'').toLowerCase().includes(q)||(p.serie||'').toLowerCase().includes(q)||(p.marca||'').toLowerCase().includes(q));
+    lista=lista.filter(p=>(p.modelo||'').toLowerCase().includes(q)||(p.imei||'').toLowerCase().includes(q)||(p.serie||'').toLowerCase().includes(q)||(p.ean||'').toLowerCase().includes(q)||(p.marca||'').toLowerCase().includes(q));
   }
 
   el('page-estoque').innerHTML=`
@@ -3446,7 +3469,7 @@ function renderEstoque(){
     </div>
 
     <div class="module-actions"><button class="btn" onclick="abrirCatalogo()">Montar catálogo ↗</button>
-    ${podeEditar()?`<button class="btn secondary" onclick="openProduto()">+ Cadastrar aparelho</button>`:''}</div>
+    ${podeEditar()?`<button class="btn secondary" onclick="openProduto()">+ Cadastrar aparelho</button><button class="btn secondary" onclick="itFotoCadastro('produto')">${vectorIcon('camera')} Foto inteligente</button><button class="btn secondary" onclick="itImportarAbrir('produtos')">${vectorIcon('file')} Importar Excel</button>`:''}</div>
     <div class="sec-title">Aparelhos</div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -3549,7 +3572,7 @@ function renderAssistencia(){
     </div>
 
     <div class="module-actions assist-actions"><button class="btn" onclick="abrirCatalogoServ()">${vectorIcon('folder')} Montar catálogo</button>
-    ${podeEditar()?`<button class="btn secondary" onclick="openNovoServico()">${plusIcon()} Cadastrar serviço</button>`:''}</div>
+    ${podeEditar()?`<button class="btn secondary" onclick="openNovoServico()">${plusIcon()} Cadastrar serviço</button><button class="btn secondary" onclick="itImportarAbrir('servicos')">${vectorIcon('file')} Importar Excel / CSV</button>`:''}</div>
     <div class="sec-title">Serviços</div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -3908,7 +3931,7 @@ function renderCarrinhoAcess(isAdmin){
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px">
       <div class="sec-title" style="margin:0">Acessórios disponíveis</div>
-      ${podeEditar()?`<button class="btn secondary" style="width:auto;padding:6px 12px;font-size:13px" onclick="openNovoAcessorio()">+ Cadastrar</button>`:''}
+      ${podeEditar()?`<button class="btn secondary" style="width:auto;padding:6px 12px;font-size:13px" onclick="openNovoAcessorio()">+ Cadastrar</button><button class="btn secondary" style="width:auto;padding:6px 12px;font-size:13px" onclick="itFotoCadastro('acessorio')">${vectorIcon('camera')} Foto</button><button class="btn secondary" style="width:auto;padding:6px 12px;font-size:13px" onclick="itImportarAbrir('acessorios')">${vectorIcon('file')} Excel</button>`:''}
     </div>
     ${listaAgrupada}
 
@@ -4050,6 +4073,7 @@ function enviarPedidoAcess(modo){
 function openNovoAcessorio(){ formAcessorio(null); }
 function editarAcessorio(id){ const a=(db.acessorios||[]).find(x=>x.id===id); formAcessorio(a); }
 function formAcessorio(a){
+  itFotoFile=null;itFotoTipo=null;
   if(!podeEditar()){ toast('Só o administrador pode cadastrar/editar'); return; }
   tempFotosAcess = a ? (a.fotos||[]).slice() : [];
   // categorias já usadas nos acessórios
@@ -4068,12 +4092,13 @@ function formAcessorio(a){
     ${selFld('Situação','ac-sit',['Disponível','Aguardando pedido','Sem estoque'],a?(a.situacao||'Disponível'):'Disponível')}
     ${fld('Fornecedor (de onde veio)','ac-forn',{ph:'ex: Distribuidora X',val:a?a.fornecedor:''})}
     ${fld('Número de série (opcional)','ac-serie',{ph:'deixe vazio se for item de quantidade',val:a?a.serie:''})}
+    ${fld('Código de barras / EAN (opcional)','ac-ean',{ph:'código da embalagem',val:a?a.ean:''})}
     ${fld('Preço de venda','ac-venda',{ph:'0,00',val:a?a.venda:''})}
     ${fld('Custo (só você vê)','ac-custo',{ph:'0,00',val:a?a.custo:''})}
     ${fld('Quantidade em estoque','ac-qtd',{ph:'0',val:a?a.qtd:''})}
     <div class="field"><label>Fotos</label>
       <button class="btn secondary" onclick="el('ac-foto-input').click()" style="width:auto;padding:8px 14px">${vectorIcon('camera')} Adicionar fotos</button>
-      <input type="file" id="ac-foto-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display:none" onchange="addFotoAcess(event)">
+      <input type="file" id="ac-foto-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display:none" onchange="addFotoAcess(event)"><div class="it-photo-help"><div style="flex:1"><b>Cadastro com foto real</b><p>Use a câmera para anexar a imagem ao cadastro; para identificar nome ou modelo, fotografe a etiqueta da embalagem.</p><div class="it-photo-status" id="it-photo-status"></div></div><button type="button" class="btn secondary" onclick="itFotoSolicitar('acessorio')">${vectorIcon('camera')} Câmera</button><button type="button" class="btn secondary" onclick="itFotoReanalisar('acessorio')">Ler foto</button></div>
       <div id="ac-fotos-grid" class="photo-grid" style="margin-top:10px"></div>
     </div>
   `;
@@ -4089,6 +4114,7 @@ function formAcessorio(a){
       situacao:getV('ac-sit'),
       fornecedor:getV('ac-forn').trim(),
       serie:getV('ac-serie').trim(),
+      ean:getV('ac-ean').trim(),
       venda:parseFloat(String(getV('ac-venda')).replace(',','.'))||0,
       custo:parseFloat(String(getV('ac-custo')).replace(',','.'))||0,
       qtd:parseInt(getV('ac-qtd'))||0,
@@ -4556,6 +4582,7 @@ function pillPick(id,val,elm){
   elm.classList.add('active');
 }
 function openProduto(prod){
+  itFotoFile=null;itFotoTipo=null;
   if(!podeEditar()){ toast('Só o administrador pode cadastrar/editar'); return; }
   tempFotos = prod? (prod.fotos||[]).slice() : [];
   const p=prod||{};
@@ -4581,11 +4608,12 @@ function openProduto(prod){
     </div>
     <div class="field"><label>Fotos do aparelho</label>
       <div class="photo-grid" id="foto-grid"></div>
-      <input type="file" id="foto-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display:none" onchange="addFoto(event)">
+      <input type="file" id="foto-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display:none" onchange="addFoto(event)"><div class="it-photo-help"><div style="flex:1"><b>Cadastro por foto real</b><p>Fotografe a embalagem ou etiqueta com o modelo legível. O sistema tenta reconhecer texto e código de barras e sugere os campos; confirme antes de salvar.</p><div class="it-photo-status" id="it-photo-status"></div></div><button type="button" class="btn secondary" onclick="itFotoSolicitar('produto')">${vectorIcon('camera')} Câmera</button><button type="button" class="btn secondary" onclick="itFotoReanalisar('produto')">Ler foto</button></div>
     </div>
     <div id="estado-box">${estadoFields(p)}</div>
     ${fld('IMEI','pr-imei',{val:p.imei,ph:'só números',inputmode:'numeric'})}
     ${fld('Número de série','pr-serie',{val:p.serie,ph:'opcional'})}
+    ${fld('Código de barras / EAN','pr-ean',{val:p.ean,ph:'opcional'})}
     ${fld('Saúde da bateria (%)','pr-bateria',{val:p.bateria,ph:'ex: 89',inputmode:'numeric'})}
     ${fld('Peças trocadas','pr-pecas',{val:p.pecas,ph:'ex: Tela original, bateria'})}
     ${fld('Fornecedor','pr-forn',{val:p.fornecedor,ph:'de quem comprou'})}
@@ -4812,7 +4840,7 @@ function saveProduto(id){
     cat:getV('pr-cat'),marca:getV('pr-marca'),modelo,cor:getV('pr-cor'),
     armazenamento:getV('pr-arm'),condicao:getV('pr-cond'),imei,serie,
     bateria:getV('pr-bateria'),pecas:getV('pr-pecas'),
-    fornecedor:getV('pr-forn'),entrada:getV('pr-entrada'),
+    ean:getV('pr-ean'),fornecedor:getV('pr-forn'),entrada:getV('pr-entrada'),
     compra:getN('pr-compra'),venda:getN('pr-venda'),status:getV('pr-status'),
     obs:el('pr-obs').value.trim(),fotos:tempFotos.slice()
   };
@@ -7286,7 +7314,7 @@ function itAiOverview(){const sales=itAiCanSales()?itAiSalesStats('mes'):null,cr
  if(stock)cards.push(itAiKpi('Acessórios em alerta',itAiN(stock.low.length),'3 unidades ou menos'));
  if(fin&&!stock)cards.push(itAiKpi('A pagar',itAiMoney(fin.payTotal),'Contas pendentes'));
  if(itAiCanProfit()&&sales)cards.push(itAiKpi('Lucro das vendas',itAiMoney(sales.profit),'Antes de despesas da loja'));
- const quick=itAiPrompts();return `<div class="it-ai-intro"><b>Seus dados, sem adivinhação.</b><p>Resumo atualizado dos registros carregados. Vou mostrar prioridades e explicar cada indicador. Nenhuma operação é feita sem sua ação.</p></div><div class="it-ai-section-head"><b>Visão atual</b><span>${itAiEsc(itAiDate().split('-').reverse().join('/'))}</span></div>${cards.length?`<div class="it-ai-kpi-grid">${cards.join('')}</div>`:'<div class="it-ai-empty">Nenhum módulo analítico autorizado para seu perfil.</div>'}${itAiChart()}<div class="it-ai-section-head"><b>Precisa de atenção</b><span>${a.length} alerta(s)</span></div>${a.length?a.slice(0,3).map(itAiNotice).join(''):'<div class="it-ai-empty">Não encontrei alertas nos registros disponíveis.</div>'}<div class="it-ai-section-head"><b>Pergunte à iTronic AI</b><span>Respostas com dados</span></div><div class="it-ai-quick-grid">${quick.slice(0,6).map(x=>`<button class="it-ai-quick" type="button" onclick="itAiAsk('${x.id}')">${itAiEsc(x.title)}</button>`).join('')}</div>${itAiSources()}`;}
+ const quick=itAiPrompts();return `<div class="it-ai-intro"><b>Seus dados, sem adivinhação.</b><p>Resumo atualizado dos registros carregados. Vou mostrar prioridades e explicar cada indicador. Nenhuma operação é feita sem sua ação.</p></div><div class="it-ai-section-head"><b>Visão atual</b><span>${itAiEsc(itAiDate().split('-').reverse().join('/'))}</span></div>${cards.length?`<div class="it-ai-kpi-grid">${cards.join('')}</div>`:'<div class="it-ai-empty">Nenhum módulo analítico autorizado para seu perfil.</div>'}${itAiChart()}<div class="it-ai-section-head"><b>Precisa de atenção</b><span>${a.length} alerta(s)</span></div>${a.length?a.slice(0,3).map(itAiNotice).join(''):'<div class="it-ai-empty">Não encontrei alertas nos registros disponíveis.</div>'}<div class="it-ai-section-head"><b>Pergunte à iTronic AI</b><span>Respostas com dados</span></div><div class="it-ai-quick-grid">${quick.slice(0,6).map(x=>`<button class="it-ai-quick" type="button" onclick="itAiAsk('${x.id}')">${itAiEsc(x.title)}</button>`).join('')}</div>${podeEditar()?`<div class="it-ai-section-head"><b>Cadastro inteligente</b><span>Ferramentas assistidas</span></div><div class="it-ai-actions"><button class="it-ai-small-btn" type="button" onclick="itAiToggle(false);itImportarAbrir('servicos')">Importar planilha</button><button class="it-ai-small-btn" type="button" onclick="itAiToggle(false);itFotoCadastro('produto')">Cadastrar por foto</button></div>`:''}${itAiSources()}`;}
 function itAiPriorities(){const a=itAiAlerts();return `<div class="it-ai-intro"><b>Plano de ação da loja</b><p>As prioridades abaixo são calculadas a partir dos dados acessíveis para seu perfil. Toque em Abrir para conferir os registros na área correspondente.</p></div><div class="it-ai-section-head"><b>Fila de atenção</b><span>${itAiN(a.length)} ocorrência(s)</span></div>${a.length?a.map(itAiNotice).join(''):'<div class="it-ai-empty">Nenhuma pendência identificada nas fontes consultadas.</div>'}<div class="it-ai-actions"><button class="it-ai-small-btn" type="button" onclick="itAiRefresh()">↻ Atualizar dados</button>${itAiCanCrm()?itAiLink('CRM','crm'):''}${itAiAllowed('relatorios')?itAiLink('Relatórios','relatorios'):''}</div>${itAiSources()}`;}
 function itAiPrompts(){return [
  ...(itAiCanSales()?[{id:'vendas',title:'Como foram minhas vendas?'},{id:'ticket',title:'Qual meu ticket médio?'}]:[]),
@@ -7353,6 +7381,120 @@ function itAiReset(){itAiState.messages=[];itAiState.tab='resumo';itAiState.open
 function itAiOnLogin(){itAiState.messages=[];itAiState.tab='resumo';document.body.classList.add('it-ai-ready');}
 function itAiVoice(){const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){toast('Ditado indisponível neste navegador. Use o teclado.');return;}try{const rec=new Recognition();rec.lang='pt-BR';rec.interimResults=false;rec.maxAlternatives=1;rec.onresult=e=>{const v=e.results?.[0]?.[0]?.transcript||'';const input=el('it-ai-input');if(input){input.value=v;input.focus();}itAiSetTab('chat');};rec.onerror=()=>toast('Não foi possível usar o microfone.');rec.start();toast('Pode falar a pergunta.');}catch(_){toast('Ditado não disponível neste dispositivo.');}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('it-ai-root')?.classList.contains('open'))itAiToggle(false);});
+
+
+/* ========== ITRONIC | ASSISTENTE DE IMPORTAÇÃO E FOTO REAL ========== */
+const itImpRules={
+ servicos:[['nome','Nome do serviço',true],['categoria','Tipo de serviço',false],['modelo','Modelo',false],['qualidade','Qualidade',false],['situacao','Situação',false],['venda','Preço de venda',true],['custo','Custo da peça',false],['fornecedor','Fornecedor',false]],
+ acessorios:[['nome','Nome do acessório',true],['categoria','Categoria',false],['sub','Tipo / qualidade',false],['situacao','Situação',false],['venda','Preço de venda',true],['custo','Custo',false],['qtd','Quantidade',false],['fornecedor','Fornecedor',false],['serie','Série',false]],
+ produtos:[['modelo','Modelo do aparelho',true],['marca','Marca',false],['cat','Categoria',false],['cor','Cor',false],['armazenamento','Armazenamento',false],['condicao','Condição',false],['imei','IMEI',false],['serie','Série',false],['venda','Preço de venda',true],['compra','Custo',false],['fornecedor','Fornecedor',false]]
+};
+const itImpAliases={
+ nome:['nome','servico','serviços','descrição','descricao','produto','item','acessorio','peca','pecas'],
+ modelo:['modelo','aparelho','compativel','compatibilidade','dispositivo','model'],
+ categoria:['categoria','tipo serviço','tipo servico','serviço tipo','servico tipo','categoria produto','grupo'],
+ cat:['categoria','grupo','tipo aparelho'],
+ venda:['preco venda','preço venda','preco final','valor de venda','valor venda','preço','preco','valor','price','preco serviço','valor serviço','preço serviço'],
+ custo:['custo','custo peça','custo peca','custo unitario','custo medio','preco compra','valor compra','compra'],
+ compra:['custo','preco compra','valor compra','compra','custo unitario'],
+ fornecedor:['fornecedor','distribuidor','origem compra'],
+ qualidade:['qualidade','linha','categoria peça','tipo peca'],
+ situacao:['situação','situacao','disponibilidade','status'],
+ qtd:['qtd','quantidade','estoque','qtde','saldo'],
+ marca:['marca','fabricante','brand'],
+ cor:['cor','color','colour'],
+ armazenamento:['armazenamento','capacidade','memoria','storage','gb'],
+ condicao:['condicao','condição','estado','novo usado'],
+ imei:['imei'],serie:['serie','serial','numero serie','nº serie'],
+ sub:['qualidade','tipo','linha']
+};
+let itImpState=null;
+function itImpNorm(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
+function itImpEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function itImpNum(v){if(typeof v==='number')return Number.isFinite(v)?v:NaN;const raw=String(v??'').trim();if(!raw)return NaN;let t=raw.replace(/R\$|\s|[^\d.,\-]/g,'');if(t.includes(',')&&t.includes('.')){t=t.lastIndexOf(',')>t.lastIndexOf('.')?t.replace(/\./g,'').replace(',','.'):t.replace(/,/g,'');}else if(t.includes(',')){t=t.replace(/\./g,'').replace(',','.');}else if(/^\d{1,3}(\.\d{3})+$/.test(t)){t=t.replace(/\./g,'');}const n=Number(t);return Number.isFinite(n)?n:NaN;}
+function itImpCSV(text){let rows=[],row=[],field='',quoted=false;const src=String(text||'').replace(/^\uFEFF/,'');const first=src.split(/\r?\n/).find(x=>x.trim())||'';const sep=(first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length?';':',';for(let i=0;i<src.length;i++){let c=src[i];if(quoted){if(c==='"'&&src[i+1]==='"'){field+='"';i++;}else if(c==='"')quoted=false;else field+=c;}else if(c==='"')quoted=true;else if(c===sep){row.push(field);field='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&src[i+1]==='\n')i++;row.push(field);if(row.some(x=>String(x).trim()))rows.push(row);row=[];field='';}else field+=c;}row.push(field);if(row.some(x=>String(x).trim()))rows.push(row);return rows;}
+function itImpLoadLib(){if(window.XLSX)return Promise.resolve();if(window.itImpXLSXPromise)return window.itImpXLSXPromise;window.itImpXLSXPromise=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=()=>window.XLSX?resolve():reject(new Error('Leitor Excel indisponível'));sc.onerror=()=>reject(new Error('Não foi possível carregar o leitor Excel. Verifique a internet ou exporte o arquivo como CSV.'));document.head.appendChild(sc);});return window.itImpXLSXPromise.catch(e=>{window.itImpXLSXPromise=null;throw e;});}
+function itImportarAbrir(tipo='servicos'){
+ if(!podeEditar()){toast('Você não tem permissão para importar cadastros.');return;}
+ itImpState={tipo:itImpRules[tipo]?tipo:'servicos',file:null,book:null,aba:'',tables:{},headers:[],data:[],map:{},selected:new Set(),erro:''};
+ openSheet('Importação inteligente','',null,null);itImpRender();
+}
+function itImpRender(){
+ const st=itImpState;if(!st)return;
+ const tipoLabels={servicos:'Serviços da assistência',acessorios:'Acessórios',produtos:'Aparelhos do estoque'};
+ const has=st.headers.length>0;
+ let html=`<div class="it-import-welcome"><strong>Importar cadastros sem digitar linha por linha</strong><p>Envie uma planilha Excel (.xlsx, .xls) ou CSV, confira o mapeamento das colunas e revise os itens antes de salvar. Nenhum preço existente será alterado automaticamente.</p></div>
+ <div class="it-import-grid"><div class="it-import-field"><label>Onde cadastrar</label><select class="input" id="it-imp-tipo" onchange="itImpTrocarTipo(this.value)">${Object.entries(tipoLabels).map(([k,v])=>`<option value="${k}" ${st.tipo===k?'selected':''}>${v}</option>`).join('')}</select></div>
+ ${st.book?`<div class="it-import-field"><label>Aba do Excel</label><select class="input" onchange="itImpTrocarAba(this.value)">${Object.keys(st.tables).map(n=>`<option value="${itImpEsc(n)}" ${n===st.aba?'selected':''}>${itImpEsc(n)}</option>`).join('')}</select></div>`:''}</div>
+ <div class="it-import-file" role="button" tabindex="0" onclick="el('it-imp-file').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();el('it-imp-file').click()}"><b>${st.file?'Arquivo: '+itImpEsc(st.file.name):'Selecionar planilha Excel ou CSV'}</b><small>Colunas comuns: serviço/produto, modelo, preço, custo, categoria e fornecedor</small><input type="file" id="it-imp-file" style="display:none" accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onclick="event.stopPropagation()" onchange="itImpLerArquivo(event)"></div>`;
+ if(st.erro)html+=`<p style="color:var(--red);font-size:12px;margin:8px 0">${itImpEsc(st.erro)}</p>`;
+ if(has){html+=`<div class="it-import-welcome"><strong>Confira quais colunas representam cada informação</strong><p>Escolha a coluna correta nos campos abaixo. Se um custo não estiver na planilha, ele permanece zerado para você preencher depois.</p></div><div class="it-import-grid">`;
+ for(const [field,label,required] of itImpRules[st.tipo]){
+ const val=st.map[field]??'';
+ html+=`<div class="it-import-field"><label>${itImpEsc(label)}${required?' *':''}</label><select class="input" aria-label="${itImpEsc(label)}" onchange="itImpMapear('${field}',this.value)"><option value="">— não importar —</option>${st.headers.map((h,i)=>`<option value="${i}" ${String(i)===String(val)?'selected':''}>${itImpEsc(h||'Coluna '+(i+1))}</option>`).join('')}</select></div>`;
+ }
+ html+='</div>'+itImpPreview();
+ }
+ html+=`<p class="it-import-note">Importação assistida, não um reconhecimento infalível por IA. Revise nomes, preços e duplicidades antes de confirmar. Arquivos grandes podem atingir o limite de armazenamento do Firebase.</p>`;
+ el('sheet-body').innerHTML=html;
+ const ok=el('sheet-save');ok.textContent=has?'Confirmar importação':'';ok.style.visibility=has?'visible':'hidden';sheetSaveFn=has?itImpSalvar:null;
+}
+function itImpTrocarTipo(v){if(!itImpState||!itImpRules[v])return;itImpState.tipo=v;if(itImpState.data.length)itImpDetectMap();itImpRender();}
+function itImpTrocarAba(v){if(!itImpState||!itImpState.tables[v])return;itImpState.aba=v;itImpPrepareRows();itImpRender();}
+function itImpTrocarHeader(rows){if(!rows||!rows.length)return 0;let best=0,bestScore=-1;for(let i=0;i<Math.min(rows.length,15);i++){let score=0;for(const cell of rows[i]){const n=itImpNorm(cell);if(!n)continue;for(const key of ['nome','modelo','venda','custo','compra','categoria','qtd','marca','cor'])if((itImpAliases[key]||[]).some(a=>itImpNorm(a)===n))score+=2;}if(score>bestScore){bestScore=score;best=i;}}return best;}
+function itImpPrepareRows(){let st=itImpState,rows=st.tables[st.aba]||[];const headerIndex=itImpTrocarHeader(rows);st.headers=(rows[headerIndex]||[]).map((h,i)=>String(h??'').trim()||'Coluna '+(i+1));st.data=rows.slice(headerIndex+1).filter(r=>r&&r.some(x=>String(x??'').trim())).slice(0,1000);st.erro='';itImpDetectMap();}
+function itImpDetectMap(){const st=itImpState;st.map={};const used=new Set();for(const [key] of itImpRules[st.tipo]){const aliases=(itImpAliases[key]||[]).map(itImpNorm);let best=-1,score=0;st.headers.forEach((h,i)=>{if(used.has(i))return;const n=itImpNorm(h);const sc=aliases.includes(n)?5:(aliases.some(x=>n.startsWith(x+' ')||n.endsWith(' '+x))?3:0);if(sc>score){score=sc;best=i;}});if(best>=0){st.map[key]=String(best);used.add(best);}}}
+function itImpMapear(k,v){if(!itImpState)return;itImpState.map[k]=v;itImpRender();}
+async function itImpLerArquivo(e){const file=e.target.files?.[0];if(!file)return;let st=itImpState;st.file=file;st.erro='';st.headers=[];st.data=[];itImpRender();try{if(/\.csv$/i.test(file.name)){st.book=null;st.aba='Dados';st.tables={'Dados':itImpCSV(await file.text())};}else{await itImpLoadLib();const buf=await file.arrayBuffer();const book=XLSX.read(buf,{type:'array',cellDates:false});st.book=book;st.tables={};for(const sheet of book.SheetNames){const rows=XLSX.utils.sheet_to_json(book.Sheets[sheet],{header:1,defval:'',raw:true});if(rows.length)st.tables[sheet]=rows;}st.aba=Object.keys(st.tables)[0]||'';}if(!st.aba)throw new Error('Não encontrei linhas para importar.');itImpPrepareRows();if(!st.data.length)throw new Error('Planilha sem registros após o cabeçalho.');toast('Arquivo lido. Revise as colunas.');}catch(err){st.erro=err.message||'Erro ao ler planilha';st.headers=[];st.data=[];}itImpRender();}
+function itImpCampo(row,k){const col=itImpState.map[k];return col!==undefined&&col!==''?String(row[Number(col)]??'').trim():'';}
+function itImpCria(row){const st=itImpState,t=st.tipo;const name=itImpCampo(row,t==='produtos'?'modelo':'nome');let obj={nome:name,modelo:itImpCampo(row,'modelo'),venda:itImpNum(itImpCampo(row,'venda')),custo:itImpNum(itImpCampo(row,'custo'))};if(t==='servicos'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.modelo=itImpCampo(row,'modelo');obj.qualidade=itImpCampo(row,'qualidade')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.fornecedor=itImpCampo(row,'fornecedor');}else if(t==='acessorios'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.sub=itImpCampo(row,'sub')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.qtd=Math.max(0,Math.floor(itImpNum(itImpCampo(row,'qtd'))||0));obj.fornecedor=itImpCampo(row,'fornecedor');obj.serie=itImpCampo(row,'serie');}else{obj.modelo=name;delete obj.nome;obj.marca=itImpCampo(row,'marca')||'Apple';obj.cat=itImpCampo(row,'cat')||'iPhone';obj.cor=itImpCampo(row,'cor');obj.armazenamento=itImpCampo(row,'armazenamento');obj.condicao=itImpCampo(row,'condicao')||'Novo';obj.imei=itImpCampo(row,'imei');obj.serie=itImpCampo(row,'serie');obj.fornecedor=itImpCampo(row,'fornecedor');obj.compra=itImpNum(itImpCampo(row,'compra'));delete obj.custo;obj.status='Disponível';}
+ return obj;
+}
+function itImpKey(o,kind){const n=itImpNorm;if(kind==='servicos')return [n(o.nome),n(o.modelo),n(o.qualidade||'Original')].join('|');if(kind==='acessorios')return [n(o.nome),n(o.categoria)].join('|');return [n(o.modelo),n(o.armazenamento),n(o.cor),n(o.imei||o.serie)].join('|');}
+function itImpValid(o,kind){const name=kind==='produtos'?o.modelo:o.nome;if(!name)return 'sem nome/modelo';if(!Number.isFinite(o.venda)||o.venda<=0)return 'preço inválido';if(kind==='produtos'){if(!Number.isFinite(o.compra)||o.compra<0)o.compra=0;}else if(!Number.isFinite(o.custo)||o.custo<0)o.custo=0;return '';}
+function itImpRevisar(){const st=itImpState,kind=st.tipo,old=db[kind]||[];const existing=new Set(old.map(o=>itImpKey(o,kind)));const seen=new Set();let valid=0,dupes=0,invalid=0;let data=st.data.map((row,idx)=>{const obj=itImpCria(row);let why=itImpValid(obj,kind);const key=itImpKey(obj,kind);if(!why&&(existing.has(key)||seen.has(key)))why='já cadastrado';if(!why){seen.add(key);valid++;}else if(why==='já cadastrado')dupes++;else invalid++;return {idx,obj,why};});return{data,valid,dupes,invalid};}
+function itImpPreview(){const r=itImpRevisar();const name=k=>k==='produtos'?'modelo':'nome';let html=`<div class="it-import-stats"><span class="it-import-stat">${itImpState.data.length} linhas</span><span class="it-import-stat" style="color:var(--green)">${r.valid} prontos</span><span class="it-import-stat">${r.dupes} duplicados ignorados</span><span class="it-import-stat">${r.invalid} para corrigir</span></div><div class="it-import-preview"><table><thead><tr><th>Produto/serviço</th><th>Preço</th><th>Custo</th><th>Estado</th></tr></thead><tbody>`;for(let item of r.data.slice(0,30)){const o=item.obj;html+=`<tr class="${item.why?'it-import-invalid':''}"><td>${itImpEsc(o[name(itImpState.tipo)]||'—')}<small>${itImpEsc(o.modelo&&o.nome?' · '+o.modelo:'')}</small></td><td>${Number.isFinite(o.venda)?money(o.venda):'—'}</td><td>${money((itImpState.tipo==='produtos'?o.compra:o.custo)||0)}</td><td>${itImpEsc(item.why||'Pronto')}</td></tr>`;}html+=`</tbody></table></div><p class="it-import-note">Prévia de até 30 linhas. Novos cadastros: <b>${r.valid}</b>. Existentes não serão sobrescritos. Confira a categoria, os modelos e os valores.</p>`;return html;}
+function itImpSalvar(){const st=itImpState;if(!st||!podeEditar())return;const required=itImpRules[st.tipo].filter(x=>x[2]);if(required.some(x=>st.map[x[0]]===undefined||st.map[x[0]]==='')){toast('Associe as colunas obrigatórias antes de importar.');return;}const review=itImpRevisar(),items=review.data.filter(x=>!x.why).map(x=>x.obj);if(!items.length){toast('Nenhum item novo válido para importar.');return;}if(items.length>150){toast('Importe até 150 registros por vez para proteger a base.');return;}const tipo=st.tipo;
+ askConfirm(`Cadastrar ${items.length} ${tipo==='servicos'?'serviços':tipo==='produtos'?'aparelhos':'acessórios'}? ${review.dupes} duplicados serão ignorados. Os preços atuais não serão alterados.`,()=>{
+  const agora=todayStr();const list=(db[tipo]||[]);items.forEach(o=>{o.id=uid();o.entrada=agora;o.fotos=[];list.push(o);});const base=JSON.stringify(db);if(new Blob([base]).size>850000){list.splice(-items.length);toast('Importação cancelada: a base ficaria grande demais para o documento do Firebase. Divida os cadastros ou migre a base para coleções.');return;}
+  try{saveDB();closeSheet();render(currentTab);toast(`${items.length} cadastros importados com sucesso.`);}catch(err){list.splice(-items.length);toast('Erro ao salvar. Nenhum item foi importado.');}
+ });
+}
+/* CADASTRO VISUAL: imagem real + leitura optativa de etiqueta/código */
+let itFotoFile=null,itFotoTipo=null,itFotoLeitura=false;
+function itFotoCadastro(tipo='produto'){if(!podeEditar()){toast('Você não tem permissão para cadastrar.');return;}itFotoSolicitar(tipo,true);}
+function itFotoSolicitar(tipo='produto',novo=false){
+ if(!podeEditar()){toast('Sem permissão para cadastrar.');return;}
+ const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');inp.style.display='none';document.body.appendChild(inp);
+ inp.onchange=()=>{const f=inp.files?.[0];inp.remove();if(!f)return;if(novo){if(tipo==='acessorio')formAcessorio(null);else openProduto(null);}itFotoReceber(f,tipo);};
+ inp.addEventListener('cancel',()=>inp.remove(),{once:true});inp.click();
+}
+function itFotoStatus(msg){const p=el('it-photo-status');if(p)p.textContent=msg;}
+function itFotoReceber(file,tipo){itFotoFile=file;itFotoTipo=tipo;itFotoStatus('Preparando a foto...');comprimirFoto(file,(data)=>{if(!data){itFotoStatus('Não consegui abrir essa imagem.');return;}if(tipo==='acessorio'){tempFotosAcess.push(data);renderFotosAcess();}else{tempFotos.push(data);renderFotos();}itFotoStatus('Foto real anexada. Lendo informações da embalagem...');itFotoAnalisar(file,tipo);});}
+function itFotoReanalisar(tipo){const ar=tipo==='acessorio'?tempFotosAcess:tempFotos;const f=itFotoFile;if(f&&itFotoTipo===tipo){itFotoAnalisar(f,tipo);return;}const src=ar[ar.length-1];if(!src){toast('Adicione uma foto primeiro.');return;}if(src.startsWith('data:')){fetch(src).then(r=>r.blob()).then(b=>itFotoAnalisar(b,tipo)).catch(()=>toast('Não consegui ler a foto.'));}else toast('Use a câmera novamente para analisar esta imagem.');}
+function itFotoLoadOCR(){if(window.Tesseract)return Promise.resolve();if(window.itFotoOcrPromise)return window.itFotoOcrPromise;window.itFotoOcrPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';script.onload=()=>window.Tesseract?resolve():reject(new Error('OCR indisponível'));script.onerror=()=>reject(new Error('Não foi possível carregar a leitura de texto.'));document.head.appendChild(script);});return window.itFotoOcrPromise.catch(e=>{window.itFotoOcrPromise=null;throw e;});}
+async function itFotoAnalisar(file,tipo){if(itFotoLeitura)return;itFotoLeitura=true;let achou=[];try{
+ if('BarcodeDetector' in window){try{const bd=new BarcodeDetector({formats:['ean_13','ean_8','code_128','qr_code']});const bmp=await createImageBitmap(file);const r=await bd.detect(bmp);bmp.close?.();if(r.length){const codigo=r[0].rawValue;achou.push('Código '+codigo+' detectado (confira a etiqueta).');const alvo=el(tipo==='acessorio'?'ac-ean':'pr-ean');if(alvo&&!alvo.value.trim())alvo.value=codigo;}}catch(_){}}
+ itFotoStatus('Analisando texto visível na foto...');await itFotoLoadOCR();const result=await Tesseract.recognize(file,'por+eng');const texto=(result.data?.text||'').replace(/\s+/g,' ').trim();const sugestoes=itFotoSugestao(texto,tipo);for(const [k,v] of Object.entries(sugestoes)){const node=el(k);if(!node)continue;if(node.tagName==='SELECT'){const option=Array.from(node.options).find(o=>itImpNorm(o.value)===itImpNorm(v));if(option){node.value=option.value;node.dispatchEvent(new Event('change',{bubbles:true}));achou.push(v);}}else if(!node.value.trim()||(k==='pr-marca'&&node.value==='Apple')){node.value=v;achou.push(v);}}
+ itFotoSugerirPreco(tipo);
+ itFotoStatus(achou.length?'Sugestões: '+[...new Set(achou)].join(' · ')+'. Revise antes de salvar.':'Foto anexada. Não encontrei modelo legível; informe o nome e o custo antes de salvar.');
+ }catch(err){itFotoStatus('Foto anexada. Leitura automática indisponível: preencha ou confirme os dados manualmente.');}finally{itFotoLeitura=false;}}
+function itFotoSugerirPreco(tipo){
+ if(tipo==='acessorio'){const nome=getV('ac-nome'),preco=el('ac-venda');if(!nome||!preco||preco.value.trim())return;const match=(db.acessorios||[]).find(x=>itImpNorm(x.nome)===itImpNorm(nome)&&Number(x.venda)>0);if(match){preco.value=match.venda;itFotoStatus('Preço copiado de um acessório idêntico já cadastrado. Confira o valor.');}return;}
+ const modelo=getV('pr-modelo'),arm=getV('pr-arm'),cor=getV('pr-cor'),preco=el('pr-venda');
+ if(!modelo||!arm||!cor||!preco||preco.value.trim())return;
+ const match=(db.produtos||[]).find(x=>itImpNorm(x.modelo)===itImpNorm(modelo)&&itImpNorm(x.armazenamento)===itImpNorm(arm)&&itImpNorm(x.cor)===itImpNorm(cor)&&itImpNorm(x.condicao||'Novo')===itImpNorm(getV('pr-cond')||'Novo')&&Number(x.venda)>0);
+ if(match){preco.value=match.venda;itFotoStatus('Preço de venda sugerido do mesmo modelo, armazenamento, cor e condição. Confira antes de salvar.');}
+}
+function itFotoSugestao(texto,tipo){const v=String(texto||'').replace(/\s+/g,' '),r={};if(tipo==='acessorio'){
+ const vlow=itImpNorm(v);const kinds=[['Capinha',/capinha|case|capa\b/i],['Película',/pelicula|screen protector|vidro 9d/i],['Fonte',/fonte|charger|adaptador|carregador/i],['Cabo',/cabo|usb.c cable|lightning cable/i],['Fone',/airpods|earbuds|earphones|fone/i]];const kind=kinds.find(x=>x[1].test(v));const model=v.match(/iPhone\s*(?:1[0-8])(?:\s*(?:Pro\s*Max|Pro|Plus|Mini))?/i);if(kind){r['ac-nome']=kind[0]+(model?' '+model[0]:'');}else if(model){r['ac-nome']='Acessório para '+model[0];}return r;
+ }
+ const m=v.match(/iPhone\s*(?:1[0-8])(?:\s*(?:Pro\s*Max|Pro|Plus|Mini|Air))?/i)||v.match(/iPad\s*(?:Air|Pro|Mini)?\s*\d{0,2}/i)||v.match(/MacBook\s*(?:Air|Pro)?\s*(?:M[1-9])?/i)||v.match(/Apple\s*Watch\s*(?:Ultra|Series|SE)?\s*\d*/i);
+ if(m){r['pr-modelo']=m[0].replace(/\s+/g,' ').trim();const c=r['pr-modelo'].split(' ')[0];r['pr-cat']=c==='MacBook'?'MacBook':c==='iPad'?'iPad':c==='Apple'?'Apple Watch':'iPhone';}
+ const storage=v.match(/\b(64|128|256|512)\s*(?:GB|G)\b|\b(1|2)\s*TB\b/i);if(storage)r['pr-arm']=storage[0].replace(/\s+/g,'').toUpperCase();
+ const colors=['Titânio Natural','Titânio Deserto','Titânio Azul','Laranja Cósmico','Azul Intenso','Prateado','Grafite','Preto','Branco','Azul','Rosa','Verde','Roxo','Lavanda','Bordô','Dourado','Natural','Deserto','Sálvia'];const cor=colors.find(c=>itImpNorm(v).includes(itImpNorm(c)));if(cor)r['pr-cor']=cor;
+ return r;
+}
 
 /* ============ INIT ============ */
 loadDB();
