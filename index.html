@@ -2129,6 +2129,21 @@ function vendasVisiveis(){
   return db.vendas.filter(v=>v.vendedor===(session?session.nome:''));
 }
 function podeEditar(){return podeAcao('editarCatalogo');}
+// Estoque por cadastro: registros antigos representam uma unidade; registros novos podem ter lote.
+function qtdAparelho(p){
+  if(!p)return 0;
+  if(p.qtd===undefined||p.qtd===null||p.qtd==='')return p.status==='Vendido'?0:1;
+  const n=Number(p.qtd);
+  return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;
+}
+function qtdInteiraFormulario(id,rotulo,opcional=false){
+  const campo=el(id),v=String(campo?.value??'').trim();
+  if(opcional&&!v)return null;
+  const n=Number(v);
+  if(!v||!Number.isSafeInteger(n)||n<0){toast('Informe uma quantidade válida para '+rotulo+' (0 ou mais).');campo?.focus();return undefined;}
+  return n;
+}
+
 function podeVerPainel(){return podeAcessarModulo('painel');}
 function reconciliarVendidos(){
   // Corrige produtos que já foram vendidos mas ficaram como "Disponível"/"Reservado".
@@ -2138,7 +2153,7 @@ function reconciliarVendidos(){
   db.vendas.forEach(v=>{ (v.itens||[]).forEach(it=>{ if(it.prodId) idsVendidos.add(it.prodId); }); });
   let mudou=false;
   db.produtos.forEach(p=>{
-    if(idsVendidos.has(p.id) && p.status!=='Vendido'){
+    if(idsVendidos.has(p.id) && p.status!=='Vendido' && (p.qtd==null || qtdAparelho(p)===0)){
       p.status='Vendido';
       if(!p.vendidoEm){
         // tenta usar a data da venda correspondente
@@ -2942,10 +2957,10 @@ function vendaCaixa(v){
 
 function dashStats(){
   const disp = db.produtos.filter(p=>p.status!=='Vendido');
-  const valorEstoque = disp.reduce((s,p)=>s+(Number(p.compra)||0),0);
-  const vendaEstoque = disp.reduce((s,p)=>s+(Number(p.venda)||0),0);
+   const valorEstoque = disp.reduce((s,p)=>s+(Number(p.compra)||0)*qtdAparelho(p),0);
+   const vendaEstoque = disp.reduce((s,p)=>s+(Number(p.venda)||0)*qtdAparelho(p),0);
   const lucroPotencial = vendaEstoque - valorEstoque;
-  const qtd = disp.length;
+   const qtd = disp.reduce((total,p)=>total+qtdAparelho(p),0);
   const t = todayStr();
   const mesAtual = t.slice(0,7);
   let vendaDia=0,vendaMes=0,lucroDia=0,lucroMes=0,aReceber=0;
@@ -3436,9 +3451,9 @@ function setFiltroEstoque(k){
 }
 window.setFiltroEstoque=setFiltroEstoque;
 function renderEstoque(){
-  const invest = db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.compra)||0),0);
-  const disponiveis = db.produtos.filter(p=>p.status==='Disponível').length;
-  const vendidos = db.produtos.filter(p=>p.status==='Vendido').length;
+   const invest = db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.compra)||0)*qtdAparelho(p),0);
+   const disponiveis = db.produtos.filter(p=>p.status==='Disponível').reduce((s,p)=>s+qtdAparelho(p),0);
+   const vendidos = (db.vendas||[]).reduce((total,v)=>total+(v.itens||[]).filter(it=>it.prodId).reduce((sum,it)=>sum+(Math.max(1,Number(it.qtd)||1)),0),0);
   // parados: disponível há mais de 45 dias
   const parados = db.produtos.filter(p=>{
     if(p.status!=='Disponível'||!p.entrada) return false;
@@ -3450,6 +3465,7 @@ function renderEstoque(){
   if(filterEstoque==='disp') lista=lista.filter(p=>p.status==='Disponível');
   else if(filterEstoque==='res') lista=lista.filter(p=>p.status==='Reservado');
   else if(filterEstoque==='vend') lista=lista.filter(p=>p.status==='Vendido');
+   else if(filterEstoque==='sem') lista=lista.filter(p=>p.status==='Sem estoque'||qtdAparelho(p)===0);
   else if(filterEstoque==='parado') lista=lista.filter(p=>{
     if(p.status!=='Disponível'||!p.entrada) return false;
     return (Date.now()-new Date(p.entrada).getTime())/86400000>45;
@@ -3480,7 +3496,7 @@ function renderEstoque(){
       <input placeholder="Buscar por modelo, IMEI ou série" value="${searchEstoque}" oninput="searchEstoque=this.value;renderEstoque();this.focus()">
     </div>
     <div class="filters">
-      ${['todos:Todos','disp:Disponíveis','res:Reservados','vend:Vendidos','parado:Parados'].map(f=>{const[k,l]=f.split(':');return `<button class="chip ${filterEstoque===k?'active':''}" onclick="setFiltroEstoque('${k}')">${l}</button>`}).join('')}
+      ${['todos:Todos','disp:Disponíveis','res:Reservados','vend:Vendidos','sem:Sem estoque','parado:Parados'].map(f=>{const[k,l]=f.split(':');return `<button class="chip ${filterEstoque===k?'active':''}" onclick="setFiltroEstoque('${k}')">${l}</button>`}).join('')}
     </div>
     ${lista.length? renderEstoqueAgrupado(lista) :
       `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><div>Nenhum aparelho aqui.<br>Toque em + para cadastrar.</div></div>`}
@@ -3599,7 +3615,7 @@ function servRow(s,isAdmin){
   const qualidadeClasse=qual==='Original'?'original':(qual==='Premium'?'premium':'paralela');
   return `<div class="row assist-service" onclick="acaoServico('${s.id}')">
     <div class="thumb assist-service-icon" style="${s.fotos&&s.fotos[0]?'padding:4px;background:#fff;border:1px solid var(--line)':''}">${s.fotos&&s.fotos[0]?`<img src="${imgFoto(s.fotos[0])}" style="width:100%;height:100%;object-fit:contain">`:assistIcon(s.categoria||s.nome)}</div>
-    <div class="info"><div class="t"><span class="assist-quality ${qualidadeClasse}">${qual}</span>${s.modelo||s.nome||''}</div><div class="s"><span class="assist-dot" style="background:${badgeCor}"></span>${badgeTxt}${isAdmin&&s.custo?' · custo '+money(s.custo):''}</div></div>
+    <div class="info"><div class="t"><span class="assist-quality ${qualidadeClasse}">${qual}</span>${s.modelo||s.nome||''}</div><div class="s"><span class="assist-dot" style="background:${badgeCor}"></span>${badgeTxt}${s.qtd!=null?' · '+Math.max(0,Number(s.qtd)||0)+' peça(s) em estoque':''}${isAdmin&&s.custo?' · custo '+money(s.custo):''}</div></div>
     <div class="right"><div class="p money-in">${money(s.venda)}</div>${chev()}</div>
   </div>`;
 }
@@ -3626,6 +3642,7 @@ function formServico(s){
     ${selFld('Situação','sv-sit',['Disponível','Aguardando pedido','Sem estoque'],s?(s.situacao||'Disponível'):'Disponível')}
     ${fld('Preço do serviço (cliente)','sv-venda',{ph:'0,00',val:s?s.venda:''})}
     ${fld('Custo da peça (só você vê)','sv-custo',{ph:'0,00',val:s?s.custo:''})}
+    <div class="field"><label for="sv-qtd">Quantidade de peças em estoque</label><input class="input" id="sv-qtd" type="number" inputmode="numeric" min="0" step="1" placeholder="Ex.: 5" value="${s&&s.qtd!=null?s.qtd:''}"><small style="display:block;margin:5px 3px 0;color:var(--text2);font-size:12px">Informe 0 se não houver peças. Deixe vazio quando o serviço não exigir controle de peça.</small></div>
     ${fld('Fornecedor da peça','sv-forn',{ph:'de onde compra',val:s?s.fornecedor:''})}
     <div class="field"><label>Fotos</label>
       <button class="btn secondary" onclick="el('sv-foto-input').click()" style="width:auto;padding:8px 14px">${vectorIcon('camera')} Adicionar fotos</button>
@@ -3636,6 +3653,8 @@ function formServico(s){
   openSheet(s?'Editar serviço':'Novo serviço', html, 'Salvar', ()=>{
     const nome=getV('sv-nome').trim();
     if(!nome){ toast('Informe o nome'); return; }
+    const qtd=qtdInteiraFormulario('sv-qtd','peças do serviço',true);
+    if(qtd===undefined)return;
     let categoria=getV('sv-cat');
     if(categoria==='__nova__') categoria=getV('sv-cat-nova').trim();
     else if(el('sv-cat-nova')&&el('sv-cat-nova').value.trim()&&categoria==='') categoria=getV('sv-cat-nova').trim();
@@ -3643,7 +3662,8 @@ function formServico(s){
       nome, categoria,
       modelo:getV('sv-modelo').trim(),
       qualidade:getV('sv-qual'),
-      situacao:getV('sv-sit'),
+      situacao:qtd===0&&getV('sv-sit')==='Disponível'?'Sem estoque':qtd>0&&getV('sv-sit')==='Sem estoque'?'Disponível':getV('sv-sit'),
+      qtd,
       venda:parseFloat(String(getV('sv-venda')).replace(',','.'))||0,
       custo:parseFloat(String(getV('sv-custo')).replace(',','.'))||0,
       fornecedor:getV('sv-forn').trim()
@@ -3807,14 +3827,14 @@ function renderEstoqueAgrupado(lista){
   `).join('');
 }
 function prodRow(p){
-  const b = p.status==='Disponível'?'disp':p.status==='Reservado'?'res':'vend';
+  const b = p.status==='Disponível'?'disp':(p.status==='Reservado'||p.status==='Sem estoque')?'res':'vend';
   const thumb = temFoto(p.fotos&&p.fotos[0])? `<img src="${imgFoto(p.fotos[0])}">` : CAT_VECTOR[p.cat]||vectorIcon('package');
   return `<div class="row" onclick="openProdDetail('${p.id}')">
     <div class="thumb">${thumb}</div>
     <div class="info">
       <div class="t">${p.marca||''} ${p.modelo||''}</div>
-      <div class="s">${[p.cor,p.armazenamento,p.condicao].filter(Boolean).join(' · ')}</div>
-      <span class="badge ${b}">${p.status}</span>
+<div class="s">${[p.cor,p.armazenamento,p.condicao].filter(Boolean).join(' · ')} · ${qtdAparelho(p)} un.</div>
+       <span class="badge ${b}">${p.status}</span>
     </div>
     <div class="right"><div><div class="p money-in">${money(p.venda)}</div>${podeEditar()&&Number(p.compra)?`<div class="neg" style="font-size:12px;text-align:right">(${money(p.compra)})</div>`:''}</div>${chev()}</div>
   </div>`;
@@ -4357,7 +4377,7 @@ function rpChart(v,canCosts){
  return `<div class="rp-graph"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolução do faturamento${canCosts?' e do lucro':''} em valores reais" preserveAspectRatio="none">${out}</svg></div><div class="rp-legend"><span><i></i>Faturamento bruto</span>${canCosts?'<span><i class="light"></i>Lucro das vendas</span>':''}</div>`;
 }
 function rpStockAge(p){if(!rpISO(p.entrada))return -1;return Math.max(0,Math.floor((rpDate(todayStr())-rpDate(rpISO(p.entrada)))/86400000));}
-function rpStockStats(stock,accessories){const ages={'Até 30 dias':0,'31–60 dias':0,'61–90 dias':0,'Acima de 90 dias':0,'Sem data':0};let locked=0,stale=0;for(const x of stock){const age=rpStockAge(x);if(age<0)ages['Sem data']++;else if(age<=30)ages['Até 30 dias']++;else if(age<=60)ages['31–60 dias']++;else if(age<=90)ages['61–90 dias']++;else ages['Acima de 90 dias']++;if(x.status==='Reservado')locked++;if(age>60&&x.status==='Disponível')stale++}const units=rpSum(accessories,x=>x.qtd),low=accessories.filter(x=>rpNum(x.qtd)<=3).length;return {ages,locked,stale,units,low,cost:rpSum(stock,x=>x.compra),price:rpSum(stock,x=>x.venda),valueAccessories:rpSum(accessories,x=>rpNum(x.qtd)*rpNum(x.custo))}}
+function rpStockStats(stock,accessories){const ages={'Até 30 dias':0,'31–60 dias':0,'61–90 dias':0,'Acima de 90 dias':0,'Sem data':0};let locked=0,stale=0;for(const x of stock){const age=rpStockAge(x);if(age<0)ages['Sem data']+=qtdAparelho(x);else if(age<=30)ages['Até 30 dias']+=qtdAparelho(x);else if(age<=60)ages['31–60 dias']+=qtdAparelho(x);else if(age<=90)ages['61–90 dias']+=qtdAparelho(x);else ages['Acima de 90 dias']+=qtdAparelho(x);if(x.status==='Reservado')locked+=qtdAparelho(x);if(age>60&&x.status==='Disponível')stale+=qtdAparelho(x)}const units=rpSum(accessories,x=>x.qtd),low=accessories.filter(x=>rpNum(x.qtd)<=3).length;return {ages,locked,stale,units,low,cost:rpSum(stock,x=>rpNum(x.compra)*qtdAparelho(x)),price:rpSum(stock,x=>rpNum(x.venda)*qtdAparelho(x)),valueAccessories:rpSum(accessories,x=>rpNum(x.qtd)*rpNum(x.custo))}}
 function rpSaleCats(v){const s={};for(const sale of v){const items=sale.itens||[],sum=rpSum(items,it=>it.venda);for(const it of items){const cat=it.cat||'Não informado';const amt=sum>0?rpNum(it.venda)/sum*vendaLiquido(sale):vendaLiquido(sale)/Math.max(items.length,1);s[cat]=(s[cat]||0)+amt;}}return s}
 function rpSaleItems(v){const units={},models={};for(const sale of v){for(const it of sale.itens||[]){const n=rpTxt(it.nome)||'Produto sem nome',q=Math.max(1,rpNum(it.qtd)||1),key=it.cat||'Outros';units[n]=(units[n]||0)+q;models[key]=(models[key]||0)+q}}return {units,models}}
 function rpPayments(v){const arr={};for(const sale of v){for(const p of sale.pagamentos||[]){const f=p.forma||'Não informada';arr[f]=(arr[f]||0)+rpNum(p.valor)}}return arr}
@@ -4367,14 +4387,14 @@ function rpSummary(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),canCosts=rp
  const sellerRank={};v.forEach(x=>{const k=x.vendedor||'Sem vendedor';sellerRank[k]=(sellerRank[k]||0)+vendaLiquido(x)});
  const {units}=rpSaleItems(v),cats=rpSaleCats(v),ss=rpStockStats(s.stock,s.accessories);
  const activeCrm=s.crm.filter(crmIsOpen).length,lateCrm=s.crm.filter(crmDue).length;
- const cards=rpKpi('Faturamento registrado',money(t.faturamento),rpDelta(t.faturamento,s.range.from?old.faturamento:null),'good')+rpKpi('Vendas concluídas',rpInt(t.qtd),rpDelta(t.qtd,s.range.from?old.qtd:null))+rpKpi('Ticket médio',money(t.ticket),'Valor médio por venda')+(canCosts?rpKpi('Lucro das vendas',money(t.lucro),'Margem '+rpPct(t.margem),t.lucro<0?'bad':'good'):rpKpi('Produtos em estoque',rpInt(s.stock.length),'Aparelhos não vendidos'));
+ const cards=rpKpi('Faturamento registrado',money(t.faturamento),rpDelta(t.faturamento,s.range.from?old.faturamento:null),'good')+rpKpi('Vendas concluídas',rpInt(t.qtd),rpDelta(t.qtd,s.range.from?old.qtd:null))+rpKpi('Ticket médio',money(t.ticket),'Valor médio por venda')+(canCosts?rpKpi('Lucro das vendas',money(t.lucro),'Margem '+rpPct(t.margem),t.lucro<0?'bad':'good'):rpKpi('Produtos em estoque',rpInt(rpSum(s.stock,qtdAparelho)),'Unidades não vendidas'));
  const salesBlock=rpPanel('Evolução de vendas','Faturamento registrado por data; baseado nos lançamentos existentes.',rpChart(v,canCosts),rpTxt(s.range.from)?rpFmtDate(s.range.from)+' – '+rpFmtDate(s.range.to):'Histórico');
  const topBlock=rpPanel('Produtos mais vendidos','Ranking por unidades vendidas, sem estimativas.',rpBarLabels(units,rpInt,6));
  const catBlock=rpPanel('Participação por categoria','Faturamento distribuído proporcionalmente pelos itens de cada venda.',rpBarLabels(cats,money,6));
  const sellersBlock=rpPanel('Vendas por vendedor','Total registrado por responsável.',rpBarLabels(sellerRank,money,6));
  const alerts=[];if(ss.stale)alerts.push({label:rpInt(ss.stale)+' aparelhos parados há mais de 60 dias',sub:'Estoque disponível com data de entrada informada.',tone:'warning',tab:'estoque'});if(ss.low)alerts.push({label:rpInt(ss.low)+' referências de acessórios com estoque baixo',sub:'Até 3 unidades por referência.',tone:'warning',tab:'estoque'});if(rpHas('crm')&&lateCrm)alerts.push({label:rpInt(lateCrm)+' follow-ups vencidos no período',sub:'Baseado nos retornos cadastrados neste navegador.',tone:'danger',tab:'crm'});if(rpCanFinance()){const overdue=(db.contas||[]).filter(x=>x.status!=='pago'&&rpISO(x.venc)&&x.venc<todayStr());if(overdue.length)alerts.push({label:rpInt(overdue.length)+' contas vencidas',sub:'Contas pendentes, independentemente do filtro de vendas.',tone:'danger',tab:'financeiro'});}if(!alerts.length)alerts.push({label:'Sem alertas críticos nos indicadores analisados',sub:'Continue registrando vendas, estoque e retornos.',tone:'positive',tab:'geral'});
  const alertBlock=rpPanel('Pontos de atenção','Indicadores operacionais para priorizar o trabalho.',`<div class="rp-alertlist">${alerts.map(a=>`<button class="rp-alert ${a.tone}" onclick="rpSwitchTab('${a.tab}')"><span><b>${rpEsc(a.label)}</b><small>${rpEsc(a.sub)}</small></span><strong>Ver →</strong></button>`).join('')}</div>`);
- const extra=rpPanel('Operação em números','Acompanhamento dos registros operacionais.',`<div class="rp-alertlist"><div class="rp-alert"><span>Clientes cadastrados</span><strong>${rpInt((db.clientes||[]).length)}</strong></div><div class="rp-alert"><span>Aparelhos em estoque</span><strong>${rpInt(s.stock.length)}</strong></div><div class="rp-alert"><span>Acessórios em estoque</span><strong>${rpInt(ss.units)} un.</strong></div>${rpHas('crm')?`<div class="rp-alert"><span>Oportunidades abertas criadas no período</span><strong>${rpInt(activeCrm)}</strong></div>`:''}${rpCanFinance()?`<div class="rp-alert"><span>Entradas de caixa registradas</span><strong>${money(cashIn)}</strong></div><div class="rp-alert"><span>Saídas manuais de caixa</span><strong>${money(cashOut)}</strong></div>`:''}</div><p class="rp-micro">Entradas incluem recebimentos das vendas e lançamentos manuais. As saídas são movimentos registrados, não equivalem automaticamente às despesas contábeis do período.</p>`);
+ const extra=rpPanel('Operação em números','Acompanhamento dos registros operacionais.',`<div class="rp-alertlist"><div class="rp-alert"><span>Clientes cadastrados</span><strong>${rpInt((db.clientes||[]).length)}</strong></div><div class="rp-alert"><span>Aparelhos em estoque</span><strong>${rpInt(rpSum(s.stock,qtdAparelho))}</strong></div><div class="rp-alert"><span>Acessórios em estoque</span><strong>${rpInt(ss.units)} un.</strong></div>${rpHas('crm')?`<div class="rp-alert"><span>Oportunidades abertas criadas no período</span><strong>${rpInt(activeCrm)}</strong></div>`:''}${rpCanFinance()?`<div class="rp-alert"><span>Entradas de caixa registradas</span><strong>${money(cashIn)}</strong></div><div class="rp-alert"><span>Saídas manuais de caixa</span><strong>${money(cashOut)}</strong></div>`:''}</div><p class="rp-micro">Entradas incluem recebimentos das vendas e lançamentos manuais. As saídas são movimentos registrados, não equivalem automaticamente às despesas contábeis do período.</p>`);
  return `<div class="rp-kpis">${cards}</div><div class="rp-layout">${salesBlock}${alertBlock}</div><div class="rp-layout equal">${topBlock}${catBlock}</div><div class="rp-layout equal">${sellersBlock}${extra}</div>`;
 }
 function rpSales(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),data=rpSaleItems(v),category=rpSaleCats(v),payments=rpPayments(v),canCosts=rpCanCosts(),totPay=rpSum(Object.values(payments),x=>x);const n=rpSum(v,x=>rpSum(x.itens||[],it=>it.qtd||1));
@@ -4383,10 +4403,10 @@ function rpSales(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),data=rpSaleIt
  const pay=Object.entries(payments).sort((a,b)=>b[1]-a[1]),gauge=pay.length?`<div class="rp-gauge">${pay.map(([k,x],i)=>`<span style="width:${totPay?x/totPay*100:0}%;background:${['#315f4b','#9cce59','#d4bb7b','#92b1ad','#dd9b8e','#94a4bd'][i%6]}" title="${rpEsc(k)}: ${money(x)}"></span>`).join('')}</div>`:'';
  return `<div class="rp-kpis">${cards.join('')}</div><div class="rp-layout">${rpPanel('Evolução do faturamento','Compare os períodos com base na data da venda.',rpChart(v,canCosts))}${rpPanel('Formas de pagamento','Lançamentos das vendas; incluem trocas em aparelhos, quando existentes.',gauge+rpBarLabels(payments,money,7))}</div><div class="rp-layout equal">${rpPanel('Mix de vendas','Participação no faturamento por categoria.',rpBarLabels(category,money,8))}${rpPanel('Produtos mais vendidos','Ranking por quantidade de unidades.',rpBarLabels(data.units,rpInt,8))}</div>${rpPanel('Últimas vendas','Até 30 registros; filtre ou exporte o CSV para ver a lista completa.',rpGridTable(['Data','Cliente','Produto','Vendedor','Faturado',...(canCosts?['Lucro']:[])],rpOrderRows(v,30)))}`;
 }
-function rpInventory(s){const stock=s.stock,acc=s.accessories,ss=rpStockStats(stock,acc),canCosts=rpCanCosts();const bycat={},status={},zero=[];stock.forEach(p=>{const c=p.cat||'Outros';bycat[c]=(bycat[c]||0)+1;const st=p.status||'Disponível';status[st]=(status[st]||0)+1;});acc.forEach(a=>{if(rpNum(a.qtd)<=3)zero.push(a)});
- const cards=[rpKpi('Aparelhos não vendidos',rpInt(stock.length),'Disponíveis e reservados'),rpKpi('Reservados',rpInt(ss.locked),'Ainda não vendidos'),rpKpi('Aparelhos parados há 60d+',rpInt(ss.stale),'Aparelhos disponíveis','warn'),rpKpi('Acessórios em estoque',rpInt(ss.units),'Unidades atuais')];if(canCosts)cards.push(rpKpi('Capital em aparelhos',money(ss.cost),'Valor de compra cadastrado'),rpKpi('Capital em acessórios',money(ss.valueAccessories),'Quantidade × custo unitário'),rpKpi('Preço de venda estimado',money(ss.price),'Somente aparelhos não vendidos'),rpKpi('Ganho potencial bruto',money(ss.price-ss.cost),'Não representa lucro realizado'));
- const rows=stock.slice().sort((a,b)=>rpStockAge(b)-rpStockAge(a)).slice(0,30).map(p=>`<tr>${rpCell((p.marca||'')+' '+(p.modelo||''))}${rpCell(p.cat||'—')}${rpCell(p.status||'—')}${rpCell(p.entrada?rpFmtDate(p.entrada):'—')}${rpCell(rpStockAge(p)<0?'—':rpInt(rpStockAge(p))+'d')}${canCosts?rpCell(money(p.compra),true):''}${rpCell(money(p.venda),true)}</tr>`);
- return `<div class="rp-kpis">${cards.join('')}</div><div class="rp-layout equal">${rpPanel('Idade do estoque de aparelhos','Aging baseado na data de entrada.',rpBarLabels(ss.ages,rpInt,5))}${rpPanel('Estoque por categoria','Aparelhos atualmente não vendidos.',rpBarLabels(bycat,rpInt,8))}</div><div class="rp-layout equal">${rpPanel('Estoque com risco de ruptura','Acessórios com até 3 unidades cadastradas.',zero.length?rpGridTable(['Acessório','Saldo'],zero.slice(0,16).map(a=>`<tr>${rpCell(a.nome||'Sem nome')}${rpCell(rpInt(a.qtd),true)}</tr>`)):'<div class="rp-empty">Nenhum acessório com saldo de 3 ou menos.</div>')}${rpPanel('Como interpretar','Indicadores e limites dos dados.','<div class="rp-empty-notice">A posição do estoque é <b>atual</b>, mesmo quando o período selecionado é passado. Os valores são calculados conforme custo e preço cadastrados, sem previsão de impostos, despesas futuras ou perdas. Produtos sem data de entrada não entram no cálculo de dias parados.</div>')}</div>${rpPanel('Aparelhos em estoque','Até 30 aparelhos ordenados pela maior idade; CSV contém todos.',rpGridTable(['Produto','Categoria','Status','Entrada','Idade',...(canCosts?['Custo']:[]),'Preço'],rows))}`;
+function rpInventory(s){const stock=s.stock,acc=s.accessories,ss=rpStockStats(stock,acc),canCosts=rpCanCosts();const bycat={},status={},zero=[];stock.forEach(p=>{const c=p.cat||'Outros';bycat[c]=(bycat[c]||0)+qtdAparelho(p);const st=p.status||'Disponível';status[st]=(status[st]||0)+qtdAparelho(p);});acc.forEach(a=>{if(rpNum(a.qtd)<=3)zero.push(a)});
+ const cards=[rpKpi('Unidades de aparelhos no estoque',rpInt(rpSum(stock,qtdAparelho)),'Inclui lotes e reservas'),rpKpi('Reservados',rpInt(ss.locked),'Ainda não vendidos'),rpKpi('Aparelhos parados há 60d+',rpInt(ss.stale),'Aparelhos disponíveis','warn'),rpKpi('Acessórios em estoque',rpInt(ss.units),'Unidades atuais')];if(canCosts)cards.push(rpKpi('Capital em aparelhos',money(ss.cost),'Valor de compra cadastrado'),rpKpi('Capital em acessórios',money(ss.valueAccessories),'Quantidade × custo unitário'),rpKpi('Preço de venda estimado',money(ss.price),'Somente aparelhos não vendidos'),rpKpi('Ganho potencial bruto',money(ss.price-ss.cost),'Não representa lucro realizado'));
+ const rows=stock.slice().sort((a,b)=>rpStockAge(b)-rpStockAge(a)).slice(0,30).map(p=>`<tr>${rpCell((p.marca||'')+' '+(p.modelo||''))}${rpCell(p.cat||'—')}${rpCell(p.status||'—')}${rpCell(rpInt(qtdAparelho(p)),true)}${rpCell(p.entrada?rpFmtDate(p.entrada):'—')}${rpCell(rpStockAge(p)<0?'—':rpInt(rpStockAge(p))+'d')}${canCosts?rpCell(money(p.compra),true):''}${rpCell(money(p.venda),true)}</tr>`);
+ return `<div class="rp-kpis">${cards.join('')}</div><div class="rp-layout equal">${rpPanel('Idade do estoque de aparelhos','Aging baseado na data de entrada.',rpBarLabels(ss.ages,rpInt,5))}${rpPanel('Estoque por categoria','Aparelhos atualmente não vendidos.',rpBarLabels(bycat,rpInt,8))}</div><div class="rp-layout equal">${rpPanel('Estoque com risco de ruptura','Acessórios com até 3 unidades cadastradas.',zero.length?rpGridTable(['Acessório','Saldo'],zero.slice(0,16).map(a=>`<tr>${rpCell(a.nome||'Sem nome')}${rpCell(rpInt(a.qtd),true)}</tr>`)):'<div class="rp-empty">Nenhum acessório com saldo de 3 ou menos.</div>')}${rpPanel('Como interpretar','Indicadores e limites dos dados.','<div class="rp-empty-notice">A posição do estoque é <b>atual</b>, mesmo quando o período selecionado é passado. Os valores são calculados conforme custo e preço cadastrados, sem previsão de impostos, despesas futuras ou perdas. Produtos sem data de entrada não entram no cálculo de dias parados.</div>')}</div>${rpPanel('Aparelhos em estoque','Até 30 aparelhos ordenados pela maior idade; CSV contém todos.',rpGridTable(['Produto','Categoria','Status','Qtde','Entrada','Idade',...(canCosts?['Custo un.']:[]),'Preço un.'],rows))}`;
 }
 function rpFinance(s){if(!rpCanFinance())return '<div class="rp-empty">Seu perfil não possui permissão de financeiro.</div>';
  const ins=s.cash.filter(x=>x.tipo==='entrada'),outs=s.cash.filter(x=>x.tipo==='saida'),sumIn=rpSum(ins,x=>x.valor),sumOut=rpSum(outs,x=>x.valor),net=sumIn-sumOut;const pending=(db.contas||[]).filter(x=>x.status!=='pago'),pay=pending.filter(x=>x.tipo==='pagar'),receive=pending.filter(x=>x.tipo==='receber');const late=pending.filter(x=>rpISO(x.venc)&&x.venc<todayStr());const catOut={};outs.forEach(x=>{const c=x.cat||'Outros';catOut[c]=(catOut[c]||0)+rpNum(x.valor)});const hasSales=s.v.length>0;const periodReceivable=rpSum(s.v,x=>x.aReceber);const cards=[rpKpi('Entradas de caixa',money(sumIn),'Vendas recebidas + entradas manuais','good'),rpKpi('Saídas de caixa',money(sumOut),'Saídas manuais registradas'),rpKpi('Saldo de movimentações',money(net),'Entradas menos saídas',net<0?'bad':'good'),rpKpi('Valores a receber de vendas',money(periodReceivable),'Dívidas no registro das vendas'),rpKpi('Contas a pagar pendentes',money(rpSum(pay,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas a receber pendentes',money(rpSum(receive,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas vencidas',rpInt(late.length),'Contas abertas até hoje',late.length?'bad':''),rpKpi('Movimentos manuais',rpInt(s.rawCash.length),'Entradas e saídas no período')];
@@ -4402,7 +4422,7 @@ function rpCRM(s){if(!rpHas('crm'))return '<div class="rp-empty">Seu perfil não
 function rpCustomers(s){if(!rpHas('clientes'))return '<div class="rp-empty">Seu perfil não possui permissão para ver os clientes.</div>';const registered=db.clientes||[],cs=rpClientStats(s.v),repeat=cs.repeated,customers=[...cs.clients.values()].sort((a,b)=>b.total-a.total),ids=new Set(s.v.map(x=>x.clienteId).filter(Boolean));const top=customers.slice(0,20).map(x=>`<tr>${rpCell(x.name)}${rpCell(rpInt(x.qtd),true)}${rpCell(money(x.total),true)}</tr>`);
  return `<div class="rp-kpis">${rpKpi('Clientes no cadastro',rpInt(registered.length),'Base total cadastrada')}${rpKpi('Clientes compradores',rpInt(cs.clients.size),'Compradores do período')}${rpKpi('Clientes recorrentes',rpInt(repeat.length),'2 ou mais compras no período')}${rpKpi('Recorrência',rpPct(cs.repeatRate),'Participação dos compradores recorrentes')}</div><div class="rp-layout equal">${rpPanel('Perfil de compras','Distribuição dos clientes por frequência.',rpBarLabels({'Uma compra':customers.filter(x=>x.qtd===1).length,'Duas compras':customers.filter(x=>x.qtd===2).length,'Três ou mais compras':customers.filter(x=>x.qtd>=3).length},rpInt,3))}${rpPanel('Qualidade do cadastro','Indicadores do registro de clientes.',`<div class="rp-alertlist"><div class="rp-alert"><span>Clientes com telefone ou WhatsApp</span><strong>${rpInt(registered.filter(x=>x.whatsapp||x.telefone).length)}</strong></div><div class="rp-alert"><span>Clientes com cadastro sem contato</span><strong>${rpInt(registered.filter(x=>!x.whatsapp&&!x.telefone).length)}</strong></div><div class="rp-alert"><span>Compradores ligados a um cadastro</span><strong>${rpInt(ids.size)}</strong></div></div><p class="rp-micro">A frequência usa as vendas efetivamente registradas, não orçamentos do CRM.</p>`)}</div>${rpPanel('Clientes com maior faturamento','Até 20 compradores dentro do período escolhido.',rpGridTable(['Cliente','Compras','Total'],top))}`;
 }
-function rpAssistance(){const items=db.servicos||[],cats={},models={};for(const x of items){cats[x.categoria||'Outros']=(cats[x.categoria||'Outros']||0)+1;if(x.modelo)models[x.modelo]=(models[x.modelo]||0)+1;}const priced=items.filter(x=>rpNum(x.valor||x.preco||x.venda)>0),price=priced.length?rpSum(priced,x=>x.valor||x.preco||x.venda)/priced.length:0;return `<div class="rp-kpis">${rpKpi('Serviços cadastrados',rpInt(items.length),'Itens disponíveis no catálogo')}${rpKpi('Categorias de serviço',rpInt(Object.keys(cats).length),'Tipos cadastrados')}${rpKpi('Serviços precificados',rpInt(priced.length),'Com valor maior que zero')}${rpKpi('Preço médio de tabela',money(price),'Somente serviços com preço')}</div><div class="rp-layout equal">${rpPanel('Serviços por categoria','Quantidade de serviços no catálogo.',rpBarLabels(cats,rpInt,9))}${rpPanel('Modelos cobertos','Serviços por modelo indicado no cadastro.',rpBarLabels(models,rpInt,9))}</div>${rpPanel('Ordens de serviço e produtividade','Informação ainda não registrada neste módulo.','<div class="rp-empty-notice">A área Assistência atual cadastra <b>tipos de serviço e preços</b>. Ela ainda não registra ordens executadas por cliente, data, técnico, custo, prazo e conclusão. Por isso <b>não é possível calcular faturamento de assistência, produtividade técnica ou garantia real</b> sem inventar dados. A próxima evolução pode incluir um módulo de OS ligado ao caixa, CRM e relatórios.</div>')}`}
+function rpAssistance(){const items=db.servicos||[],cats={},models={};for(const x of items){cats[x.categoria||'Outros']=(cats[x.categoria||'Outros']||0)+1;if(x.modelo)models[x.modelo]=(models[x.modelo]||0)+1;}const pecasCadastradas=items.filter(x=>x.qtd!=null),pecasUnidades=rpSum(pecasCadastradas,x=>x.qtd);const priced=items.filter(x=>rpNum(x.valor||x.preco||x.venda)>0),price=priced.length?rpSum(priced,x=>x.valor||x.preco||x.venda)/priced.length:0;return `<div class="rp-kpis">${rpKpi('Serviços cadastrados',rpInt(items.length),'Itens disponíveis no catálogo')}${rpKpi('Peças para serviços',rpInt(pecasUnidades),pecasCadastradas.length+' serviços com quantidade informada')}${rpKpi('Serviços precificados',rpInt(priced.length),'Com valor maior que zero')}${rpKpi('Preço médio de tabela',money(price),'Somente serviços com preço')}</div><div class="rp-layout equal">${rpPanel('Serviços por categoria','Quantidade de serviços no catálogo.',rpBarLabels(cats,rpInt,9))}${rpPanel('Modelos cobertos','Serviços por modelo indicado no cadastro.',rpBarLabels(models,rpInt,9))}</div>${rpPanel('Ordens de serviço e produtividade','Informação ainda não registrada neste módulo.','<div class="rp-empty-notice">A área Assistência atual cadastra <b>tipos de serviço e preços</b>. Ela ainda não registra ordens executadas por cliente, data, técnico, custo, prazo e conclusão. Por isso <b>não é possível calcular faturamento de assistência, produtividade técnica ou garantia real</b> sem inventar dados. A próxima evolução pode incluir um módulo de OS ligado ao caixa, CRM e relatórios.</div>')}`}
 function rpPurchases(s){const ps=s.purchases,items=rpSum(ps,x=>x.qtd),total=rpSum(ps,x=>x.total),vendors={};ps.forEach(x=>{const k=x.fornecedor||'Fornecedor não informado';vendors[k]=(vendors[k]||0)+rpNum(x.total)});const rows=ps.slice().sort((a,b)=>String(b.data).localeCompare(String(a.data))).slice(0,35).map(x=>`<tr>${rpCell(rpFmtDate(x.data))}${rpCell(x.fornecedor||'—')}${rpCell(rpInt(x.qtd),true)}${rpCell(x.pagamento||'—')}${rpCanCosts()?rpCell(money(x.total),true):''}</tr>`);return `<div class="rp-kpis">${rpKpi('Lotes de compra',rpInt(ps.length),'Entradas registradas no período')}${rpKpi('Unidades compradas',rpInt(items),'Aparelhos nos lotes')}${rpCanCosts()?rpKpi('Total comprado',money(total),'Compras cadastradas')+rpKpi('Ticket de compra',money(ps.length?total/ps.length:0),'Média por lote'):rpKpi('Fornecedores',rpInt(Object.keys(vendors).length),'Com compras no período')+rpKpi('Média de aparelhos por lote',rpInt(ps.length?items/ps.length:0),'Itens por registro')}</div><div class="rp-layout equal">${rpPanel('Compras por fornecedor','Volume registrado de compras por fornecedor.',rpCanCosts()?rpBarLabels(vendors,money,8):rpBarLabels(ps.reduce((a,x)=>{const k=x.fornecedor||'Não informado';a[k]=(a[k]||0)+1;return a},{}),rpInt,8))}${rpPanel('Cobertura do registro','Limitações dos dados de compra.','<div class="rp-empty-notice">Aqui aparecem apenas <b>compras lançadas como lote</b>. Aparelhos cadastrados manualmente no estoque não necessariamente têm compra vinculada. Compras são aquisição de estoque e <b>não devem ser somadas novamente como despesa na apuração do lucro das vendas</b>.</div>')}</div>${rpPanel('Últimas compras','Registros de entrada de aparelhos, até 35 lotes.',rpGridTable(['Data','Fornecedor','Aparelhos','Pagamento',...(rpCanCosts()?['Total']:[])],rows))}`;}
 function rpSwitchTab(key){if(key==='financeiro'&&!rpCanFinance())return;if(key==='crm'&&!rpHas('crm'))return;if(key==='clientes'&&!rpHas('clientes'))return;if(key==='assistencia'&&!rpHas('assistencia'))return;if(key==='compras'&&!podeAcao('compras'))return;rpState.tab=key;renderRelatorios();}
 function rpUpdateFilter(field,value){if(!['period','from','to','seller'].includes(field))return;const previous=rpRange();if((field==='from'||field==='to')&&rpState.period!=='personalizado'){rpState.from=previous.from||'';rpState.to=previous.to||'';}rpState[field]=value;if(field==='from'||field==='to')rpState.period='personalizado';renderRelatorios();}
@@ -4618,6 +4638,7 @@ function openProduto(prod){
     ${fld('IMEI','pr-imei',{val:p.imei,ph:'só números',inputmode:'numeric'})}
     ${fld('Número de série','pr-serie',{val:p.serie,ph:'opcional'})}
     ${fld('Código de barras / EAN','pr-ean',{val:p.ean,ph:'opcional'})}
+    <div class="field"><label for="pr-qtd">Quantidade em estoque</label><input class="input" id="pr-qtd" type="number" inputmode="numeric" min="0" step="1" value="${prod?qtdAparelho(p):1}" placeholder="Ex.: 3"><small style="display:block;margin:5px 3px 0;color:var(--text2);font-size:12px">Para aparelhos com IMEI ou série individual, cadastre 1 unidade por registro. Para produtos sem identificação individual, use a quantidade do lote.</small></div>
     ${fld('Saúde da bateria (%)','pr-bateria',{val:p.bateria,ph:'ex: 89',inputmode:'numeric'})}
     ${fld('Peças trocadas','pr-pecas',{val:p.pecas,ph:'ex: Tela original, bateria'})}
     ${fld('Fornecedor','pr-forn',{val:p.fornecedor,ph:'de quem comprou'})}
@@ -4626,7 +4647,7 @@ function openProduto(prod){
       ${fld('Valor de compra','pr-compra',{val:p.compra,ph:'0,00',inputmode:'decimal'})}
       ${fld('Preço de venda','pr-venda',{val:p.venda,ph:'0,00',inputmode:'decimal'})}
     </div>
-    ${selFld('Status','pr-status',['Disponível','Reservado','Vendido'],p.status||'Disponível')}
+    ${selFld('Status','pr-status',['Disponível','Reservado','Sem estoque','Vendido'],p.status||'Disponível')}
     <div class="field"><label>Observações</label><textarea class="input" id="pr-obs" rows="2" placeholder="opcional">${p.obs||''}</textarea></div>
   `;
   openSheet(prod?'Editar aparelho':'Novo aparelho', html, 'Salvar', ()=>saveProduto(prod?prod.id:null));
@@ -4834,8 +4855,12 @@ function addFoto(e){
 }
 function saveProduto(id){
   const imei=getV('pr-imei'), serie=getV('pr-serie'), modelo=getV('pr-modelo');
-  if(!modelo){ toast('Informe o modelo'); return; }
-  // checa duplicidade
+   if(!modelo){ toast('Informe o modelo'); return; }
+   const qtd=qtdInteiraFormulario('pr-qtd','aparelhos');
+   if(qtd===undefined)return;
+   if((imei||serie)&&qtd>1){toast('Aparelho com IMEI/série exige cadastro individual (quantidade máxima: 1).');el('pr-qtd')?.focus();return;}
+   if(getV('pr-status')==='Vendido'&&qtd>0){toast('Para disponibilizar unidades, altere o status para Disponível ou Reservado.');return;}
+   // checa duplicidade
   const dupImei = imei && db.produtos.some(p=>p.id!==id && p.imei===imei);
   const dupSerie = serie && db.produtos.some(p=>p.id!==id && p.serie===serie);
   if(dupImei){ toast('IMEI já cadastrado'); return; }
@@ -4845,7 +4870,8 @@ function saveProduto(id){
     armazenamento:getV('pr-arm'),condicao:getV('pr-cond'),imei,serie,
     bateria:getV('pr-bateria'),pecas:getV('pr-pecas'),
     ean:getV('pr-ean'),fornecedor:getV('pr-forn'),entrada:getV('pr-entrada'),
-    compra:getN('pr-compra'),venda:getN('pr-venda'),status:getV('pr-status'),
+     compra:getN('pr-compra'),venda:getN('pr-venda'),qtd,
+     status:qtd===0&&getV('pr-status')==='Disponível'?'Sem estoque':qtd>0&&getV('pr-status')==='Sem estoque'?'Disponível':getV('pr-status'),
     obs:el('pr-obs').value.trim(),fotos:tempFotos.slice()
   };
   // campos de estado (só existem quando seminovo). Cada campo é lido só se existir na categoria.
@@ -4892,8 +4918,8 @@ function saveProduto(id){
 
 /* ============ DETALHE PRODUTO ============ */
 function openProdDetail(id){
-  const p=db.produtos.find(x=>x.id===id); if(!p)return;
-  const isAdmin=session&&session.role==='Administrador';
+   const p=db.produtos.find(x=>x.id===id); if(!p)return;
+   const isAdmin=session&&session.role==='Administrador';
   const lucroPot=(Number(p.venda)||0)-(Number(p.compra)||0);
   const fotos=(p.fotos||[]).filter(f=>temFoto(f)).map(f=>`<img class="ph" style="width:80px;height:80px" src="${imgFoto(f)}">`).join('');
   const html=`
@@ -4904,7 +4930,8 @@ function openProdDetail(id){
       <div class="detail-line"><span class="k">Aparelho</span><span class="v">${p.marca} ${p.modelo}</span></div>
       <div class="detail-line"><span class="k">Cor</span><span class="v">${p.cor||'—'}</span></div>
       <div class="detail-line"><span class="k">Armazenamento</span><span class="v">${p.armazenamento||'—'}</span></div>
-      <div class="detail-line"><span class="k">Condição</span><span class="v">${p.condicao||'—'}</span></div>
+       <div class="detail-line"><span class="k">Condição</span><span class="v">${p.condicao||'—'}</span></div>
+       <div class="detail-line"><span class="k">Quantidade em estoque</span><span class="v">${qtdAparelho(p)} ${qtdAparelho(p)===1?'unidade':'unidades'}</span></div>
       <div class="detail-line"><span class="k">IMEI</span><span class="v">${p.imei||'—'}</span></div>
       <div class="detail-line"><span class="k">Nº de série</span><span class="v">${p.serie||'—'}</span></div>
       ${p.bateria?`<div class="detail-line"><span class="k">Saúde da bateria</span><span class="v">${p.bateria}%</span></div>`:''}
@@ -5311,8 +5338,9 @@ function pickProduto(){
 }
 function addAoCarrinhoAparelho(id){
   const p=db.produtos.find(x=>x.id===id);
-  if(!p){ toast('Aparelho não encontrado'); return; }
-  if(carrinho.some(it=>it.tipo==='aparelho'&&it.id===id)){
+   if(!p){ toast('Aparelho não encontrado'); return; }
+   if(p.status!=='Disponível'||qtdAparelho(p)<1){toast('Aparelho sem estoque');return;}
+   if(carrinho.some(it=>it.tipo==='aparelho'&&it.id===id)){
     // já está no carrinho: remove (toque de novo tira)
     carrinho=carrinho.filter(it=>!(it.tipo==='aparelho'&&it.id===id));
     toast('Removido do carrinho');
@@ -5498,8 +5526,14 @@ function finalizarVendaCarrinho(){
     setTimeout(pickCliente,300);
     return;
   }
-  const total=carrinhoTotal();
-  // monta um "produto virtual" representando o carrinho inteiro
+   for(const it of carrinho){
+     if(it.tipo==='aparelho'){
+       const pr=db.produtos.find(x=>x.id===it.id);
+       if(!pr||pr.status!=='Disponível'||qtdAparelho(pr)<1){toast('Aparelho sem unidades disponíveis. Atualize o carrinho.');return;}
+     }
+   }
+   const total=carrinhoTotal();
+   // monta um produto virtual representando o carrinho inteiro
   const custoTotal=carrinho.reduce((s,it)=>{
     if(it.tipo==='aparelho'){ const p=db.produtos.find(x=>x.id===it.id); return s+(p?Number(p.compra)||0:0); }
     if(it.tipo==='acessorio'){ const a=(db.acessorios||[]).find(x=>x.id===it.id); return s+(a?(Number(a.custo)||0)*it.qtd:0); }
@@ -5526,7 +5560,9 @@ function finalizarVenda(total,falta){
   const liquido=pagState.reduce((s,p)=>s+liquidoDe(p),0) - (falta>0?0:0);
   const p=produtoAtualVenda();
   if(!p){ toast('Aparelho não encontrado, selecione novamente'); return; }
-  const ehCarrinho = p && p._carrinho;
+   const ehCarrinho = p && p._carrinho;
+   if(!ehCarrinho&&!p._acessorios&&(p.status!=='Disponível'||qtdAparelho(p)<1)){toast('Este aparelho não está mais disponível no estoque.');return;}
+   if(ehCarrinho&&carrinho.some(it=>it.tipo==='aparelho'&&(!db.produtos.find(x=>x.id===it.id)||db.produtos.find(x=>x.id===it.id).status!=='Disponível'||qtdAparelho(db.produtos.find(x=>x.id===it.id))<1))){toast('Um aparelho do carrinho está sem estoque. Revise a seleção.');return;}
   const ehAcessorio = p && p._acessorios;
   let itensVenda;
   if(ehCarrinho){
@@ -5557,7 +5593,7 @@ function finalizarVenda(total,falta){
   db.vendas.push(venda);
   if(ehCarrinho){
     carrinho.forEach(it=>{
-      if(it.tipo==='aparelho'){ const pr=db.produtos.find(x=>x.id===it.id); if(pr){ pr.status='Vendido'; pr.vendidoEm=todayStr(); } }
+      if(it.tipo==='aparelho'){ const pr=db.produtos.find(x=>x.id===it.id); if(pr){ pr.qtd=Math.max(0,qtdAparelho(pr)-1); pr.status=pr.qtd>0?'Disponível':'Vendido'; pr.vendidoEm=todayStr(); } }
       if(it.tipo==='acessorio'){ const a=(db.acessorios||[]).find(x=>x.id===it.id); if(a){ a.qtd=Math.max(0,(Number(a.qtd)||0)-it.qtd); if(a.qtd<=0 && (!a.situacao||a.situacao==='Disponível')) a.situacao='Sem estoque'; } }
     });
     carrinho=[]; carrinhoAcess=[];
@@ -5565,8 +5601,9 @@ function finalizarVenda(total,falta){
   }else if(ehAcessorio){
     carrinhoAcess.forEach(it=>{ const a=(db.acessorios||[]).find(x=>x.id===it.id); if(a){ a.qtd=Math.max(0,(Number(a.qtd)||0)-it.qtd); if(a.qtd<=0 && (!a.situacao||a.situacao==='Disponível')) a.situacao='Sem estoque'; } });
   }else{
-    p.status='Vendido';
-    p.vendidoEm=todayStr();
+     p.qtd=Math.max(0,qtdAparelho(p)-1);
+     p.status=p.qtd>0?'Disponível':'Vendido';
+     p.vendidoEm=todayStr();
   }
   saveDB();
   closeSheet();
@@ -5688,7 +5725,7 @@ function quitarVenda(id){
 function delVenda(id){
   askConfirm('Remover esta venda? O aparelho volta ao estoque.', ()=>{
     const v=db.vendas.find(x=>x.id===id);
-    v.itens.forEach(it=>{ const p=db.produtos.find(x=>x.id===it.prodId); if(p)p.status='Disponível'; });
+     v.itens.forEach(it=>{ const p=db.produtos.find(x=>x.id===it.prodId); if(p){p.qtd=qtdAparelho(p)+Math.max(1,Number(it.qtd)||1);p.status='Disponível';} });
     db.vendas=db.vendas.filter(x=>x.id!==id); saveDB(); closeSheet(); render(currentTab); toast('Venda removida');
   });
 }
@@ -6884,9 +6921,9 @@ function relVendas(){
 }
 function relEstoque(){
   const grupos={};
-  db.produtos.filter(p=>p.status!=='Vendido').forEach(p=>{grupos[p.cat]=(grupos[p.cat]||0)+1});
-  const invest=db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.compra)||0),0);
-  const potencial=db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.venda)||0),0);
+  db.produtos.filter(p=>p.status!=='Vendido').forEach(p=>{grupos[p.cat]=(grupos[p.cat]||0)+qtdAparelho(p)});
+  const invest=db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.compra)||0)*qtdAparelho(p),0);
+  const potencial=db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.venda)||0)*qtdAparelho(p),0);
   const html=`
     <div class="card" style="padding:2px 16px">
       <div class="detail-line"><span class="k">Total investido</span><span class="v money-in">${money(invest)}</span></div>
@@ -7389,9 +7426,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('it-ai-root')?.c
 
 /* ========== ITRONIC | ASSISTENTE DE IMPORTAÇÃO E FOTO REAL ========== */
 const itImpRules={
- servicos:[['nome','Nome do serviço',true],['categoria','Tipo de serviço',false],['modelo','Modelo',false],['qualidade','Qualidade',false],['situacao','Situação',false],['venda','Preço de venda',true],['custo','Custo da peça',false],['fornecedor','Fornecedor',false]],
+ servicos:[['nome','Nome do serviço',true],['categoria','Tipo de serviço',false],['modelo','Modelo',false],['qualidade','Qualidade',false],['situacao','Situação',false],['venda','Preço de venda',true],['custo','Custo da peça',false],['qtd','Peças em estoque',false],['fornecedor','Fornecedor',false]],
  acessorios:[['nome','Nome do acessório',true],['categoria','Categoria',false],['sub','Tipo / qualidade',false],['situacao','Situação',false],['venda','Preço de venda',true],['custo','Custo',false],['qtd','Quantidade',false],['fornecedor','Fornecedor',false],['serie','Série',false]],
- produtos:[['modelo','Modelo do aparelho',true],['marca','Marca',false],['cat','Categoria',false],['cor','Cor',false],['armazenamento','Armazenamento',false],['condicao','Condição',false],['imei','IMEI',false],['serie','Série',false],['venda','Preço de venda',true],['compra','Custo',false],['fornecedor','Fornecedor',false]]
+ produtos:[['modelo','Modelo do aparelho',true],['marca','Marca',false],['cat','Categoria',false],['cor','Cor',false],['armazenamento','Armazenamento',false],['condicao','Condição',false],['imei','IMEI',false],['serie','Série',false],['venda','Preço de venda',true],['compra','Custo',false],['qtd','Quantidade em estoque',false],['fornecedor','Fornecedor',false]]
 };
 const itImpAliases={
  nome:['nome','servico','serviços','descrição','descricao','produto','item','acessorio','peca','pecas'],
@@ -7451,11 +7488,15 @@ function itImpDetectMap(){const st=itImpState;st.map={};const used=new Set();for
 function itImpMapear(k,v){if(!itImpState)return;itImpState.map[k]=v;itImpRender();}
 async function itImpLerArquivo(e){const file=e.target.files?.[0];if(!file)return;let st=itImpState;st.file=file;st.erro='';st.headers=[];st.data=[];itImpRender();try{if(/\.csv$/i.test(file.name)){st.book=null;st.aba='Dados';st.tables={'Dados':itImpCSV(await file.text())};}else{await itImpLoadLib();const buf=await file.arrayBuffer();const book=XLSX.read(buf,{type:'array',cellDates:false});st.book=book;st.tables={};for(const sheet of book.SheetNames){const rows=XLSX.utils.sheet_to_json(book.Sheets[sheet],{header:1,defval:'',raw:true});if(rows.length)st.tables[sheet]=rows;}st.aba=Object.keys(st.tables)[0]||'';}if(!st.aba)throw new Error('Não encontrei linhas para importar.');itImpPrepareRows();if(!st.data.length)throw new Error('Planilha sem registros após o cabeçalho.');toast('Arquivo lido. Revise as colunas.');}catch(err){st.erro=err.message||'Erro ao ler planilha';st.headers=[];st.data=[];}itImpRender();}
 function itImpCampo(row,k){const col=itImpState.map[k];return col!==undefined&&col!==''?String(row[Number(col)]??'').trim():'';}
-function itImpCria(row){const st=itImpState,t=st.tipo;const name=itImpCampo(row,t==='produtos'?'modelo':'nome');let obj={nome:name,modelo:itImpCampo(row,'modelo'),venda:itImpNum(itImpCampo(row,'venda')),custo:itImpNum(itImpCampo(row,'custo'))};if(t==='servicos'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.modelo=itImpCampo(row,'modelo');obj.qualidade=itImpCampo(row,'qualidade')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.fornecedor=itImpCampo(row,'fornecedor');}else if(t==='acessorios'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.sub=itImpCampo(row,'sub')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.qtd=Math.max(0,Math.floor(itImpNum(itImpCampo(row,'qtd'))||0));obj.fornecedor=itImpCampo(row,'fornecedor');obj.serie=itImpCampo(row,'serie');}else{obj.modelo=name;delete obj.nome;obj.marca=itImpCampo(row,'marca')||'Apple';obj.cat=itImpCampo(row,'cat')||'iPhone';obj.cor=itImpCampo(row,'cor');obj.armazenamento=itImpCampo(row,'armazenamento');obj.condicao=itImpCampo(row,'condicao')||'Novo';obj.imei=itImpCampo(row,'imei');obj.serie=itImpCampo(row,'serie');obj.fornecedor=itImpCampo(row,'fornecedor');obj.compra=itImpNum(itImpCampo(row,'compra'));delete obj.custo;obj.status='Disponível';}
+function itImpCria(row){const st=itImpState,t=st.tipo;const name=itImpCampo(row,t==='produtos'?'modelo':'nome');let obj={nome:name,modelo:itImpCampo(row,'modelo'),venda:itImpNum(itImpCampo(row,'venda')),custo:itImpNum(itImpCampo(row,'custo'))};if(t==='servicos'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.modelo=itImpCampo(row,'modelo');obj.qualidade=itImpCampo(row,'qualidade')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.fornecedor=itImpCampo(row,'fornecedor');const n=itImpCampo(row,'qtd');obj.qtd=n===''?null:itImpNum(n);if(obj.qtd===0&&obj.situacao==='Disponível')obj.situacao='Sem estoque';}else if(t==='acessorios'){obj.categoria=itImpCampo(row,'categoria')||'Outros';obj.sub=itImpCampo(row,'sub')||'Original';obj.situacao=itImpCampo(row,'situacao')||'Disponível';obj.qtd=Math.max(0,Math.floor(itImpNum(itImpCampo(row,'qtd'))||0));obj.fornecedor=itImpCampo(row,'fornecedor');obj.serie=itImpCampo(row,'serie');}else{obj.modelo=name;delete obj.nome;obj.marca=itImpCampo(row,'marca')||'Apple';obj.cat=itImpCampo(row,'cat')||'iPhone';obj.cor=itImpCampo(row,'cor');obj.armazenamento=itImpCampo(row,'armazenamento');obj.condicao=itImpCampo(row,'condicao')||'Novo';obj.imei=itImpCampo(row,'imei');obj.serie=itImpCampo(row,'serie');obj.fornecedor=itImpCampo(row,'fornecedor');obj.compra=itImpNum(itImpCampo(row,'compra'));delete obj.custo;obj.qtd=itImpCampo(row,'qtd')===''?1:itImpNum(itImpCampo(row,'qtd'));obj.status=obj.qtd===0?'Sem estoque':'Disponível';}
  return obj;
 }
 function itImpKey(o,kind){const n=itImpNorm;if(kind==='servicos')return [n(o.nome),n(o.modelo),n(o.qualidade||'Original')].join('|');if(kind==='acessorios')return [n(o.nome),n(o.categoria)].join('|');return [n(o.modelo),n(o.armazenamento),n(o.cor),n(o.imei||o.serie)].join('|');}
-function itImpValid(o,kind){const name=kind==='produtos'?o.modelo:o.nome;if(!name)return 'sem nome/modelo';if(!Number.isFinite(o.venda)||o.venda<=0)return 'preço inválido';if(kind==='produtos'){if(!Number.isFinite(o.compra)||o.compra<0)o.compra=0;}else if(!Number.isFinite(o.custo)||o.custo<0)o.custo=0;return '';}
+function itImpValid(o,kind){const name=kind==='produtos'?o.modelo:o.nome;if(!name)return 'sem nome/modelo';if(!Number.isFinite(o.venda)||o.venda<=0)return 'preço inválido';if(kind==='produtos'){if(!Number.isFinite(o.compra)||o.compra<0)o.compra=0;}else if(!Number.isFinite(o.custo)||o.custo<0)o.custo=0;
+ if(o.qtd!=null&&(!Number.isSafeInteger(o.qtd)||o.qtd<0))return 'quantidade inválida';
+ if(kind==='produtos'&&(o.imei||o.serie)&&o.qtd>1)return 'IMEI/série: máximo 1 unidade';
+ return '';}
+
 function itImpRevisar(){const st=itImpState,kind=st.tipo,old=db[kind]||[];const existing=new Set(old.map(o=>itImpKey(o,kind)));const seen=new Set();let valid=0,dupes=0,invalid=0;let data=st.data.map((row,idx)=>{const obj=itImpCria(row);let why=itImpValid(obj,kind);const key=itImpKey(obj,kind);if(!why&&(existing.has(key)||seen.has(key)))why='já cadastrado';if(!why){seen.add(key);valid++;}else if(why==='já cadastrado')dupes++;else invalid++;return {idx,obj,why};});return{data,valid,dupes,invalid};}
 function itImpPreview(){const r=itImpRevisar();const name=k=>k==='produtos'?'modelo':'nome';let html=`<div class="it-import-stats"><span class="it-import-stat">${itImpState.data.length} linhas</span><span class="it-import-stat" style="color:var(--green)">${r.valid} prontos</span><span class="it-import-stat">${r.dupes} duplicados ignorados</span><span class="it-import-stat">${r.invalid} para corrigir</span></div><div class="it-import-preview"><table><thead><tr><th>Produto/serviço</th><th>Preço</th><th>Custo</th><th>Estado</th></tr></thead><tbody>`;for(let item of r.data.slice(0,30)){const o=item.obj;html+=`<tr class="${item.why?'it-import-invalid':''}"><td>${itImpEsc(o[name(itImpState.tipo)]||'—')}<small>${itImpEsc(o.modelo&&o.nome?' · '+o.modelo:'')}</small></td><td>${Number.isFinite(o.venda)?money(o.venda):'—'}</td><td>${money((itImpState.tipo==='produtos'?o.compra:o.custo)||0)}</td><td>${itImpEsc(item.why||'Pronto')}</td></tr>`;}html+=`</tbody></table></div><p class="it-import-note">Prévia de até 30 linhas. Novos cadastros: <b>${r.valid}</b>. Existentes não serão sobrescritos. Confira a categoria, os modelos e os valores.</p>`;return html;}
 function itImpSalvar(){const st=itImpState;if(!st||!podeEditar())return;const required=itImpRules[st.tipo].filter(x=>x[2]);if(required.some(x=>st.map[x[0]]===undefined||st.map[x[0]]==='')){toast('Associe as colunas obrigatórias antes de importar.');return;}const review=itImpRevisar(),items=review.data.filter(x=>!x.why).map(x=>x.obj);if(!items.length){toast('Nenhum item novo válido para importar.');return;}if(items.length>150){toast('Importe até 150 registros por vez para proteger a base.');return;}const tipo=st.tipo;
