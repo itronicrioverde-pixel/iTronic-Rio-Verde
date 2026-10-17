@@ -934,9 +934,6 @@ body.dark #page-painel .pp-legend .pp-dot.profit{background:#bde778}
 .btn svg{margin-right:5px}
 .orc-cat-name svg{margin-right:6px}
 .icon-state svg,.empty svg,.lbl svg{width:20px;height:20px;vertical-align:-4px}
-#page-crm{padding:0;min-height:calc(100vh - 75px)}
-.crm-embedded{display:block;width:100%;height:calc(100vh - 92px);min-height:760px;border:0;border-radius:18px;background:var(--bg2);box-shadow:var(--shadow)}
-@media(max-width:600px){.crm-embedded{height:calc(100vh - 122px);min-height:700px;border-radius:14px}}
 </style>
 </head>
 <body>
@@ -1152,7 +1149,6 @@ html,body{background:#a5d900}
   <div id="page-venda" class="page"></div>
   <div id="page-simular" class="page"></div>
   <div id="page-orcamentos" class="page"></div>
-  <div id="page-crm" class="page"></div>
   <div id="page-clientes" class="page"></div>
   <div id="page-relatorios" class="page"></div>
 
@@ -1192,10 +1188,6 @@ html,body{background:#a5d900}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h18M5 16l5-5 4 3 6-8M16 6h4v4"/></svg>
       <span>Alavancagem</span>
     </a>
-    <button class="tab" data-tab="crm" onclick="go('crm')" title="Abrir CRM da iTronic" aria-label="Abrir CRM da iTronic dentro do sistema">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1H3m4-6h4m7-8a3 3 0 0 1 0 6m1 3a5 5 0 0 1 2 4v1"/></svg>
-      <span>CRM</span>
-    </button>
     <button class="tab" data-tab="clientes" onclick="go('clientes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1H3zm13-14a3 3 0 0 1 0 6m2 2a5 5 0 0 1 3 5v1h-3"/></svg>
       <span>Clientes</span>
@@ -1576,7 +1568,7 @@ installClickFeedback(document);
 const loginFeedbackFrame=document.getElementById('login-experience');
 loginFeedbackFrame.addEventListener('load',()=>{try{installClickFeedback(loginFeedbackFrame.contentDocument)}catch(_){}});
 try{if(loginFeedbackFrame.contentDocument?.readyState==='complete') installClickFeedback(loginFeedbackFrame.contentDocument)}catch(_){}
-const TITLES={dash:'Início',painel:'Painel',estoque:'Estoque',assistencia:'Assistência',venda:'Vender',simular:'Simular',orcamentos:'Orçamentos',crm:'CRM',clientes:'Clientes',relatorios:'Relatórios'};
+const TITLES={dash:'Início',painel:'Painel',estoque:'Estoque',assistencia:'Assistência',venda:'Vender',simular:'Simular',orcamentos:'Orçamentos',clientes:'Clientes',relatorios:'Relatórios'};
 let currentTab='dash';
 function syncSidebarCutout(){
   const bar=document.querySelector('.tabbar');
@@ -1587,7 +1579,6 @@ function syncSidebarCutout(){
   if(window.innerWidth<=600) bar.scrollTo({left:active.offsetLeft-(bar.clientWidth-active.clientWidth)/2,behavior:'smooth'});
 }
 window.addEventListener('resize',syncSidebarCutout);
-window.addEventListener('message',event=>{if(event.data?.type==='itronic:crm-back') go('dash')});
 function go(tab){
   if((tab==='painel'||tab==='relatorios') && !podeVerPainel()){ tab='dash'; }
   if(tab==='orcamentos' && !podeEditar()){ tab='dash'; }
@@ -1650,14 +1641,7 @@ const CATEGORY_VECTOR_NAMES={iphone:'phone',ipad:'tablet',mac:'laptop',watch:'wa
 const vectorIcon=name=>uiIcon(VECTOR_PATHS[CATEGORY_VECTOR_NAMES[name]||name]||VECTOR_PATHS.package);
 const CAT_VECTOR={'iPhone':vectorIcon('phone'),'iPad':vectorIcon('tablet'),'Apple Watch':vectorIcon('watch'),'MacBook':vectorIcon('laptop'),'AirPods':vectorIcon('headphones'),'Acessório':vectorIcon('plug')};
 
-/* ============ RENDER ROUTER ============ */
-function renderCrm(){
-  const page=el('page-crm');
-  if(page.dataset.ready==='1') return;
-  page.innerHTML='<iframe class="crm-embedded" title="CRM iTronic" src="./crm.html" loading="lazy"></iframe>';
-  page.dataset.ready='1';
-}
-function render(tab){
+/* ============ RENDER ROUTER ============ */ function render(tab){
   if(tab==='dash') renderDash();
   if(tab==='painel') renderPainel();
   if(tab==='estoque') renderEstoque();
@@ -1665,7 +1649,6 @@ function render(tab){
   if(tab==='venda') renderVenda();
   if(tab==='simular') renderSimulador();
   if(tab==='orcamentos') renderOrcamentos();
-  if(tab==='crm') renderCrm();
   if(tab==='clientes') renderClientes();
   if(tab==='relatorios') renderRelatorios();
   atualizarBadgeCarrinho();
