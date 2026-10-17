@@ -1,0 +1,33 @@
+# iTronic Rio Verde — Versão pronta para o GitHub
+
+Este pacote contém **o sistema completo** (`index.html`) e o **ícone aprovado** para navegador e instalação na tela inicial do celular.
+
+## Arquivos para enviar
+
+Coloque **todos estes arquivos na raiz do repositório** (não coloque o ZIP):
+
+- `index.html` — aplicativo completo.
+- `apple-touch-icon.png` — ícone de 180x180 no iPhone/iPad.
+- `favicon-32.png` — ícone da aba do navegador.
+- `icon-192.png` — ícone de instalação Android / PWA.
+- `icon-512.png` — ícone de instalação Android / PWA.
+- `manifest.webmanifest` — nome, cores e ícones do aplicativo.
+
+`icone-itronic-1024.png` é o arquivo mestre, opcional no GitHub; guarde para futuras edições.
+
+## Publicar sem precisar do VS Code
+
+1. Abra seu repositório no GitHub.
+2. Selecione **Add file > Upload files**.
+3. Arraste os arquivos do pacote (não o ZIP) e confirme em **Commit changes**.
+4. Se o site já usa GitHub Pages, aguarde a atualização. Se ainda não, em **Settings > Pages** selecione a branch `main` e a pasta `/(root)`.
+5. Abra a URL do site publicada, limpe/atualize a página e teste o login, clientes, vendas, CRM, relatórios e importação.
+6. No iPhone (Safari): **Compartilhar > Adicionar à Tela de Início**.
+
+## Segurança e dados
+
+- Faça backup do arquivo anterior e dos dados antes de publicar.
+- A configuração pública do Firebase está no HTML. Isso não substitui autenticação e **regras seguras no Firestore**. Verifique as permissões da base antes de publicar o site.
+- O site precisa de conexão para Firebase e para bibliotecas externas. O manifesto **não oferece uso offline** sozinho.
+- Como o ícone inclui uma maçã inspirada na marca Apple, confira o direito de uso de marca caso distribua o app publicamente para terceiros.
+- Este pacote prepara a publicação. **Nada foi enviado automaticamente ao GitHub.**

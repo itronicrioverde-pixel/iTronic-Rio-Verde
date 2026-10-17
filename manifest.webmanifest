@@ -1,0 +1,24 @@
+{
+  "name": "iTronic — Gestão de Loja",
+  "short_name": "iTronic",
+  "description": "Gestão de vendas, estoque, CRM, clientes, assistência e relatórios da iTronic Rio Verde.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b3625",
+  "theme_color": "#a5db00",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
