@@ -1365,6 +1365,121 @@ body.dark .rp-page .rp-tab.active{background:var(--brand);color:var(--brand-ink)
 }
 @media print{#page-painel .pp-client-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
+
+/* ===== iTronic · Central de Clientes 360º (isolado do restante do aplicativo) ===== */
+#page-clientes{--cl-lime:#a5db00;--cl-deep:#254c34;--cl-line:var(--line);--cl-card:var(--card);padding:clamp(16px,2.2vw,28px);max-width:1440px;min-width:0}
+#page-clientes .cl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:0 0 20px}
+#page-clientes .cl-overline{font-size:10px;font-weight:850;color:var(--brand-deep);letter-spacing:.12em}
+#page-clientes .cl-head h2{font-size:clamp(25px,2.6vw,35px);letter-spacing:-.045em;margin:6px 0 4px;line-height:1.12}
+#page-clientes .cl-head p{font-size:13px;color:var(--text2);line-height:1.5}
+#page-clientes .cl-head-actions{display:flex;gap:9px;flex-wrap:wrap}
+#page-clientes .cl-btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:800;display:inline-flex;justify-content:center;align-items:center;gap:8px;white-space:nowrap;color:var(--text);cursor:pointer}
+#page-clientes .cl-btn.primary{background:var(--brand);color:#19310b;border-color:var(--brand)}
+#page-clientes .cl-btn svg{width:16px;height:16px}
+#page-clientes .cl-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:13px}
+#page-clientes .cl-metric,#page-clientes .cl-card{min-width:0;background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+#page-clientes .cl-metric{padding:18px;display:flex;flex-direction:column;gap:5px}
+#page-clientes .cl-metric span{color:var(--text2);font-size:11px;font-weight:700}
+#page-clientes .cl-metric strong{font-size:clamp(23px,2.5vw,31px);line-height:1.2;letter-spacing:-.04em}
+#page-clientes .cl-metric small{color:var(--text2);font-size:10px;line-height:1.4}
+#page-clientes .cl-charts{display:grid;grid-template-columns:1.2fr .8fr;gap:13px;margin-bottom:15px}
+#page-clientes .cl-card{padding:20px}
+#page-clientes .cl-card-title{display:flex;justify-content:space-between;align-items:start;gap:14px;margin-bottom:14px}
+#page-clientes .cl-card-title h3{font-size:16px;font-weight:800;letter-spacing:-.025em;margin:0}
+#page-clientes .cl-card-title p{font-size:11px;color:var(--text2);line-height:1.45;margin:4px 0 0}
+#page-clientes .cl-subcap{font-size:12px;font-weight:850;color:var(--blue);white-space:nowrap}
+#page-clientes .cl-rank{display:grid;gap:12px}
+#page-clientes .cl-rank-row{width:100%;text-align:left;display:block;cursor:pointer;border:0;background:none;color:var(--text)}
+#page-clientes .cl-rank-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;font-weight:700}
+#page-clientes .cl-rank-head>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#page-clientes .cl-rank-head strong{font-size:12px;white-space:nowrap}
+#page-clientes .cl-rank-num{font-size:10px;color:var(--text2);margin-right:9px}
+#page-clientes .cl-bar{display:block;background:var(--bg2);height:7px;border-radius:10px;overflow:hidden;margin-top:6px}
+#page-clientes .cl-bar i{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#28583f,#a5db00)}
+#page-clientes .cl-segments{display:grid;gap:12px;margin:8px 0 17px}
+#page-clientes .cl-segment{display:flex;justify-content:space-between;gap:9px;font-size:12px}
+#page-clientes .cl-segment span{display:flex;align-items:center;gap:8px;color:var(--text2)}
+#page-clientes .cl-segment i{width:9px;height:9px;border-radius:50%}
+#page-clientes .cl-note{border-top:1px solid var(--line);padding-top:13px;font-size:11px;color:var(--text2);line-height:1.6}
+#page-clientes .cl-note button{color:var(--blue);text-decoration:underline;font-size:11px;font-weight:700}
+#page-clientes .cl-directory{padding:20px}
+#page-clientes .cl-sort{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--text);max-width:150px}
+#page-clientes .cl-search{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--bg2);padding:11px 13px;border-radius:12px;margin:13px 0}
+#page-clientes .cl-search svg{width:18px;height:18px;color:var(--text2)}
+#page-clientes .cl-search input{border:0;outline:0;min-width:0;width:100%;background:transparent;color:var(--text);font-size:13px}
+#page-clientes .cl-filters{display:flex;gap:7px;overflow-x:auto;padding:0 0 12px;margin-bottom:2px}
+#page-clientes .cl-filter{padding:8px 12px;border:1px solid var(--line);border-radius:100px;background:var(--bg2);font-size:11px;font-weight:750;color:var(--text2);white-space:nowrap;cursor:pointer}
+#page-clientes .cl-filter.selected{background:var(--brand);border-color:var(--brand);color:#1c350f}
+#page-clientes .cl-table-wrap{width:100%;overflow-x:auto}
+#page-clientes .cl-table{width:100%;border-collapse:collapse;text-align:left;min-width:650px}
+#page-clientes .cl-table th{font-size:10px;letter-spacing:.045em;font-weight:800;text-transform:uppercase;color:var(--text2);padding:13px 9px;border-bottom:1px solid var(--line)}
+#page-clientes .cl-table td{padding:12px 9px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:middle}
+#page-clientes .cl-table tbody tr{cursor:pointer;transition:background .15s}
+#page-clientes .cl-table tbody tr:hover{background:color-mix(in srgb,var(--brand) 8%,transparent)}
+#page-clientes .cl-table tbody tr:last-child td{border-bottom:0}
+#page-clientes .cl-person{display:flex;align-items:center;gap:10px;min-width:0}
+#page-clientes .cl-person>span{min-width:0}
+#page-clientes .cl-person strong{display:block;max-width:245px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+#page-clientes .cl-person small,#page-clientes .cl-table td small{display:block;color:var(--text2);font-size:10px;margin-top:4px;white-space:nowrap}
+#page-clientes .cl-avatar,.cl-profile-avatar{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;background:#e1efa8;color:#285431;font-size:12px;font-weight:850;overflow:hidden}
+#page-clientes .cl-avatar img,.cl-profile-avatar img{width:100%;height:100%;object-fit:cover}
+#page-clientes .cl-avatar.big,.cl-profile-avatar{width:62px;height:62px;border-radius:18px;font-size:21px}
+#page-clientes .cl-status,.cl-status{display:inline-block;border-radius:99px;padding:5px 8px;font-weight:800;font-size:10px;white-space:nowrap}
+#page-clientes .cl-status.vip,.cl-status.vip{background:#e3f1cd;color:#28572b}
+#page-clientes .cl-status.inactive,.cl-status.inactive{background:#faecd1;color:#855f25}
+#page-clientes .cl-status.recurring,.cl-status.recurring{background:#ddede2;color:#31674b}
+#page-clientes .cl-status.new,.cl-status.new{background:#e9f2dd;color:#556f31}
+#page-clientes .cl-status.none,.cl-status.none{background:var(--bg2);color:var(--text2)}
+#page-clientes .cl-money{font-weight:800;white-space:nowrap}
+#page-clientes .cl-quiet{padding:26px 12px;text-align:center;font-size:12px;color:var(--text2);line-height:1.6}
+#page-clientes .cl-bottom{font-size:10px;color:var(--text2);padding-top:13px;border-top:1px solid var(--line);margin-top:9px;line-height:1.5}
+.cl-profile-top{display:flex;gap:13px;align-items:center;margin-bottom:17px}
+.cl-profile-top .cl-avatar{width:62px;height:62px;flex:none;display:grid;place-items:center;border-radius:18px;background:#e1efa8;color:#285431;font-weight:850;font-size:21px;overflow:hidden}
+.cl-profile-top .cl-avatar img{width:100%;height:100%;object-fit:cover}
+.cl-profile-top h3{font-size:20px;margin:2px 0 3px;letter-spacing:-.03em}
+.cl-profile-top p{font-size:12px;color:var(--text2)}
+.cl-profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0}
+.cl-profile-metric{padding:12px;background:var(--bg2);border-radius:12px;min-width:0}
+.cl-profile-metric span{display:block;color:var(--text2);font-size:10px;margin-bottom:5px}
+.cl-profile-metric b{display:block;font-size:16px;overflow-wrap:anywhere}
+.cl-profile-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.cl-profile-actions .cl-btn{padding:10px 12px;font-weight:800;font-size:12px;border-radius:10px;background:var(--bg2);color:var(--text);border:1px solid var(--line)}
+.cl-profile-tabs{display:flex;gap:7px;overflow-x:auto;border-bottom:1px solid var(--line);padding:8px 0 10px}
+.cl-profile-tabs button{font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;padding:8px 10px;border-radius:10px;background:var(--bg2)}
+.cl-profile-tabs button.active{background:var(--brand);color:#173409}
+.cl-section{padding:13px 0}
+.cl-section h4{font-size:13px;margin:2px 0 10px}
+.cl-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cl-info-grid .cl-info{padding:11px;border:1px solid var(--line);border-radius:11px;min-width:0}
+.cl-info small{display:block;font-size:10px;color:var(--text2);margin-bottom:4px}
+.cl-info strong{font-size:12px;overflow-wrap:anywhere}
+.cl-entry{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.cl-entry-top{display:flex;justify-content:space-between;gap:10px;align-items:start;font-size:12px}
+.cl-entry-top b{font-size:12px}
+.cl-entry small{font-size:11px;color:var(--text2);display:block;margin-top:4px;line-height:1.45}
+.cl-entry .cl-tiny-button{margin-top:9px;font-size:11px;color:var(--blue);font-weight:800}
+.cl-help{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:15px}
+.cl-profile-form-extra{border-radius:13px;background:var(--bg2);padding:13px;margin:10px 0 17px}
+.cl-profile-form-extra h3{font-size:13px;margin:0 0 11px}
+@media(max-width:980px){#page-clientes .cl-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#page-clientes .cl-charts{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  #page-clientes .cl-table{min-width:0;width:100%}
+  #page-clientes .cl-table thead{display:none}
+  #page-clientes .cl-table tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 8px;border-bottom:1px solid var(--line);padding:13px 0}
+  #page-clientes .cl-table tbody tr:last-child{border-bottom:0}
+  #page-clientes .cl-table td{display:block;padding:0;border:0;font-size:11px;min-width:0}
+  #page-clientes .cl-table td:nth-child(1){grid-column:1/-1}
+  #page-clientes .cl-table td:nth-child(2){grid-column:1;grid-row:2}
+  #page-clientes .cl-table td:nth-child(3){grid-column:2;grid-row:2;text-align:right}
+  #page-clientes .cl-table td:nth-child(4){grid-column:1;grid-row:3;font-size:13px}
+  #page-clientes .cl-table td:nth-child(5){grid-column:2;grid-row:3;text-align:right;color:var(--text2)}
+  #page-clientes .cl-table td:nth-child(6){display:none}
+  #page-clientes .cl-person strong{max-width:255px}
+  #page-clientes .cl-directory-controls{width:auto}
+}
+
+@media(max-width:700px){#page-clientes{padding:14px 12px 84px}#page-clientes .cl-head{display:block}#page-clientes .cl-head-actions{margin-top:13px}#page-clientes .cl-head-actions .cl-btn{flex:1}#page-clientes .cl-metrics{gap:9px}#page-clientes .cl-metric{padding:13px;min-height:102px}#page-clientes .cl-metric strong{font-size:24px}#page-clientes .cl-charts{grid-template-columns:1fr;gap:10px}#page-clientes .cl-card{padding:15px}#page-clientes .cl-card-title h3{font-size:14px}#page-clientes .cl-subcap{font-size:11px}#page-clientes .cl-directory{padding:14px}#page-clientes .cl-filters{margin:0 -3px}.cl-info-grid{grid-template-columns:1fr}.cl-profile-metrics{gap:6px}.cl-profile-metric{padding:9px}.cl-profile-metric b{font-size:13px}}
+
 </style>
 </head>
 <body>
@@ -2023,7 +2138,7 @@ function go(tab){
   el('page-title').textContent=TITLES[tab];
   // FAB só em telas que criam algo
   const fab=el('fab');
-  if(tab==='clientes'){ fab.style.display='flex'; fab.innerHTML=plusIcon(); }
+  if(tab==='clientes'){ fab.style.display='none'; } // Cadastro disponível no cabeçalho de Clientes
   else fab.style.display='none';
   render(tab);
   renderPendente=false;
@@ -3618,23 +3733,114 @@ function updateVendaTotal(){
 }
 function resetVenda(){ vendaCart={cliente:null,produto:null,produtoId:null,desconto:0,pagamentos:[],obs:''}; carrinhoAcess=[]; }
 
-/* ============ CLIENTES ============ */
-function renderClientes(){
-  const list=db.clientes.slice().reverse();
-  el('page-clientes').innerHTML=`
-    <div class="sec-title">${db.clientes.length} clientes</div>
-    ${list.length?`<div class="list">${list.map(c=>{
-      const compras=db.vendas.filter(v=>v.clienteId===c.id).length;
-      return `<div class="row" onclick="openClienteDetail('${c.id}')">
-        <div class="thumb">${vectorIcon('person')}</div>
-        <div class="info"><div class="t">${c.nome}</div><div class="s">${c.telefone||'sem telefone'} ${compras?'· '+compras+' compra(s)':''}</div></div>
-        ${chev()}
-      </div>`}).join('')}</div>`:
-      `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg><div>Nenhum cliente ainda.<br>Toque em + para cadastrar.</div></div>`}
-    <div style="height:20px"></div>
-  `;
+/* ============ CLIENTES · CENTRAL 360º ============ */
+const CL_KEY_DEFAULT={vip:10000,inactiveDays:180};
+let clState={q:'',segment:'todos',order:'gasto',period:'todos',selectedView:'resumo'};
+const clEsc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clID=id=>encodeURIComponent(String(id)).replace(/'/g,'%27');
+const clDigits=v=>String(v||'').replace(/\D/g,'');
+const clName=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ');
+function clPhone(v){let n=clDigits(v);if(n.startsWith('00'))n=n.slice(2);if(n.startsWith('55')&&(n.length===12||n.length===13))n=n.slice(2);return (n.length===10||n.length===11)?n:'';}
+function clWaNumber(c){const n=clPhone(c.whatsapp)||clPhone(c.telefone);return n?'55'+n:'';}
+function clConfig(){const v=db.clienteConfig||{};return {vip:Math.max(1000,Number(v.vip)||CL_KEY_DEFAULT.vip),inactiveDays:Math.max(30,Number(v.inactiveDays)||CL_KEY_DEFAULT.inactiveDays)};}
+function clSales(){return typeof vendasVisiveis==='function'?vendasVisiveis():db.vendas||[];}
+function clAllStats(){
+ const clients=(db.clientes||[]),totals=new Map(clients.map(c=>[String(c.id),{id:String(c.id),cliente:c,total:0,count:0,last:'',first:'',max:0,items:[],vendas:[],byCat:new Map()}]));
+ const idsCPF=new Map(),phones=new Map();
+ for(const c of clients){const cpf=clDigits(c.cpf);if(cpf.length===11){idsCPF.set(cpf,[...(idsCPF.get(cpf)||[]),String(c.id)]);}for(const n of new Set([clPhone(c.whatsapp),clPhone(c.telefone)].filter(Boolean)))phones.set(n,[...(phones.get(n)||[]),String(c.id)]);}
+ for(const v of clSales()){
+  let id=String(v.clienteId||'');
+  if(!totals.has(id)){
+   const cpf=clDigits(v.clienteCpf),ph=clPhone(v.clienteTel);
+   const match=cpf&&idsCPF.get(cpf)?.length===1?idsCPF.get(cpf):ph&&phones.get(ph)?.length===1?phones.get(ph):null;
+   if(match)id=match[0];
+  }
+  const st=totals.get(id);if(!st)continue;
+  const val=Math.max(0,Number(vendaLiquido(v))||0),dt=String(v.data||'').slice(0,10);
+  st.total+=val;st.count++;st.max=Math.max(st.max,val);st.vendas.push(v);
+  if(dt&&(!st.last||dt>st.last))st.last=dt;
+  if(dt&&(!st.first||dt<st.first))st.first=dt;
+  for(const it of (v.itens||[])){
+   st.items.push({item:it,venda:v});
+   const cat=String(it.cat||it.categoria||'Outros');st.byCat.set(cat,(st.byCat.get(cat)||0)+1);
+  }
+ }
+ return totals;
 }
-
+function clCrmFor(c,knownLeads=null){
+ if(typeof crmData!=='function')return [];
+ const phone=clPhone(c.whatsapp)||clPhone(c.telefone);
+ const matching=phone?(db.clientes||[]).filter(x=>(clPhone(x.whatsapp)||clPhone(x.telefone))===phone):[];
+ return phone&&matching.length===1?(knownLeads||crmData()).filter(x=>clPhone(x.phone)===phone):[];
+}
+function clStatus(st){
+ const cfg=clConfig(),today=todayStr(),ms=st.last?Date.parse(st.last+'T12:00'):0;
+ const days=ms?Math.floor((Date.parse(today+'T12:00')-ms)/86400000):0;
+ const vip=st.total>=cfg.vip,recurring=st.count>=2,inactive=st.count>0&&days>cfg.inactiveDays;
+ return {vip,recurring,inactive,days,new:st.count===1,none:st.count===0};
+}
+function clLabel(st){const x=clStatus(st);return x.inactive?'Inativo':x.vip?'VIP':x.recurring?'Recorrente':x.new?'Primeira compra':'Sem compras';}
+function clTag(st){const x=clStatus(st);return x.inactive?'inactive':x.vip?'vip':x.recurring?'recurring':x.new?'new':'none';}
+function clInitials(n){return String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0).toUpperCase()).join('')||'?'}
+function clAvatar(c,size=''){return `<div class="cl-avatar ${size}">${c.foto?`<img loading="lazy" src="${clEsc(c.foto)}" alt="Foto de ${clEsc(c.nome)}">`:clEsc(clInitials(c.nome))}</div>`;}
+function clKpis(rows,crmById){
+ const active=rows.filter(st=>!st.cliente.arquivado),rec=active.filter(st=>clStatus(st).recurring).length,inactive=active.filter(st=>clStatus(st).inactive).length,
+ withBuying=active.filter(st=>st.count>0).length,followups=active.reduce((n,st)=>n+crmById.get(st.id).filter(x=>crmIsOpen(x)&&crmDue(x)).length+(st.cliente.tarefas||[]).filter(t=>!t.concluida&&t.data&&t.data<todayStr()).length,0);
+ return `<div class="cl-metrics">
+ <div class="cl-metric"><span>Clientes cadastrados</span><strong>${active.length}</strong><small>${withBuying} com compras registradas</small></div>
+ <div class="cl-metric"><span>Compradores recorrentes</span><strong>${rec}</strong><small>2 ou mais compras</small></div>
+ <div class="cl-metric"><span>Clientes inativos</span><strong>${inactive}</strong><small>Mais de ${clConfig().inactiveDays} dias sem comprar</small></div>
+ <div class="cl-metric"><span>Retornos CRM vencidos</span><strong>${followups}</strong><small>CRM local + lembretes internos</small></div>
+ </div>`;
+}
+function clSelectFilter(v){clState.segment=v;clPaint();}
+function clSort(v){clState.order=v;clPaint();}
+function clSearch(v){clState.q=v;clPaint(false);}
+function clPaint(resetSearch=true){
+ const root=el('page-clientes');if(!root)return;
+ const all=clAllStats(),rows=[...all.values()],leads=typeof crmData==='function'?crmData():[],crmById=new Map(rows.map(st=>[st.id,clCrmFor(st.cliente,leads)]));
+ const original=el('cl-search');const pos=original?.selectionStart??0;
+ const normalized=clName(clState.q),segment=clState.segment;
+ const matching=rows.filter(st=>{
+  const c=st.cliente,k=clStatus(st),leads=crmById.get(st.id)||[];
+  if(segment==='arquivados'?!c.arquivado:c.arquivado)return false;
+  if(segment==='vip'&&!k.vip||segment==='recorrentes'&&!k.recurring||segment==='inativos'&&!k.inactive||segment==='semcompras'&&!k.none||segment==='retornos'&&!leads.some(x=>crmIsOpen(x)&&crmDue(x)))return false;
+  if(!normalized)return true;
+  return clName([c.nome,c.cpf,c.telefone,c.whatsapp,c.email,c.tags,c.responsavel,...st.items.map(x=>[x.item.nome,x.item.imei,x.item.serie].join(' ')),...(c.aparelhos||[]).map(x=>[x.modelo,x.imei,x.serie].join(' '))].join(' ')).includes(normalized);
+ });
+ matching.sort((a,b)=>{
+  if(clState.order==='nome')return String(a.cliente.nome).localeCompare(String(b.cliente.nome),'pt-BR');
+  if(clState.order==='recente')return String(b.last).localeCompare(String(a.last))||String(a.cliente.nome).localeCompare(String(b.cliente.nome),'pt-BR');
+  if(clState.order==='compras')return b.count-a.count||b.total-a.total;
+  return b.total-a.total||b.count-a.count;
+ });
+ const activeRows=rows.filter(st=>!st.cliente.arquivado),totalSpent=activeRows.reduce((sum,s)=>sum+s.total,0),biggest=activeRows.slice().sort((a,b)=>b.total-a.total)[0];
+ const filters=[['todos','Todos'],['vip','VIP'],['recorrentes','Recorrentes'],['inativos','Inativos'],['semcompras','Sem compras'],['retornos','Follow-ups vencidos'],['arquivados','Arquivados']];
+ root.innerHTML=`<div class="cl-head"><div><div class="cl-overline">ITRONIC RIO VERDE · RELACIONAMENTO</div><h2>Inteligência de Clientes</h2><p>Histórico de compras, perfil comercial e oportunidades de recompra no mesmo lugar.</p></div><div class="cl-head-actions"><button class="cl-btn ghost" onclick="clExportCSV()">${vectorIcon('receipt')} Exportar CSV</button><button class="cl-btn primary" onclick="openCliente()">${plusIcon()} Novo cliente</button></div></div>
+ ${clKpis(rows,crmById)}
+ <div class="cl-charts"><section class="cl-card"><div class="cl-card-title"><div><h3>Maiores clientes da loja</h3><p>Compras associadas aos cadastros · histórico disponível</p></div><span class="cl-subcap">${money(totalSpent)}</span></div>
+ ${activeRows.some(st=>st.total>0)?`<div class="cl-rank">${activeRows.slice().sort((a,b)=>b.total-a.total).filter(x=>x.total>0).slice(0,5).map((s,i)=>`<button class="cl-rank-row" onclick="openClienteDetail(decodeURIComponent('${clID(s.id)}'))"><span class="cl-rank-head"><span><b class="cl-rank-num">${i+1}</b>${clEsc(s.cliente.nome)}</span><strong>${money(s.total)}</strong></span><span class="cl-bar"><i style="width:${(100*s.total/Math.max(1,biggest.total)).toFixed(1)}%"></i></span></button>`).join('')}</div>`:'<div class="cl-quiet">Sem vendas vinculadas a clientes. O gráfico será preenchido com as vendas registradas.</div>'}
+ </section><section class="cl-card"><div class="cl-card-title"><div><h3>Perfil da carteira</h3><p>Classificação calculada automaticamente</p></div></div>
+ <div class="cl-segments">${[['VIP',activeRows.filter(x=>clStatus(x).vip).length,'#275a40'],['Recorrentes',activeRows.filter(x=>clStatus(x).recurring).length,'#6fa476'],['Inativos',activeRows.filter(x=>clStatus(x).inactive).length,'#d8ab55'],['Sem compras',activeRows.filter(x=>x.count===0).length,'#b8c7b7']].map(([label,count,color])=>`<div class="cl-segment"><span><i style="background:${color}"></i>${label}</span><b>${count}</b></div>`).join('')}</div>
+ <div class="cl-note">As categorias podem se sobrepor: um cliente VIP também pode estar inativo. VIP: ${money(clConfig().vip)} em compras; inatividade: ${clConfig().inactiveDays} dias. <button onclick="clSettings()">Ajustar critérios</button></div></section></div>
+ <section class="cl-card cl-directory"><div class="cl-card-title"><div><h3>Carteira de clientes</h3><p>${matching.length} resultado(s) · total e ticket médio calculados sobre vendas autorizadas</p></div><div class="cl-directory-controls"><select class="cl-sort" onchange="clSort(this.value)"><option value="gasto" ${clState.order==='gasto'?'selected':''}>Maior gasto</option><option value="recente" ${clState.order==='recente'?'selected':''}>Compra recente</option><option value="compras" ${clState.order==='compras'?'selected':''}>Mais compras</option><option value="nome" ${clState.order==='nome'?'selected':''}>Nome A–Z</option></select></div></div>
+ <div class="cl-search"><span>${vectorIcon('person')}</span><input id="cl-search" type="search" autocomplete="off" placeholder="Buscar nome, CPF, telefone, aparelho, IMEI..." value="${clEsc(clState.q)}" oninput="clSearch(this.value)" aria-label="Pesquisar clientes"></div>
+ <div class="cl-filters">${filters.map(([key,label])=>`<button class="cl-filter ${segment===key?'selected':''}" onclick="clSelectFilter('${key}')">${label}</button>`).join('')}</div>
+ ${matching.length?`<div class="cl-table-wrap"><table class="cl-table"><thead><tr><th>Cliente</th><th>Classificação</th><th>Compras</th><th>Total gasto</th><th>Última compra</th><th></th></tr></thead><tbody>${matching.map(st=>{const c=st.cliente,k=clTag(st);return `<tr onclick="openClienteDetail(decodeURIComponent('${clID(st.id)}'))" tabindex="0" onkeydown="if(event.key==='Enter')openClienteDetail(decodeURIComponent('${clID(st.id)}'))"><td><div class="cl-person">${clAvatar(c)}<span><strong>${clEsc(c.nome||'Sem nome')}</strong><small>${clEsc(c.telefone||c.whatsapp||'Sem telefone')}${c.responsavel?' · '+clEsc(c.responsavel):''}</small></span></div></td><td><span class="cl-status ${k}">${clLabel(st)}</span></td><td><b>${st.count}</b><small>${st.count?money(st.total/st.count)+' / compra':'—'}</small></td><td class="cl-money">${money(st.total)}</td><td>${st.last?fmtData(st.last):'—'}</td><td>${chev()}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="cl-quiet">Nenhum cliente encontrado. Ajuste os filtros ou cadastre um novo cliente.</div>'}
+ <div class="cl-bottom">Clientes arquivados permanecem no histórico das vendas. Os atendimentos do CRM ainda são locais a este navegador.</div></section>`;
+ if(!resetSearch){const n=el('cl-search');if(n){n.focus();n.setSelectionRange(Math.min(pos,n.value.length),Math.min(pos,n.value.length));}}
+}
+function renderClientes(){clPaint();}
+function clSettings(){
+ if(session?.role!=='Administrador')return toast('Somente o administrador pode alterar os critérios.');
+ const cfg=clConfig();openSheet('Critérios de classificação',`<p class="cl-help">Esses valores classificam os clientes e não alteram preços, vendas nem o cálculo de lucro.</p><div class="field"><label>Valor mínimo para VIP (R$)</label><input id="cl-cfg-vip" class="input" type="number" min="1000" step="100" value="${cfg.vip}"></div><div class="field"><label>Cliente inativo após (dias)</label><input id="cl-cfg-days" class="input" type="number" min="30" max="3650" step="1" value="${cfg.inactiveDays}"></div>`,'Salvar',()=>{db.clienteConfig={vip:Math.max(1000,getN('cl-cfg-vip')),inactiveDays:Math.max(30,Math.round(getN('cl-cfg-days')))};saveDB();closeSheet();renderClientes();toast('Critérios atualizados.');});
+}
+function clExportCSV(){
+ if(session?.role!=='Administrador')return toast('Somente o administrador pode exportar a carteira completa.');
+ const stats=clAllStats(),head=['Nome','Telefone','WhatsApp','E-mail','CPF','Total gasto','Quantidade compras','Última compra','Classificação','Responsável','Tags','Marketing autorizado'];
+ const csv=[head,...[...stats.values()].map(st=>{const c=st.cliente;return [c.nome,c.telefone,c.whatsapp,c.email,c.cpf,st.total.toFixed(2),st.count,st.last,clLabel(st),c.responsavel,c.tags,c.marketingConsent?'Sim':'Não'];})].map(arr=>arr.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+ const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='itronic-clientes-'+todayStr()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 /* ============ RELATÓRIOS ============ */
 /* ===== ITRONIC · INTELIGÊNCIA DE RELATÓRIOS V3 =====
  * Leitura somente: usa os dados reais do sistema e nunca altera lucroVenda().
@@ -4485,112 +4691,147 @@ function venderEsse(id){
   resetVenda(); vendaCart.produto=p; vendaCart.produtoId=id; closeSheet(); go('venda');
 }
 
-/* ============ CLIENTES ============ */
+/* ============ CLIENTES · CADASTRO E FICHA 360º ============ */
+let clPendingPhoto='';
+function clReadPhoto(e){
+ const file=e.target?.files?.[0];if(!file)return;
+ if(!file.type.startsWith('image/')){toast('Selecione uma imagem JPG, PNG ou WEBP.');return;}
+ if(file.size>6*1024*1024){toast('Escolha uma foto de até 6 MB.');return;}
+ const reader=new FileReader();reader.onload=()=>{
+  const img=new Image();img.onload=()=>{
+   const canvas=document.createElement('canvas'),size=140;canvas.width=size;canvas.height=size;
+   const ctx=canvas.getContext('2d');const min=Math.min(img.width,img.height);
+   ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,size,size);
+   const data=canvas.toDataURL('image/jpeg',.66);
+   if(data.length>35000){toast('A foto não pôde ser compactada.');return;}
+   clPendingPhoto=data;const preview=el('cl-photo-preview');if(preview)preview.innerHTML='<img src="'+clEsc(data)+'" alt="Foto escolhida">';
+  };img.onerror=()=>toast('Não foi possível abrir a imagem.');img.src=String(reader.result||'');
+ };reader.onerror=()=>toast('Erro ao ler a foto.');reader.readAsDataURL(file);
+}
+function clRemovePhoto(){clPendingPhoto='';const avatar=el('cl-photo-preview');if(avatar)avatar.innerHTML=clEsc(clInitials(getV('cl-nome')));}
 function openCliente(cli){
-  const c=cli||{};
-  const html=`
-    ${fld('Nome','cl-nome',{val:c.nome,ph:'nome completo'})}
-    ${fld('CPF','cl-cpf',{val:c.cpf,ph:'000.000.000-00',inputmode:'numeric'})}
-    ${fld('Telefone','cl-tel',{val:c.telefone,ph:'(64) 90000-0000',inputmode:'tel'})}
-    ${fld('WhatsApp','cl-wpp',{val:c.whatsapp,ph:'se diferente',inputmode:'tel'})}
-    <div class="sec-title" style="margin:18px 4px 6px">Endereço</div>
-    <div class="field"><label>CEP</label>
-      <div class="inline-2">
-        <input class="input" id="cl-cep" inputmode="numeric" placeholder="00000-000" value="${c.cep||''}" style="flex:1">
-        <button class="btn secondary" onclick="buscarCep()" style="width:auto;padding:13px 18px;margin:0">Buscar</button>
-      </div>
-    </div>
-    <div class="form-row">
-      <div style="grid-column:span 2">${fld('Rua','cl-rua',{val:c.rua,ph:'logradouro'})}</div>
-    </div>
-    <div class="form-row">
-      ${fld('Número','cl-num',{val:c.num,ph:'nº'})}
-      ${fld('Bairro','cl-bairro',{val:c.bairro,ph:'bairro'})}
-    </div>
-    ${fld('Complemento','cl-comp',{val:c.comp,ph:'apto, bloco (opcional)'})}
-    <div class="form-row">
-      ${fld('Cidade','cl-cidade',{val:c.cidade,ph:'cidade'})}
-      ${fld('UF','cl-uf',{val:c.uf,ph:'GO'})}
-    </div>
-    <div class="field"><label>Observações</label><textarea class="input" id="cl-obs" rows="2" placeholder="opcional">${c.obs||''}</textarea></div>
-    <div style="height:20px"></div>
-  `;
-  openSheet(cli?'Editar cliente':'Novo cliente', html, 'Salvar', ()=>saveCliente(cli?cli.id:null));
+ if(!podeAcessarModulo('clientes'))return toast('Sem acesso a Clientes.');
+ const c=cli||{};clPendingPhoto=c.foto||'';
+ const html=`
+ <div class="cl-profile-form-extra"><h3>Foto do cliente (opcional)</h3><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div class="cl-profile-avatar" id="cl-photo-preview">${clPendingPhoto?`<img src="${clEsc(clPendingPhoto)}" alt="Foto do cliente">`:clEsc(clInitials(c.nome))}</div><div><input id="cl-photo-file" type="file" accept="image/png,image/jpeg,image/webp" onchange="clReadPhoto(event)" style="max-width:220px;font-size:12px"><button type="button" onclick="clRemovePhoto()" style="display:block;margin-top:7px;font-size:11px;color:var(--text2);text-decoration:underline">Remover foto</button><small style="display:block;font-size:10px;color:var(--text2);margin-top:5px">A foto é compactada para não sobrecarregar o Firebase.</small></div></div></div>
+ ${fld('Nome completo *','cl-nome',{val:c.nome,ph:'Nome e sobrenome'})}
+ <div class="form-row">${fld('CPF','cl-cpf',{val:c.cpf,ph:'000.000.000-00',inputmode:'numeric'})}${fld('Nascimento','cl-nascimento',{val:c.nascimento,type:'date'})}</div>
+ <div class="form-row">${fld('Telefone','cl-tel',{val:c.telefone,ph:'(64) 99999-9999',inputmode:'tel'})}${fld('WhatsApp','cl-wpp',{val:c.whatsapp,ph:'Se diferente',inputmode:'tel'})}</div>
+ ${fld('E-mail','cl-email',{val:c.email,ph:'cliente@exemplo.com',type:'email'})}
+ <div class="sec-title" style="margin:18px 4px 9px">Relacionamento</div>
+ <div class="form-row">${fld('Vendedor responsável','cl-resp',{val:c.responsavel,ph:'Responsável'})}${fld('Etiquetas','cl-tags',{val:c.tags,ph:'VIP, acessórios, iPhone'})}</div>
+ <div class="field"><label>Preferências / informações comerciais</label><textarea class="input" id="cl-preferencias" rows="2" placeholder="Preferência por modelos, cores, horários de atendimento...">${clEsc(c.preferencias||'')}</textarea></div>
+ <div class="cl-profile-form-extra"><label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5"><input type="checkbox" id="cl-consent" ${c.marketingConsent===true?'checked':''} style="width:18px;height:18px;flex:none;margin-top:1px"> Cliente autorizou receber comunicações de ofertas e relacionamento. Registrar essa opção não envia mensagens automaticamente.</label></div>
+ <div class="sec-title" style="margin:18px 4px 9px">Endereço</div>
+ <div class="field"><label>CEP</label><div class="inline-2"><input class="input" id="cl-cep" inputmode="numeric" placeholder="00000-000" value="${clEsc(c.cep||'')}" style="flex:1"><button class="btn secondary" onclick="buscarCep()" style="width:auto;padding:13px 18px;margin:0">Buscar</button></div></div>
+ ${fld('Rua','cl-rua',{val:c.rua,ph:'Logradouro'})}
+ <div class="form-row">${fld('Número','cl-num',{val:c.num,ph:'Nº'})}${fld('Bairro','cl-bairro',{val:c.bairro,ph:'Bairro'})}</div>
+ ${fld('Complemento','cl-comp',{val:c.comp,ph:'Complemento (opcional)'})}
+ <div class="form-row">${fld('Cidade','cl-cidade',{val:c.cidade,ph:'Cidade'})}${fld('UF','cl-uf',{val:c.uf,ph:'GO'})}</div>
+ <div class="field"><label>Observações</label><textarea class="input" id="cl-obs" rows="3" placeholder="Notas de atendimento">${clEsc(c.obs||'')}</textarea></div>
+ <div style="height:22px"></div>`;
+ openSheet(cli?'Editar cliente':'Novo cliente',html,'Salvar',()=>saveCliente(cli?cli.id:null));
 }
 function buscarCep(){
-  const cep=(getV('cl-cep')||'').replace(/\D/g,'');
-  if(cep.length!==8){ toast('Digite um CEP com 8 números'); return; }
-  toast('Buscando endereço...');
-  fetch('https://viacep.com.br/ws/'+cep+'/json/')
-    .then(r=>r.json())
-    .then(d=>{
-      if(d.erro){ toast('CEP não encontrado'); return; }
-      if(el('cl-rua')) el('cl-rua').value=d.logradouro||'';
-      if(el('cl-bairro')) el('cl-bairro').value=d.bairro||'';
-      if(el('cl-cidade')) el('cl-cidade').value=d.localidade||'';
-      if(el('cl-uf')) el('cl-uf').value=d.uf||'';
-      toast('Endereço preenchido');
-      if(el('cl-num')) el('cl-num').focus();
-    })
-    .catch(()=>toast('Sem internet para buscar o CEP'));
+ const cep=(getV('cl-cep')||'').replace(/\D/g,'');if(cep.length!==8){toast('Digite um CEP com 8 números');return;}
+ toast('Buscando endereço...');
+ fetch('https://viacep.com.br/ws/'+cep+'/json/').then(r=>r.json()).then(d=>{
+  if(d.erro){toast('CEP não encontrado');return;}
+  for(const [field,key] of [['cl-rua','logradouro'],['cl-bairro','bairro'],['cl-cidade','localidade'],['cl-uf','uf']])if(el(field))el(field).value=d[key]||'';
+  toast('Endereço preenchido');el('cl-num')?.focus();
+ }).catch(()=>toast('Sem internet para buscar o CEP'));
+}
+function clFindDuplicate(data,id){
+ const cpf=clDigits(data.cpf),phones=new Set([clPhone(data.telefone),clPhone(data.whatsapp)].filter(Boolean));
+ return (db.clientes||[]).find(c=>String(c.id)!==String(id||'')&&(
+  (cpf.length===11&&clDigits(c.cpf)===cpf)||[clPhone(c.telefone),clPhone(c.whatsapp)].some(n=>n&&phones.has(n))
+ ));
 }
 function saveCliente(id){
-  const nome=getV('cl-nome'); if(!nome){toast('Informe o nome');return;}
-  const data={
-    nome, cpf:getV('cl-cpf'), telefone:getV('cl-tel'), whatsapp:getV('cl-wpp'),
-    cep:getV('cl-cep'), rua:getV('cl-rua'), num:getV('cl-num'), bairro:getV('cl-bairro'),
-    comp:getV('cl-comp'), cidade:getV('cl-cidade'), uf:getV('cl-uf'),
-    obs:el('cl-obs').value.trim()
-  };
-  if(id){ Object.assign(db.clientes.find(c=>c.id===id),data); toast('Cliente atualizado'); }
-  else { data.id=uid(); db.clientes.push(data); toast('Cliente cadastrado'); }
-  saveDB(); closeSheet(); render(currentTab);
+ if(!podeAcessarModulo('clientes'))return toast('Sem permissão.');
+ const nome=getV('cl-nome');if(!nome){toast('Informe o nome completo.');el('cl-nome')?.focus();return;}
+ const data={nome,cpf:getV('cl-cpf'),nascimento:getV('cl-nascimento'),telefone:getV('cl-tel'),whatsapp:getV('cl-wpp'),email:getV('cl-email'),responsavel:getV('cl-resp'),tags:getV('cl-tags'),preferencias:getV('cl-preferencias'),marketingConsent:!!el('cl-consent')?.checked,
+  cep:getV('cl-cep'),rua:getV('cl-rua'),num:getV('cl-num'),bairro:getV('cl-bairro'),comp:getV('cl-comp'),cidade:getV('cl-cidade'),uf:getV('cl-uf'),obs:getV('cl-obs'),foto:clPendingPhoto||''};
+ if(data.cpf&&clDigits(data.cpf).length!==11){toast('O CPF deve ter 11 dígitos ou ficar em branco.');return;}
+ if(data.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){toast('Confira o e-mail do cliente.');return;}
+ const duplicate=clFindDuplicate(data,id);
+ if(duplicate){toast('Cadastro já existente: '+duplicate.nome+'. Verifique CPF ou telefone.');return;}
+ if(id){const obj=db.clientes.find(c=>String(c.id)===String(id));if(!obj)return toast('Cliente não encontrado.');Object.assign(obj,data);toast('Cliente atualizado.');}
+ else{data.id=uid();data.criadoEm=new Date().toISOString();data.aparelhos=[];data.tarefas=[];db.clientes.push(data);toast('Cliente cadastrado.');}
+ saveDB();closeSheet();render(currentTab);
 }
-function openClienteDetail(id){
-  const c=db.clientes.find(x=>x.id===id); if(!c)return;
-  const compras=db.vendas.filter(v=>v.clienteId===id);
-  const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');
-  const html=`
-    <div style="text-align:center;margin:6px 0 18px">
-      <div class="thumb" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px">${vectorIcon('person')}</div>
-      <div style="font-size:20px;font-weight:700">${c.nome}</div>
-      <div style="color:var(--text2);font-size:14px">${c.telefone||'sem telefone'}</div>
-    </div>
-    ${wpp?`<a href="https://wa.me/55${wpp}" target="_blank" style="text-decoration:none"><button class="btn" style="background:var(--green)">Chamar no WhatsApp</button></a>`:''}
-    ${(c.cpf||c.rua||c.cep)?`<div class="card" style="margin-top:12px;padding:2px 16px">
-      ${c.cpf?`<div class="detail-line"><span class="k">CPF</span><span class="v">${c.cpf}</span></div>`:''}
-      ${c.rua?`<div class="detail-line"><span class="k">Endereço</span><span class="v" style="max-width:62%">${[c.rua,c.num].filter(Boolean).join(', ')}${c.comp?' · '+c.comp:''}</span></div>`:''}
-      ${c.bairro?`<div class="detail-line"><span class="k">Bairro</span><span class="v">${c.bairro}</span></div>`:''}
-      ${(c.cidade||c.uf)?`<div class="detail-line"><span class="k">Cidade</span><span class="v">${[c.cidade,c.uf].filter(Boolean).join(' - ')}</span></div>`:''}
-      ${c.cep?`<div class="detail-line"><span class="k">CEP</span><span class="v">${c.cep}</span></div>`:''}
-    </div>`:''}
-    ${c.obs?`<div class="card" style="margin-top:12px"><div style="font-size:13px;color:var(--text2);margin-bottom:4px">Observações</div>${c.obs}</div>`:''}
-    <div class="sec-title">Histórico de compras (${compras.length})</div>
-    ${compras.length?`<div class="list">${compras.slice().reverse().map(v=>`
-      <div class="row" onclick="openVendaDetail('${v.id}')"><div class="thumb">${thumbVenda(v)}</div>
-      <div class="info"><div class="t">${v.itens.map(i=>i.nome).join(', ')}</div><div class="s">${fmtData(v.data)}</div></div>
-      <div class="right"><div class="p money-in">${money(vendaLiquido(v))}</div></div></div>`).join('')}</div>`
-      :`<div class="empty" style="padding:24px">Nenhuma compra ainda.</div>`}
-    <button class="btn secondary" onclick="editarCliente('${c.id}')" style="margin-top:14px">Editar</button>
-    <button class="btn danger" onclick="delCliente('${c.id}')" style="margin-top:8px">Remover cliente</button>
-    <div style="height:30px"></div>
-  `;
-  openSheet('Cliente', html);
+function clDevices(st){
+ const list=[],seen=new Set();
+ const add=(d)=>{const key=clDigits(d.imei)||String(d.serie||'').toUpperCase().trim()||String(d.prodId||'');if(key&&seen.has(key))return;if(key)seen.add(key);list.push(d);};
+ for(const v of st.vendas){for(const it of (v.itens||[])){
+  if(it.cat==='Acessório'||it.acessId)continue;
+  const prod=(db.produtos||[]).find(p=>String(p.id)===String(it.prodId||''))||{};
+  add({modelo:it.nome||[prod.marca,prod.modelo].filter(Boolean).join(' '),armazenamento:prod.armazenamento||it.armazenamento||'',cor:prod.cor||it.cor||'',imei:it.imei||prod.imei||'',serie:it.serie||prod.serie||'',dataCompra:v.data,origem:'Compra na iTronic',prodId:it.prodId||''});
+ }}
+ for(const d of (st.cliente.aparelhos||[]))add({...d,origem:d.origem||'Cadastrado manualmente'});
+ return list;
 }
-function editarCliente(id){
-  const c=db.clientes.find(x=>x.id===id);
-  if(!c){ toast('Cliente não encontrado'); return; }
-  openCliente(c);
+function clDetailTab(id,tab){clState.selectedView=tab;openClienteDetail(id,tab);}
+function openClienteDetail(id,tab='resumo'){
+ if(!podeAcessarModulo('clientes'))return toast('Sem acesso.');
+ const c=(db.clientes||[]).find(x=>String(x.id)===String(id));if(!c)return;
+ const st=clAllStats().get(String(id));if(!st)return;
+ const crm=clCrmFor(c),tasks=Array.isArray(c.tarefas)?c.tarefas:[],devices=clDevices(st),status=clStatus(st),wa=clWaNumber(c);
+ const tabs=[['resumo','Visão geral'],['compras','Compras'],['aparelhos','Aparelhos'],['crm','CRM'],['pos','Pós-venda']];
+ const tok=clID(id);clState.selectedView=tab;
+ const item=(label,value)=>`<div class="cl-info"><small>${label}</small><strong>${clEsc(value||'—')}</strong></div>`;
+ let section='';
+ if(tab==='resumo'){
+  const latest=[...st.vendas].sort((a,b)=>String(b.data).localeCompare(String(a.data))).slice(0,3);
+  section=`<section class="cl-section"><h4>Dados de relacionamento</h4><div class="cl-info-grid">${item('CPF',c.cpf)}${item('Telefone',c.telefone)}${item('WhatsApp',c.whatsapp||c.telefone)}${item('E-mail',c.email)}${item('Nascimento',c.nascimento?fmtData(c.nascimento):'')}${item('Vendedor responsável',c.responsavel)}${item('Consentimento de marketing',c.marketingConsent?'Registrado':'Não registrado')}${item('Primeira compra',st.first?fmtData(st.first):'')}${item('Última compra',st.last?fmtData(st.last):'')}</div>
+  ${(c.tags||c.preferencias)?`<div class="cl-entry"><b>Preferências e etiquetas</b><small>${clEsc([c.tags,c.preferencias].filter(Boolean).join(' · '))}</small></div>`:''}
+  ${c.obs?`<div class="cl-entry"><b>Observações</b><small>${clEsc(c.obs)}</small></div>`:''}
+  ${(c.rua||c.cep)?`<div class="cl-entry"><b>Endereço</b><small>${clEsc([c.rua,c.num,c.bairro,c.cidade,c.uf,c.cep].filter(Boolean).join(', '))}</small></div>`:''}
+  <h4 style="margin-top:17px">Últimas compras</h4>${latest.length?latest.map(v=>`<div class="cl-entry"><div class="cl-entry-top"><b>${clEsc((v.itens||[]).map(it=>it.nome).join(', ')||'Compra registrada')}</b><strong>${money(vendaLiquido(v))}</strong></div><small>${fmtData(v.data)} · ${clEsc(v.vendedor||'Vendedor não identificado')}</small></div>`).join(''):'<p class="cl-help">Este cliente ainda não possui compras vinculadas ao cadastro.</p>'}`;
+ }else if(tab==='compras'){
+  section=`<section class="cl-section"><h4>Histórico de compras · ${st.count}</h4>${st.vendas.length?[...st.vendas].sort((a,b)=>String(b.data).localeCompare(String(a.data))).map(v=>`<div class="cl-entry"><div class="cl-entry-top"><b>${clEsc((v.itens||[]).map(it=>it.nome).join(' + ')||'Venda')}</b><strong>${money(vendaLiquido(v))}</strong></div><small>${fmtData(v.data)} · ${clEsc(v.vendedor||'Vendedor não identificado')}</small>${podeAcessarModulo('venda')?`<button class="cl-tiny-button" onclick="closeSheet();openVendaDetail(decodeURIComponent('${clID(v.id)}'))">Ver venda</button>`:''}</div>`).join(''):'<p class="cl-help">Nenhuma compra vinculada a este cadastro.</p>'}</section>`;
+ }else if(tab==='aparelhos'){
+  section=`<section class="cl-section"><div class="cl-entry-top"><h4>Aparelhos vinculados · ${devices.length}</h4><button class="cl-tiny-button" onclick="clNewDevice(decodeURIComponent('${tok}'))">+ Cadastrar aparelho</button></div>${devices.length?devices.map(d=>`<div class="cl-entry"><div class="cl-entry-top"><b>${clEsc(d.modelo||'Aparelho')}</b><span class="cl-status recurring">${clEsc(d.origem)}</span></div><small>${clEsc([d.armazenamento,d.cor].filter(Boolean).join(' · ')||'Modelo sem especificação')}</small>${d.imei?`<small>IMEI: ${clEsc(d.imei)}</small>`:''}${d.serie?`<small>Série: ${clEsc(d.serie)}</small>`:''}${d.dataCompra?`<small>Compra: ${fmtData(d.dataCompra)}</small>`:''}${d.garantiaAte?`<small>Garantia informada: ${fmtData(d.garantiaAte)}</small>`:''}</div>`).join(''):'<p class="cl-help">Nenhum aparelho cadastrado. Aparelhos comprados com identificação são relacionados automaticamente.</p>'}<div class="cl-help">A garantia só é mostrada quando uma data foi informada. O catálogo de assistência ainda não registra ordens de serviço completas.</div></section>`;
+ }else if(tab==='crm'){
+  section=`<section class="cl-section"><div class="cl-entry-top"><h4>Oportunidades e atendimentos · ${crm.length}</h4>${podeAcessarModulo('crm')?`<button class="cl-tiny-button" onclick="clGoCRM(decodeURIComponent('${tok}'),true)">+ Nova oportunidade</button>`:''}</div>${crm.length?crm.map(x=>`<div class="cl-entry"><div class="cl-entry-top"><b>${clEsc(x.device||x.type||'Atendimento')}</b><span class="cl-status recurring">${clEsc(crmLabel(x.stage))}</span></div><small>${clEsc(x.owner||'Sem responsável')} · ${x.value?money(x.value):'Sem valor estimado'}</small><small>${x.nextAt?'Retorno: '+clEsc(String(x.nextAt).replace('T',' ')):'Sem retorno agendado'}</small>${podeAcessarModulo('crm')?`<button class="cl-tiny-button" onclick="clGoCRM(decodeURIComponent('${tok}'),false,decodeURIComponent('${clID(x.id)}'))">Abrir no CRM</button>`:''}</div>`).join(''):'<p class="cl-help">Não encontrei oportunidades associadas ao WhatsApp deste cliente. O vínculo por telefone evita misturar atendimentos de pessoas com o mesmo nome.</p>'}<p class="cl-help">As mensagens do WhatsApp ainda não são sincronizadas. O CRM permanece armazenado neste navegador até a integração oficial.</p></section>`;
+ }else{
+  section=`<section class="cl-section"><div class="cl-entry-top"><h4>Pós-venda e lembretes</h4><button class="cl-tiny-button" onclick="clNewTask(decodeURIComponent('${tok}'))">+ Agendar contato</button></div>${tasks.length?tasks.slice().sort((a,b)=>String(a.data||'').localeCompare(String(b.data||''))).map(t=>`<div class="cl-entry"><div class="cl-entry-top"><b>${clEsc(t.titulo||'Contato')}</b><span class="cl-status ${t.concluida?'recurring':t.data&&t.data<todayStr()?'inactive':'new'}">${t.concluida?'Concluído':t.data&&t.data<todayStr()?'Atrasado':'Pendente'}</span></div><small>${t.data?fmtData(t.data):'Sem data'} · ${clEsc(t.responsavel||'Sem responsável')}</small>${t.nota?`<small>${clEsc(t.nota)}</small>`:''}<button class="cl-tiny-button" onclick="clToggleTask(decodeURIComponent('${tok}'),decodeURIComponent('${clID(t.id)}'))">${t.concluida?'Reabrir':'Concluir tarefa'}</button></div>`).join(''):'<p class="cl-help">Nenhum retorno cadastrado. Agende acompanhamentos após a venda ou troca de aparelho.</p>'}<p class="cl-help">Estes lembretes são internos e manuais; não enviam mensagens ao WhatsApp.</p></section>`;
+ }
+ const html=`<div class="cl-profile-top">${clAvatar(c,'big')}<div><span class="cl-status ${clTag(st)}">${clLabel(st)}</span><h3>${clEsc(c.nome)}</h3><p>${clEsc(c.telefone||c.whatsapp||'Sem telefone')} ${c.arquivado?'· Arquivado':''}</p></div></div>
+ <div class="cl-profile-metrics"><div class="cl-profile-metric"><span>Total gasto</span><b>${money(st.total)}</b></div><div class="cl-profile-metric"><span>Compras</span><b>${st.count}</b></div><div class="cl-profile-metric"><span>Ticket médio</span><b>${st.count?money(st.total/st.count):money(0)}</b></div></div>
+ <div class="cl-profile-actions">${wa?`<button class="cl-btn" onclick="window.open('https://wa.me/${wa}','_blank','noopener')">${vectorIcon('message')} WhatsApp</button>`:''}<button class="cl-btn" onclick="editarCliente(decodeURIComponent('${tok}'))">${vectorIcon('edit')} Editar</button>${podeAcessarModulo('crm')?`<button class="cl-btn" onclick="clGoCRM(decodeURIComponent('${tok}'),false)">${vectorIcon('chart')} Ir ao CRM</button>`:''}</div>
+ <nav class="cl-profile-tabs" aria-label="Seções da ficha do cliente">${tabs.map(([key,label])=>`<button class="${key===tab?'active':''}" onclick="clDetailTab(decodeURIComponent('${tok}'),'${key}')">${label}</button>`).join('')}</nav>
+ ${section}
+ <div class="divider"></div><button class="btn secondary" onclick="clArchive(decodeURIComponent('${tok}'))">${c.arquivado?'Reativar cliente':'Arquivar cliente'}</button>
+ ${st.count===0&&crm.length===0&&!devices.length?`<button class="btn danger" style="margin-top:8px" onclick="delCliente(decodeURIComponent('${tok}'))">Excluir cadastro sem histórico</button>`:''}<div style="height:20px"></div>`;
+ openSheet('Cliente · ficha 360°',html);
 }
-function delCliente(id){
-  askConfirm('Remover este cliente?', ()=>{
-    db.clientes=db.clientes.filter(c=>c.id!==id); saveDB(); closeSheet(); render(currentTab); toast('Cliente removido');
-  });
+function clNewDevice(id){const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return;openSheet('Cadastrar aparelho',`<p class="cl-help">Registre aparelhos que o cliente possui, inclusive comprados fora da loja. Evite cadastrar novamente um aparelho já identificado por IMEI.</p>${fld('Modelo *','cl-dev-model',{ph:'Ex.: iPhone 16 Pro Max'})}<div class="form-row">${fld('Armazenamento','cl-dev-storage',{ph:'256 GB'})}${fld('Cor','cl-dev-color',{ph:'Titânio natural'})}</div>${fld('IMEI','cl-dev-imei',{ph:'Opcional'})}${fld('Número de série','cl-dev-serial',{ph:'Opcional'})}${fld('Garantia até (se comprovada)','cl-dev-warranty',{type:'date'})}`,'Cadastrar',()=>{
+ const modelo=getV('cl-dev-model');if(!modelo)return toast('Informe o modelo.');const imei=getV('cl-dev-imei');const stats=clAllStats().get(String(id));if(imei&&clDevices(stats).some(x=>clDigits(x.imei)===clDigits(imei)))return toast('Este IMEI já está vinculado ao cliente.');
+ if(!Array.isArray(c.aparelhos))c.aparelhos=[];c.aparelhos.push({id:uid(),modelo,armazenamento:getV('cl-dev-storage'),cor:getV('cl-dev-color'),imei,serie:getV('cl-dev-serial'),garantiaAte:getV('cl-dev-warranty'),origem:'Cadastrado manualmente'});saveDB();openClienteDetail(id,'aparelhos');toast('Aparelho vinculado.');
+ });}
+function clNewTask(id){const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return;openSheet('Novo acompanhamento',`${fld('Próxima ação *','cl-task-title',{ph:'Ex.: Confirmar satisfação com o iPhone'})}${fld('Data do acompanhamento *','cl-task-date',{type:'date',val:todayStr()})}${fld('Responsável','cl-task-owner',{val:c.responsavel||session?.nome})}<div class="field"><label>Detalhes</label><textarea class="input" id="cl-task-note" rows="3" placeholder="Informações úteis para o próximo contato"></textarea></div>`,'Agendar',()=>{
+ const titulo=getV('cl-task-title'),data=getV('cl-task-date');if(!titulo||!data)return toast('Informe a ação e a data.');if(!Array.isArray(c.tarefas))c.tarefas=[];c.tarefas.push({id:uid(),titulo,data,responsavel:getV('cl-task-owner'),nota:getV('cl-task-note'),concluida:false,criadaEm:new Date().toISOString()});saveDB();openClienteDetail(id,'pos');toast('Acompanhamento agendado.');
+ });}
+function clToggleTask(id,taskId){const c=db.clientes.find(x=>String(x.id)===String(id)),t=c?.tarefas?.find(x=>String(x.id)===String(taskId));if(!t)return;t.concluida=!t.concluida;t.concluidaEm=t.concluida?new Date().toISOString():'';saveDB();openClienteDetail(id,'pos');toast(t.concluida?'Acompanhamento concluído.':'Acompanhamento reaberto.');}
+function clGoCRM(id,isNew=false,leadId=''){
+ if(!podeAcessarModulo('crm'))return toast('Sem acesso ao CRM.');
+ const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return;
+ const lead=leadId?crmData().find(x=>x.id===leadId):clCrmFor(c)[0];
+ closeSheet();go('crm');
+ if(isNew||!lead){if(!crmPodeEditar())return toast('Sem permissão para criar oportunidades.');crmOpenNew();if(el('crm-e-name'))el('crm-e-name').value=c.nome||'';if(el('crm-e-phone'))el('crm-e-phone').value=c.whatsapp||c.telefone||'';if(el('crm-e-owner')&&c.responsavel)el('crm-e-owner').value=c.responsavel;if(el('crm-e-optin'))el('crm-e-optin').checked=!!c.marketingConsent;}
+ else crmOpen(lead.id);
+}
+function editarCliente(id){const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return toast('Cliente não encontrado.');openCliente(c);}
+function clArchive(id){const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return;askConfirm(c.arquivado?'Reativar este cliente?':'Arquivar este cliente? As vendas e o histórico serão preservados.',()=>{c.arquivado=!c.arquivado;saveDB();closeSheet();render(currentTab);toast(c.arquivado?'Cliente arquivado.':'Cliente reativado.');},c.arquivado?'Reativar':'Arquivar');}
+function delCliente(id){const c=db.clientes.find(x=>String(x.id)===String(id));if(!c)return;
+ const st=clAllStats().get(String(id));if(st?.count||clCrmFor(c).length||(c.aparelhos||[]).length||(c.tarefas||[]).length)return toast('Há histórico vinculado. Arquive o cliente para preservá-lo.');
+ askConfirm('Excluir cadastro sem compras, aparelhos ou atendimentos?',()=>{db.clientes=db.clientes.filter(x=>String(x.id)!==String(id));saveDB();closeSheet();render(currentTab);toast('Cliente excluído.');});
 }
 
 /* ============ SELETORES NA VENDA ============ */
 function pickCliente(){
-  const list=db.clientes.slice();
+  const list=db.clientes.filter(c=>!c.arquivado);
   const html=`
     <button class="btn secondary" onclick="closeSheet();setTimeout(()=>openClienteFromVenda(),320)" style="margin-bottom:12px">+ Novo cliente</button>
     ${list.length?`<div class="list">${list.map(c=>`<div class="row" onclick="selCliente('${c.id}')"><div class="thumb">${vectorIcon('person')}</div><div class="info"><div class="t">${c.nome}</div><div class="s">${c.telefone||''}</div></div>${chev()}</div>`).join('')}</div>`
