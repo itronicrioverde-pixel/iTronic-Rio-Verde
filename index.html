@@ -834,25 +834,29 @@ body #login,body.dark #login{position:fixed;inset:0;display:block;padding:0;over
 #page-painel .pp-note{font-size:10px;line-height:1.4;color:var(--text2);background:var(--bg2);padding:9px 11px;border-radius:10px;margin-top:13px}
 #page-painel .pp-empty{padding:25px 10px;text-align:center;color:var(--text2);font-size:12px}
 #page-simular .sim-shell{max-width:1160px;margin:0 auto;position:relative}
-#page-simular .sim-hero{position:relative;overflow:hidden;margin:0 0 22px;padding:28px 32px;border-radius:22px;color:#fff;background:linear-gradient(115deg,#0759df 0%,#1677ff 43%,#52b6ff 100%);box-shadow:0 16px 32px rgba(18,101,232,.22)}
+#page-simular .sim-hero{position:relative;overflow:hidden;margin:0 0 22px;padding:28px 32px;border-radius:22px;color:#fff;background:linear-gradient(115deg,#173c2d 0%,#2e5b33 48%,#5f9560 100%);box-shadow:0 16px 32px rgba(31,78,42,.22)}
 #page-simular .sim-hero:after{content:"";position:absolute;width:430px;height:430px;right:9%;top:-245px;border:1px solid rgba(255,255,255,.28);border-radius:50%;box-shadow:0 0 0 34px rgba(255,255,255,.08),0 0 0 68px rgba(255,255,255,.05)}
 #page-simular .sim-hero small{display:block;position:relative;z-index:1;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:800;opacity:.76}
 #page-simular .sim-hero h3{position:relative;z-index:1;margin:8px 0 6px;font-size:28px;letter-spacing:-.04em}
 #page-simular .sim-hero p{position:relative;z-index:1;margin:0;color:rgba(255,255,255,.82);font-size:13px}
 #page-simular .sim-layout{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(300px,.87fr);gap:20px;align-items:start}
 #page-simular .sim-main-col,#page-simular .sim-summary-col{display:grid;gap:14px;min-width:0}
-#page-simular .sim-top-options{display:flex;gap:8px;margin-bottom:0}
-#page-simular .sim-top-options .btn{flex:1;padding:12px;font-size:14px}
+#page-simular .module-heading{margin-bottom:16px}
+#page-simular .sim-top-options{display:flex;gap:10px;margin:0 0 14px;align-items:stretch}
+#page-simular .sim-top-options .btn{flex:1;min-height:46px;padding:12px 16px;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
 #page-simular .sim-card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 32px rgba(18,44,23,.08);padding:22px}
 #page-simular .sim-card>div:first-child{font-size:16px!important;margin-bottom:14px!important}
-#page-simular .sim-difer-box{border-radius:18px;background:linear-gradient(135deg,#0c61e9,#42adff);color:#fff;padding:19px 21px;box-shadow:0 12px 25px rgba(18,101,232,.18)}
+#page-simular .sim-card .input{width:100%;margin-left:0;margin-right:0}
+#page-simular .sim-difer-box{border-radius:18px;background:linear-gradient(135deg,#173c2d,#3f7547);color:#fff;padding:19px 21px;box-shadow:0 12px 25px rgba(31,78,42,.18)}
 #page-simular .sim-difer-box .k{color:rgba(255,255,255,.78)}
 #page-simular .sim-difer-box .v{font-size:25px}
-#page-simular .sim-summary-col>.btn{width:100%;margin:0!important}
+#page-simular .sim-summary-col>.btn{width:100%;min-height:46px;margin:0!important;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+#page-simular .sim-summary-col>.btn.secondary{margin-top:-4px!important}
 #page-simular:before,#page-simular:after{z-index:0;top:22%;width:clamp(190px,22vw,340px);height:62%;opacity:.20;filter:saturate(1.15);background-size:contain;background-repeat:no-repeat;background-position:center}
 #page-simular:before{left:-105px;transform:rotate(-7deg)}
 #page-simular:after{right:-105px;transform:scaleX(-1) rotate(-7deg)}
 #page-simular .sim-shell>*{position:relative;z-index:1}
+@media(max-width:760px){#page-simular .sim-layout{grid-template-columns:1fr;gap:14px}#page-simular .sim-hero{padding:23px 21px}#page-simular .sim-hero h3{font-size:23px}#page-simular .sim-card{padding:18px}}
 #page-simular .sim-alert{padding:12px 14px;border-radius:12px;background:var(--bg2);border:1px solid var(--line);color:var(--red);font-size:13px;line-height:1.4}
 #page-orcamentos .orc-toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
 #page-orcamentos .orc-toolbar .btn{width:auto;margin:0;padding:11px 16px}
