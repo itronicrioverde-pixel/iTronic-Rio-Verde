@@ -135,7 +135,7 @@
       <button data-view="followups"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 5h4"/></svg>Retornos</button>
     </nav>
     <div class="sidebar-bottom">
-      <a class="backlink" href="./index.html"><svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M5 12h15"/></svg>Voltar ao iTronic</a>
+      <a class="backlink" href="#" onclick="if(window.parent!==window){window.parent.postMessage({type:'itronic:crm-back'},'*');return false}"><svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M5 12h15"/></svg>Voltar ao iTronic</a>
       <p class="sidebar-note">Atendimento próximo gera vendas melhores.</p>
     </div>
   </aside>
@@ -330,8 +330,9 @@ const clickSound=new Audio('data:audio/mpeg;base64,SUQzBAAAAAABBFRYWFgAAAASAAADb
 clickSound.preload='auto';clickSound.volume=.7;let lastSound=-Infinity;
 const clickSelector='button,a[href],input,select,textarea,label,[role="button"],[data-action],[data-view]';
 function clickedControl(ev){const node=ev.target?.nodeType===1?ev.target:ev.target?.parentElement;return node?.closest(clickSelector)}
-document.addEventListener('pointerdown',ev=>{if(!clickedControl(ev)||matchMedia('(prefers-reduced-motion:reduce)').matches)return;for(let i=0;i<2;i++){const wave=document.createElement('i');wave.className='global-click-wave'+(i?' second':'');wave.style.left=ev.clientX+'px';wave.style.top=ev.clientY+'px';document.body.appendChild(wave);setTimeout(()=>wave.remove(),480)}},true);
-document.addEventListener('click',ev=>{if(!ev.isTrusted||!clickedControl(ev))return;const time=performance.now();if(time-lastSound<70)return;lastSound=time;try{clickSound.pause();if(clickSound.readyState>0)clickSound.currentTime=0;clickSound.play().catch(()=>{})}catch(_){}},true);
+function playClick(){const time=performance.now();if(time-lastSound<70)return;lastSound=time;try{clickSound.pause();if(clickSound.readyState>0)clickSound.currentTime=0;const p=clickSound.play();if(p&&typeof p.catch==='function')p.catch(()=>{})}catch(_){} }
+document.addEventListener('pointerdown',ev=>{if(!clickedControl(ev))return;playClick();if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;for(let i=0;i<2;i++){const wave=document.createElement('i');wave.className='global-click-wave'+(i?' second':'');wave.style.left=ev.clientX+'px';wave.style.top=ev.clientY+'px';document.body.appendChild(wave);setTimeout(()=>wave.remove(),480)}},true);
+document.addEventListener('click',ev=>{if(!ev.isTrusted||!clickedControl(ev))return;if(ev.detail===0)playClick()},true);
 render();
 </script>
 </body>
