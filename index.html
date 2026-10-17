@@ -834,7 +834,7 @@ body #login,body.dark #login{position:fixed;inset:0;display:block;padding:0;over
 #page-painel .pp-note{font-size:10px;line-height:1.4;color:var(--text2);background:var(--bg2);padding:9px 11px;border-radius:10px;margin-top:13px}
 #page-painel .pp-empty{padding:25px 10px;text-align:center;color:var(--text2);font-size:12px}
 #page-simular .sim-shell{max-width:1160px;margin:0 auto;position:relative}
-#page-simular .sim-hero{position:relative;overflow:hidden;margin:0 0 22px;padding:28px 32px;border-radius:22px;color:#fff;background:linear-gradient(115deg,#0759df 0%,#1677ff 43%,#52b6ff 100%);box-shadow:0 16px 32px rgba(18,101,232,.22)}
+#page-simular .sim-hero{position:relative;overflow:hidden;margin:0 0 22px;padding:28px 32px;border-radius:22px;color:#fff;background:linear-gradient(115deg,#143a2d 0%,#2e6947 49%,#76a64f 100%);box-shadow:0 16px 32px rgba(20,75,44,.22)}
 #page-simular .sim-hero:after{content:"";position:absolute;width:430px;height:430px;right:9%;top:-245px;border:1px solid rgba(255,255,255,.28);border-radius:50%;box-shadow:0 0 0 34px rgba(255,255,255,.08),0 0 0 68px rgba(255,255,255,.05)}
 #page-simular .sim-hero small{display:block;position:relative;z-index:1;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:800;opacity:.76}
 #page-simular .sim-hero h3{position:relative;z-index:1;margin:8px 0 6px;font-size:28px;letter-spacing:-.04em}
@@ -845,7 +845,7 @@ body #login,body.dark #login{position:fixed;inset:0;display:block;padding:0;over
 #page-simular .sim-top-options .btn{flex:1;padding:12px;font-size:14px}
 #page-simular .sim-card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 32px rgba(18,44,23,.08);padding:22px}
 #page-simular .sim-card>div:first-child{font-size:16px!important;margin-bottom:14px!important}
-#page-simular .sim-difer-box{border-radius:18px;background:linear-gradient(135deg,#0c61e9,#42adff);color:#fff;padding:19px 21px;box-shadow:0 12px 25px rgba(18,101,232,.18)}
+#page-simular .sim-difer-box{border-radius:18px;background:linear-gradient(135deg,#173c2d,#397b51);color:#fff;padding:19px 21px;box-shadow:0 12px 25px rgba(20,70,43,.18)}
 #page-simular .sim-difer-box .k{color:rgba(255,255,255,.78)}
 #page-simular .sim-difer-box .v{font-size:25px}
 #page-simular .sim-summary-col>.btn{width:100%;margin:0!important}
@@ -1183,6 +1183,187 @@ body.dark .rp-page .rp-tab.active{background:var(--brand);color:var(--brand-ink)
 .crm-v2 .crm-recovery-intro strong{font-size:13px}.crm-v2 .crm-recovery-intro span{font-size:11px;color:var(--text2);max-width:540px}
 .crm-v2 .crm-health-no{float:right;color:var(--blue)}.crm-v2 .crm-health-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 0;font-size:12px}
 @media(max-width:640px){.sim-quote-best{align-items:flex-start;flex-direction:column}.crm-v2 .crm-recovery-intro{display:block}.crm-v2 .crm-recovery-intro span{display:block;margin-top:6px}}
+
+/* ============================================================
+   iTronic · Revisão visual 17/10/2026
+   Espaçamentos coerentes em todos os módulos; destaque verde.
+   ============================================================ */
+#page-simular .sim-hero{background:linear-gradient(115deg,#143a2d 0%,#2e6947 49%,#76a64f 100%);box-shadow:0 16px 32px rgba(20,75,44,.22)}
+#page-simular .sim-difer-box{background:linear-gradient(135deg,#173c2d,#397b51);box-shadow:0 12px 25px rgba(20,70,43,.18)}
+/* Todas as formas de pagamento do Simulador seguem a paleta da loja, sem azul/roxo. */
+#page-simular .pay-deb{background:linear-gradient(135deg,#e3f3e9,#d6eadd);border-color:#76b48e}
+#page-simular .pay-deb .pay-val{color:#26774e}
+#page-simular .pay-cred{background:linear-gradient(135deg,#f0f7e6,#e2efcf);border-color:#9bc66d}
+#page-simular .pay-cred .pay-val{color:#416c2c}
+
+#page-simular .sim-hero h3,#page-simular .sim-difer-box .v{color:#f6fff0}
+#page-simular .sim-top-options{display:flex;gap:11px;align-items:stretch;margin:0 0 18px}
+#page-simular .sim-top-options .btn{display:flex;align-items:center;justify-content:center;gap:7px;min-height:46px;min-width:0;border-radius:12px}
+#page-simular .sim-layout{gap:16px}
+#page-simular .sim-main-col,#page-simular .sim-summary-col{gap:15px}
+#page-simular .sim-card{padding:20px;min-width:0}
+#page-simular .sim-card .input{margin-top:0;min-height:46px}
+#page-simular .sim-card label.mini-lbl{margin-top:14px!important;margin-bottom:7px!important}
+#page-simular .sim-card label + input.input{margin-top:0!important}
+#page-simular .sim-quote{margin:17px 0 8px;padding:15px}
+#page-simular .sim-quote-head{margin-bottom:12px}
+#page-simular .sim-source{margin-bottom:15px}
+#page-simular .sim-summary-col>.btn{min-height:46px}
+#page-simular .sim-shell{width:100%;max-width:1160px}
+/* Consistência de gutters e quebras sem alterar a sidebar/abas */
+#app .page{min-width:0;box-sizing:border-box}
+#app .page .module-heading{margin:4px 0 20px;gap:16px}
+#app .page .module-heading h2{line-height:1.16}
+#app .page .module-metrics{gap:14px;margin-bottom:19px}
+#app .page .module-actions{gap:10px;margin:16px 0}
+#app .page .sale-layout{gap:16px}
+#app .page .grid2{gap:13px}
+#app .page .card{margin-bottom:14px}
+#app .page .list{margin-bottom:14px}
+#app .page .field{min-width:0}
+#app .page input,#app .page select,#app .page textarea{max-width:100%}
+#app .page .module-heading>*,#app .page .dash-welcome>*,#app .page .pp-card-head>*,#app .page .rp-head>*,#app .page .rp-top>*,#app .page .crm-v2-head>*{min-width:0}
+#page-administrador .ia-head{gap:18px;margin:4px 0 20px}
+#page-administrador .ia-cards{gap:13px;margin-bottom:17px}
+#page-administrador .ia-panel{padding:20px;margin-bottom:16px}
+#page-administrador .ia-user{gap:14px}
+#page-crm.crm-v2{padding-top:18px}
+#page-crm .crm-v2-head{gap:18px;margin-bottom:20px}
+#page-crm .crm-v2-kpis{gap:12px;margin:16px 0 18px}
+#page-crm .crm-v2-main{padding:19px}
+#page-crm .crm-v2-list{gap:11px}
+/* Central de relatórios: métricas, tabelas, campos e cabeçalhos */
+#page-relatorios.rp-page{padding-top:20px}
+.rp-page .rp-top{gap:23px;margin-bottom:22px;align-items:flex-start}
+.rp-page .rp-top>div:first-child{flex:1;min-width:220px}
+.rp-page .rp-title{margin:7px 0 9px;line-height:1.12}
+.rp-page .rp-tools{gap:9px}
+.rp-page .rp-btn{min-height:40px;gap:8px;padding:10px 14px}
+.rp-page .rp-filterbox{padding:20px;margin-bottom:18px}
+.rp-page .rp-filterrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:end}
+.rp-page .rp-filtergroup,.rp-page .rp-filtergroup.wide{display:flex;flex:initial;gap:8px;min-width:0}
+.rp-page .rp-input{height:44px;padding:10px 12px;font-size:13px}
+.rp-page .rp-filter-note{margin-top:14px}
+.rp-page .rp-tabs{gap:9px;margin-bottom:15px;padding:3px 0 12px}
+.rp-page .rp-tab{padding:11px 15px}
+.rp-page .rp-kpis{gap:14px;margin-bottom:16px}
+.rp-page .rp-kpi{padding:18px;min-height:130px}
+.rp-page .rp-kpi>strong{margin-top:17px}
+.rp-page .rp-layout,.rp-page .rp-layout.equal{gap:16px;margin-bottom:16px}
+.rp-page .rp-panel{padding:22px;margin-bottom:16px}
+.rp-page .rp-head{gap:13px;margin-bottom:19px}
+.rp-page .rp-head p{margin-top:6px}
+.rp-page table.rp-table th,.rp-page table.rp-table td{padding:14px 15px;vertical-align:middle}
+.rp-page .rp-mini-list{gap:15px}
+.rp-page .rp-micro{margin-top:16px}
+/* Painel: inteligência comercial */
+#page-painel .pp-header{gap:18px;margin-bottom:20px}
+#page-painel .pp-kpis{gap:13px}
+#page-painel .pp-main,#page-painel .pp-second{gap:15px;margin-top:15px}
+#page-painel .pp-card{padding:21px;min-width:0}
+#page-painel .pp-card-head{gap:14px;margin-bottom:16px}
+#page-painel .pp-clients-area{margin-top:23px;display:grid;gap:15px;min-width:0}
+#page-painel .pp-section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+#page-painel .pp-section-heading h3{font-size:clamp(20px,2.2vw,27px);letter-spacing:-.035em;margin:5px 0 7px}
+#page-painel .pp-section-heading p{font-size:12px;color:var(--text2);line-height:1.5}
+#page-painel .pp-section-context{font-size:11px;color:var(--text2);font-weight:750}
+#page-painel .pp-client-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+#page-painel .pp-client-metric{background:color-mix(in srgb,var(--card) 91%,transparent);border:1px solid var(--line);border-radius:17px;padding:18px;min-width:0;box-shadow:var(--shadow)}
+#page-painel .pp-client-metric small{display:block;color:var(--text2);font-weight:700;font-size:11px;line-height:1.45}
+#page-painel .pp-client-metric strong{display:block;margin:11px 0 7px;font-size:clamp(17px,1.8vw,24px);line-height:1.2;font-weight:850;letter-spacing:-.04em;overflow-wrap:anywhere}
+#page-painel .pp-client-metric span{display:block;font-size:10px;color:var(--text2);line-height:1.45}
+#page-painel .pp-clients-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:15px;align-items:stretch}
+#page-painel .pp-clients-grid>.pp-card{margin:0}
+#page-painel .pp-client-list{display:grid;gap:15px}
+#page-painel .pp-client-row-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px}
+#page-painel .pp-client-row-head>span{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+#page-painel .pp-client-row-head>span>b:not(.pp-client-order){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-painel .pp-client-row-head small{color:var(--text2);font-size:10px;white-space:nowrap}
+#page-painel .pp-client-row-head>strong{white-space:nowrap;font-size:12px}
+#page-painel .pp-client-order{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:9px;background:color-mix(in srgb,var(--brand) 17%,var(--card));color:var(--brand-deep);font-size:10px}
+#page-painel .pp-client-track{height:9px;margin:8px 0 0 36px;background:var(--bg2);border-radius:20px;overflow:hidden}
+#page-painel .pp-client-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#2d7650,#8bc76c)}
+#page-painel .pp-client-legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;font-size:10px;color:var(--text2);margin-top:18px;line-height:1.5}
+#page-painel .pp-key-square{display:inline-block;width:9px;height:9px;background:#3e9161;margin-right:6px;border-radius:3px}
+#page-painel .pp-client-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+#page-painel .pp-client-facts>div{padding:12px;border-radius:12px;background:var(--bg2);min-width:0}
+#page-painel .pp-client-facts small{display:block;color:var(--text2);font-size:10px}
+#page-painel .pp-client-facts strong{display:block;margin-top:7px;font-size:12px;overflow-wrap:anywhere}
+#page-painel .pp-client-category-title{font-size:12px;font-weight:800;margin:12px 0 15px}
+#page-painel .pp-client-donut-area{display:grid;grid-template-columns:142px minmax(0,1fr);gap:18px;align-items:center}
+#page-painel .pp-client-donut{aspect-ratio:1;border-radius:50%;display:grid;place-items:center}
+#page-painel .pp-client-donut>div{width:69%;height:69%;background:var(--card);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#page-painel .pp-client-donut b{font-size:23px}
+#page-painel .pp-client-donut small{font-size:10px;color:var(--text2)}
+#page-painel .pp-client-categories{display:grid;gap:10px;min-width:0}
+#page-painel .pp-client-categories>div{display:flex;justify-content:space-between;gap:8px;font-size:11px}
+#page-painel .pp-client-categories>div>span{display:flex;align-items:center;gap:7px;min-width:0}
+#page-painel .pp-client-categories b{font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#page-painel .pp-client-categories i{width:9px;height:9px;display:inline-block;border-radius:3px;flex:none}
+#page-painel .pp-client-categories strong{white-space:nowrap;font-size:11px}
+#page-painel .pp-client-disclaimer{font-size:10px;line-height:1.5;color:var(--text2);margin:10px 0 0}
+#page-painel .pp-client-highlight{background:var(--bg2);border-radius:11px;padding:12px;line-height:1.55;margin-top:14px!important}
+#page-painel .pp-client-month-chart{height:188px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:15px;align-items:end;border-bottom:1px solid var(--line);padding:0 12px 9px}
+#page-painel .pp-client-month{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+#page-painel .pp-client-month>strong{font-size:11px;font-weight:750;white-space:nowrap}
+#page-painel .pp-client-month>span{font-size:11px;color:var(--text2);font-weight:750}
+#page-painel .pp-client-month-track{width:min(49px,100%);flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center}
+#page-painel .pp-client-month-track i{display:block;width:100%;background:linear-gradient(180deg,#a5db55,#3d8059);border-radius:7px 7px 0 0;min-height:0;transition:height .25s}
+@media(max-width:1170px){.rp-page .rp-filterrow{grid-template-columns:repeat(2,minmax(0,1fr))}#page-painel .pp-client-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#page-painel .pp-clients-grid{grid-template-columns:1fr}}
+@media(max-width:760px){
+ #app .page{padding:17px 14px calc(85px + var(--safe-b))}
+ #app .page .module-heading{align-items:flex-start;gap:10px;margin-bottom:16px}
+ #app .page .module-metrics{gap:10px}
+ #app .page .grid2{gap:10px}
+ #app .page .card{margin-bottom:12px}
+ #page-administrador .ia-panel{padding:15px}
+ #page-crm .crm-v2-main{padding:14px}
+ #page-crm .crm-v2-kpis{gap:9px}
+ #page-simular .sim-hero{padding:22px 19px;margin-bottom:16px}
+ #page-simular .sim-top-options{gap:9px;margin-bottom:14px}
+ #page-simular .sim-top-options .btn{padding:10px 8px!important;font-size:12px!important}
+ #page-simular .sim-card{padding:16px}
+ #page-simular .sim-layout,#page-simular .sim-main-col,#page-simular .sim-summary-col{gap:12px}
+ #page-relatorios.rp-page{padding:16px 13px calc(90px + var(--safe-b))}
+ .rp-page .rp-top{gap:15px;margin-bottom:16px;flex-wrap:wrap}
+ .rp-page .rp-tools{justify-content:flex-start;width:100%}
+ .rp-page .rp-btn{flex:1 1 auto;padding:9px 10px;font-size:11px}
+ .rp-page .rp-filterbox{padding:14px;margin-bottom:14px}
+ .rp-page .rp-filterrow{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .rp-page .rp-filtergroup:first-child{grid-column:1/-1}
+ .rp-page .rp-filtergroup.wide:last-child{grid-column:1/-1}
+ .rp-page .rp-filtergroup,.rp-page .rp-filtergroup.wide{min-width:0;flex:initial}
+ .rp-page .rp-input{font-size:12px;min-width:0}
+ .rp-page .rp-tabs{gap:6px;margin-bottom:11px}
+ .rp-page .rp-tab{padding:10px 12px}
+ .rp-page .rp-kpis{gap:10px;margin-bottom:12px}
+ .rp-page .rp-kpi{padding:14px;min-height:115px}
+ .rp-page .rp-panel{padding:15px;margin-bottom:12px}
+ .rp-page .rp-layout,.rp-page .rp-layout.equal{gap:12px;margin-bottom:12px;grid-template-columns:1fr}
+ .rp-page .rp-head{margin-bottom:13px}
+ .rp-page table.rp-table th,.rp-page table.rp-table td{padding:11px 12px}
+ #page-painel .pp-kpis{gap:9px}
+ #page-painel .pp-main,#page-painel .pp-second{gap:11px;margin-top:11px}
+ #page-painel .pp-card{padding:15px}
+ #page-painel .pp-clients-area{gap:12px;margin-top:18px}
+ #page-painel .pp-client-metrics{gap:9px}
+ #page-painel .pp-client-metric{padding:13px}
+ #page-painel .pp-client-metric strong{font-size:18px}
+ #page-painel .pp-client-facts{gap:7px}
+ #page-painel .pp-client-facts>div{padding:10px}
+ #page-painel .pp-client-donut-area{grid-template-columns:110px minmax(0,1fr);gap:12px}
+ #page-painel .pp-client-month-chart{gap:7px;padding:0 2px 9px}
+ #page-painel .pp-client-month>strong{font-size:9px}
+}
+@media(max-width:390px){
+ .rp-page .rp-filterrow{grid-template-columns:1fr 1fr}
+ .rp-page .rp-tools .rp-btn{flex:1 1 45%}
+ #page-painel .pp-client-donut-area{grid-template-columns:1fr}
+ #page-painel .pp-client-donut{width:125px;margin:auto}
+ #page-painel .pp-client-row-head small{display:none}
+ #page-painel .pp-client-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media print{#page-painel .pp-client-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 </style>
 </head>
@@ -2440,6 +2621,99 @@ function painelBarsSvg(labels,faturamento,lucros,mostrarLucro){
   return `<svg class="pp-chart" viewBox="0 0 520 158" role="img" aria-label="Faturamento${mostrarLucro?' e lucro':''} dos últimos seis meses" preserveAspectRatio="xMidYMid meet">${lines}${bars}</svg>`;
 }
 
+/* ============ PAINEL · INTELIGÊNCIA DE CLIENTES ============ */
+function painelClientesInsight(vendas,periodo,esc,periodoReferencia){
+  if(!podeAcessarModulo('clientes')){
+    return `<section class="pp-card pp-client-blocked"><h3>Inteligência de clientes</h3><p>Este perfil não tem permissão para consultar o cadastro de clientes.</p></section>`;
+  }
+  const clientes=new Map();let semIdentificacao=0;
+  const chaveCliente=(v)=>{
+    const id=String(v.clienteId||'').trim();
+    if(id)return 'id:'+id;
+    const nome=String(v.clienteNome||'').trim();
+    if(!nome||/^(consumidor(?:\s+final)?|cliente|não informado|sem nome)$/i.test(nome))return '';
+    return 'nome:'+nome.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').replace(/\s+/g,' ');
+  };
+  const cadastro=new Map((db.clientes||[]).map(c=>[String(c.id),c]));
+  for(const venda of vendas){
+    const key=chaveCliente(venda);if(!key){semIdentificacao++;continue;}
+    const registrado=cadastro.get(String(venda.clienteId||''));
+    const nome=String(venda.clienteNome||registrado?.nome||'').trim();
+    const linha=clientes.get(key)||{key,nome:nome||'Cliente',total:0,qtd:0,maior:0,ultima:'',vendas:[],categorias:new Map(),produtos:new Map()};
+    if(nome&&linha.nome==='Cliente')linha.nome=nome;
+    const valor=Math.max(0,vendaLiquido(venda));
+    linha.total+=valor;linha.qtd++;linha.maior=Math.max(linha.maior,valor);
+    if(String(venda.data||'')>linha.ultima)linha.ultima=String(venda.data||'');
+    linha.vendas.push(venda);
+    const itens=Array.isArray(venda.itens)?venda.itens:[];
+    const detalhe=itens.map(it=>Math.max(0,Number(it.venda??it.preco)||0));
+    const somaDetalhe=detalhe.reduce((a,b)=>a+b,0);
+    itens.forEach((it,i)=>{
+      const cat=String(it.cat||it.categoria||'Outros').trim()||'Outros';
+      const nomeItem=String(it.nome||'Produto não identificado').trim()||'Produto não identificado';
+      const proporcional=somaDetalhe>0?valor*detalhe[i]/somaDetalhe:valor/Math.max(1,itens.length);
+      linha.categorias.set(cat,(linha.categorias.get(cat)||0)+proporcional);
+      linha.produtos.set(nomeItem,(linha.produtos.get(nomeItem)||0)+proporcional);
+    });
+    clientes.set(key,linha);
+  }
+  const rank=[...clientes.values()].sort((a,b)=>b.total-a.total||b.qtd-a.qtd);
+  if(!rank.length)return `<div class="pp-clients-area"><div class="pp-section-heading"><div><span class="pp-eyebrow">RELACIONAMENTO</span><h3>Quem mais compra na iTronic</h3><p>Clientes e comportamento de compra no período escolhido.</p></div></div><section class="pp-card pp-client-blocked"><div class="pp-empty">Não há vendas com clientes identificados neste período. Cadastre o cliente na venda para acompanhar o histórico de compras.</div></section></div>`;
+  const top=rank.slice(0,5),first=rank[0],somaIdentificada=rank.reduce((sum,c)=>sum+c.total,0);
+  const totalPer=periodo.reduce((sum,v)=>sum+vendaLiquido(v),0);
+  const pct=(value,base)=>base>0?(value/base*100).toFixed(1).replace('.',',')+'%':'0%';
+  const topMax=Math.max(1,top[0].total),topSum=top.reduce((sum,x)=>sum+x.total,0);
+  const clienteMedio=first.qtd?first.total/first.qtd:0;
+  const paleta=['#275a40','#4b8961','#82af72','#b1d48e','#d3e8bd'];
+  const catList=[...first.categorias].sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const catRest=[...first.categorias].sort((a,b)=>b[1]-a[1]).slice(4).reduce((sum,p)=>sum+p[1],0);
+  if(catRest>0)catList.push(['Demais categorias',catRest]);
+  const catTotal=catList.reduce((sum,p)=>sum+p[1],0);
+  let cum=0;
+  const gradients=catList.map(([label,val],i)=>{
+    const a=cum;cum+=(val/catTotal)*100;
+    return `${paleta[i%paleta.length]} ${a.toFixed(2)}% ${cum.toFixed(2)}%`;
+  });
+  const topProduct=[...first.produtos].sort((a,b)=>b[1]-a[1])[0];
+  const dates=first.vendas.map(v=>String(v.data||'').slice(0,7)).filter(m=>/^\d{4}-\d{2}$/.test(m)).sort();
+  const anchor=dates.length?dates[dates.length-1]:(/^\d{4}-\d{2}$/.test(periodoReferencia)?periodoReferencia:todayStr().slice(0,7));
+  const [ano,mes]=anchor.split('-').map(Number);
+  const monthly=Array.from({length:6},(_,i)=>{
+    const d=new Date(ano,mes-1+i-5,1),m=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    return {key:m,short:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][d.getMonth()],total:first.vendas.filter(v=>String(v.data||'').startsWith(m)).reduce((sum,v)=>sum+vendaLiquido(v),0)};
+  });
+  const monthMax=Math.max(1,...monthly.map(m=>m.total));
+  const clienteRecorrente=rank.filter(c=>c.qtd>=2).length;
+  const txtNumero=(n)=>Number(n||0).toLocaleString('pt-BR');
+  const tooltip=(v)=>esc(v).replace(/`/g,'');
+  return `<div class="pp-clients-area">
+    <div class="pp-section-heading"><div><span class="pp-eyebrow">RELACIONAMENTO · VENDAS REGISTRADAS</span><h3>Inteligência de clientes</h3><p>Quem compra mais, quanto investe em produtos e como o relacionamento evolui.</p></div><span class="pp-section-context">${txtNumero(rank.length)} compradores identificados</span></div>
+    <div class="pp-client-metrics">
+      <div class="pp-client-metric"><small>Maior comprador do período</small><strong title="${tooltip(first.nome)}">${esc(first.nome)}</strong><span>${txtNumero(first.qtd)} compra(s) registrada(s)</span></div>
+      <div class="pp-client-metric"><small>Total gasto pelo maior comprador</small><strong class="money-in">${money(first.total)}</strong><span>${pct(first.total,totalPer)} do faturamento do período</span></div>
+      <div class="pp-client-metric"><small>Clientes que voltaram a comprar</small><strong>${txtNumero(clienteRecorrente)}</strong><span>${pct(clienteRecorrente,rank.length)} dos clientes identificados</span></div>
+      <div class="pp-client-metric"><small>Participação dos 5 maiores</small><strong>${pct(topSum,totalPer)}</strong><span>Do faturamento total do período</span></div>
+    </div>
+    <div class="pp-clients-grid">
+      <section class="pp-card pp-client-ranking"><div class="pp-card-head"><div><h3>Top 5 clientes por valor gasto</h3><p>Compras concluídas · período selecionado</p></div><span class="pp-small-label">${money(topSum)} no Top 5</span></div>
+        <div class="pp-client-list">${top.map((c,i)=>`<div class="pp-client-row"><div class="pp-client-row-head"><span><b class="pp-client-order">${String(i+1).padStart(2,'0')}</b><b title="${tooltip(c.nome)}">${esc(c.nome)}</b><small>${txtNumero(c.qtd)} compra(s)</small></span><strong class="money-in">${money(c.total)}</strong></div><div class="pp-client-track"><i style="width:${Math.max(1,c.total/topMax*100).toFixed(1)}%"></i></div></div>`).join('')}</div>
+        <div class="pp-client-legend"><span><i class="pp-key-square"></i> Barra proporcional ao maior comprador</span><span>Valores em R$</span></div>
+      </section>
+      <section class="pp-card pp-client-profile"><div class="pp-card-head"><div><h3>Raio-X do cliente destaque</h3><p>${esc(first.nome)} · ${txtNumero(first.qtd)} compra(s)</p></div><span class="pp-small-label">${pct(first.total,somaIdentificada)} dos clientes identificados</span></div>
+        <div class="pp-client-facts"><div><small>Ticket médio</small><strong>${money(clienteMedio)}</strong></div><div><small>Maior compra</small><strong>${money(first.maior)}</strong></div><div><small>Última compra</small><strong>${/^\d{4}-\d{2}-\d{2}$/.test(first.ultima)?fmtData(first.ultima):'Não informada'}</strong></div></div>
+        <div class="pp-client-category-title">Em que categorias ele mais gastou</div>
+        ${catTotal>0?`<div class="pp-client-donut-area"><div class="pp-client-donut" style="background:conic-gradient(${gradients.join(',')})"><div><b>${catList.length}</b><small>categorias</small></div></div><div class="pp-client-categories">${catList.map(([name,val],i)=>`<div><span><i style="background:${paleta[i%paleta.length]}"></i><b title="${tooltip(name)}">${esc(name)}</b></span><strong>${money(val)}</strong></div>`).join('')}</div></div><p class="pp-client-disclaimer">Distribuição estimada proporcionalmente aos itens registrados em cada venda.</p>`:'<div class="pp-empty">Sem produtos detalhados para mostrar categorias.</div>'}
+        ${topProduct?`<p class="pp-client-highlight">Produto com maior valor atribuído: <b>${esc(topProduct[0])}</b> (${money(topProduct[1])}).</p>`:''}
+      </section>
+    </div>
+    <section class="pp-card pp-client-history"><div class="pp-card-head"><div><h3>Gastos do cliente destaque ao longo do tempo</h3><p>Últimos seis meses até a compra mais recente registrada</p></div><span class="pp-small-label">${esc(first.nome)}</span></div>
+      <div class="pp-client-month-chart">${monthly.map(m=>`<div class="pp-client-month"><strong class="money-in">${m.total?money(m.total):'—'}</strong><div class="pp-client-month-track"><i style="height:${m.total?Math.max(5,m.total/monthMax*100):0}%" title="${m.short}: ${money(m.total)}"></i></div><span>${m.short}</span></div>`).join('')}</div>
+      <div class="pp-client-legend"><span><i class="pp-key-square"></i> Valores efetivamente faturados ao cliente</span><span>Sem incluir orçamentos não fechados</span></div>
+    </section>
+    ${semIdentificacao?`<p class="pp-client-disclaimer">${txtNumero(semIdentificacao)} venda(s) sem cliente identificável ficaram fora do ranking; continuam incluídas no faturamento geral.</p>`:''}
+  </div>`;
+}
+
 function renderPainel(){
   const isAdmin=session&&session.role==='Administrador';
   const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -2554,6 +2828,7 @@ function renderPainel(){
         <div class="pp-note">Aparelhos recebidos em troca ficam no estoque, fora deste gráfico de pagamentos.</div>
       </section>
     </div>
+    ${painelClientesInsight(filtered,filtered,esc,currentSelection)}
   `;
 }
 
