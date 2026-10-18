@@ -1137,12 +1137,12 @@ body.dark #page-painel .pp-legend .pp-dot.profit{background:#bde778}
 .rp-page .rp-btn.primary{border-color:transparent;background:var(--brand);color:var(--brand-ink)}
 .rp-page .rp-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .rp-page .rp-filterbox,.rp-page .rp-panel{background:var(--card);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
-.rp-page .rp-filterbox{padding:15px 17px;margin-bottom:15px}
-.rp-page .rp-filterrow{display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px}
-.rp-page .rp-filtergroup{display:flex;flex-direction:column;gap:5px;flex:0 1 170px}
-.rp-page .rp-filtergroup.wide{flex-basis:205px}
-.rp-page .rp-filtergroup label{font-size:10px;letter-spacing:.025em;font-weight:800;color:var(--text2)}
-.rp-page .rp-input{height:39px;width:100%;min-width:0;appearance:auto;border:1px solid var(--line);border-radius:11px;padding:8px 10px;font-size:12px;font-weight:650;color:var(--text);background:var(--bg2);outline:0}
+.rp-page .rp-filterbox{padding:18px 20px 16px;margin-bottom:15px}
+.rp-page .rp-filterrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px;align-items:end}
+.rp-page .rp-filtergroup{display:flex;flex-direction:column;gap:8px;min-width:0}
+.rp-page .rp-filtergroup.wide{min-width:0}
+.rp-page .rp-filtergroup label{font-size:10px;letter-spacing:.08em;font-weight:800;color:var(--text2);text-align:center;display:block;width:100%;line-height:1.1;margin:0 0 2px}
+.rp-page .rp-input{height:48px;width:100%;min-width:0;appearance:auto;border:1px solid var(--line);border-radius:14px;padding:10px 16px;font-size:12px;font-weight:650;color:var(--text);background:var(--bg2);outline:0}
 .rp-page .rp-input:focus{border-color:var(--brand-deep);box-shadow:0 0 0 3px rgba(165,219,0,.13)}
 .rp-page .rp-filter-note{font-size:10px;color:var(--text2);margin-top:10px;line-height:1.45}
 .rp-page .rp-tabs{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:thin;padding:2px 0 11px;margin-bottom:9px}
@@ -1760,6 +1760,9 @@ body.it-ai-ready .it-ai-root{display:block}
 .it-photo-help .it-photo-status{font-size:11px;color:var(--brand-deep);margin-top:5px}
 @media(max-width:590px){.it-import-grid{grid-template-columns:1fr}.it-import-card-action .btn{flex:1}.it-photo-help{flex-wrap:wrap}}
 
+
+@media (max-width:740px){.rp-page .rp-filterrow{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.rp-page .rp-filterbox{padding:16px}.rp-page .rp-filtergroup label{text-align:left}.rp-page .rp-input{height:46px}}
+@media (max-width:520px){.rp-page .rp-filterrow{grid-template-columns:1fr}}
 </style>
 <style id="alavancagem-integrada-estilos">
 
@@ -1788,6 +1791,108 @@ body.it-ai-ready .it-ai-root{display:block}
 @media(max-width:1023px){#page-alavancagem{padding:10px 8px 26px}.alv-toolbar{align-items:flex-start}.alv-acts{width:100%}.alv-btn{flex:1;white-space:nowrap;padding:10px 6px;font-size:11px}#alv-frame{height:calc(100dvh - 170px);min-height:510px}}
 @media(max-width:430px){#alv-frame{height:calc(100dvh - 194px);min-height:480px}.alv-toolbar h2{font-size:19px}.alv-toolbar p{font-size:11px}.alv-info{font-size:11px}}
 </style>
+
+<!-- iTronic | Relatórios: correção do alinhamento dos filtros em Safari/iPad e celular -->
+<style id="itronic-relatorios-filtros-alinhados">
+/* Cada filtro usa a mesma linha de rótulo e a mesma altura de campo.
+   Evita o desalinhamento produzido por altura intrínseca de input[type=date] no Safari. */
+#page-relatorios.rp-page .rp-filterrow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+#page-relatorios.rp-page .rp-filtergroup,
+#page-relatorios.rp-page .rp-filtergroup.wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 18px 48px;
+  gap: 8px;
+  align-content: start;
+  align-items: start;
+  justify-items: stretch;
+  min-width: 0;
+  min-height: 74px;
+  margin: 0;
+  padding: 0;
+  flex: none;
+}
+#page-relatorios.rp-page .rp-filtergroup > label {
+  display: block;
+  height: 18px;
+  min-height: 18px;
+  line-height: 18px;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .045em;
+  align-self: start;
+}
+#page-relatorios.rp-page .rp-filtergroup > .rp-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  margin: 0;
+  padding: 0 14px;
+  font-size: 14px;
+  line-height: normal;
+  text-align: left;
+  border-radius: 12px;
+  align-self: start;
+}
+#page-relatorios.rp-page .rp-filtergroup > input.rp-input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--text);
+  background-color: var(--bg2);
+  color-scheme: light;
+}
+body.dark #page-relatorios.rp-page .rp-filtergroup > input.rp-input[type="date"] {
+  color-scheme: dark;
+}
+#page-relatorios.rp-page .rp-filtergroup > input.rp-input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1em;
+  line-height: normal;
+}
+#page-relatorios.rp-page .rp-filtergroup > input.rp-input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+#page-relatorios.rp-page .rp-filter-note {
+  margin: 14px 0 0;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+@media (max-width: 1180px) {
+  #page-relatorios.rp-page .rp-filterrow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+  #page-relatorios.rp-page .rp-filtergroup:first-child,
+  #page-relatorios.rp-page .rp-filtergroup.wide:last-child {
+    grid-column: auto;
+  }
+}
+@media (max-width: 650px) {
+  #page-relatorios.rp-page .rp-filterrow { gap: 12px 10px; }
+  #page-relatorios.rp-page .rp-filtergroup:first-child,
+  #page-relatorios.rp-page .rp-filtergroup.wide:last-child { grid-column: 1 / -1; }
+  #page-relatorios.rp-page .rp-filtergroup > .rp-input { font-size: 13px; padding-inline: 11px; }
+  #page-relatorios.rp-page .rp-filterbox { padding: 15px 13px; }
+}
+@media (max-width: 375px) {
+  #page-relatorios.rp-page .rp-filterrow { grid-template-columns: minmax(0, 1fr); }
+  #page-relatorios.rp-page .rp-filtergroup:first-child,
+  #page-relatorios.rp-page .rp-filtergroup.wide:last-child { grid-column: auto; }
+}
+</style>
+
 </head>
 <body>
 
@@ -7810,4 +7915,3 @@ function alvAplicarPrecos(){
 </script>
 </body>
 </html>
-
