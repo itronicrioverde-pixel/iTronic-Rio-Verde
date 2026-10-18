@@ -91,6 +91,26 @@ input,select,textarea,button{font-family:inherit;font-size:16px;color:inherit}
 button{cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{display:none}
 
+/* Estoque · atalhos para aparelhos e cadastros de acessórios */
+.estoque-switch{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:0 0 18px}
+.estoque-switch .btn{width:auto!important;min-width:132px;margin:0!important;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.estoque-switch .btn svg{width:18px;height:18px}
+.estoque-acess-list .row{align-items:center;gap:12px;min-width:0}
+.estoque-acess-list .info{flex:1;min-width:0;cursor:default}
+.estoque-acess-list .info .t{overflow-wrap:anywhere}
+.estoque-acess-list .right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.estoque-acess-list .acess-edit{white-space:nowrap;width:auto;min-width:0;margin:0;padding:9px 13px;font-size:12px}
+.estoque-acess-caption{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5}
+.estoque-acess-list .thumb svg{height:26px;width:26px}
+#page-estoque .filters .chip.active{background:#477b3b;color:white}
+@media(max-width:540px){
+ .estoque-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .estoque-switch .btn{min-width:0!important;max-width:none;padding:11px 9px!important;font-size:13px}
+ .estoque-acess-list .row{gap:9px;flex-wrap:wrap}
+ .estoque-acess-list .info{flex-basis:calc(100% - 76px)}
+ .estoque-acess-list .right{width:100%;justify-content:space-between;padding-left:2px;gap:9px}
+}
+
 /* ---------- LOGIN ---------- */
 #login{
   position:fixed;inset:0;background:var(--bg);z-index:200;
@@ -2121,6 +2141,7 @@ function applyLogos(){
 /* ---- estado ---- */
 let db, session=null, theme='light';
 let filterEstoque='todos', searchEstoque='';
+let estoqueModo='aparelhos', buscaEstoqueAcess='', filtroEstoqueAcess='todos';
 let relMesSelecionado=null; // mês escolhido nos relatórios (null = mês atual)
 let painelMes='todos'; // abre o histórico para aproveitar vendas já cadastradas
 let vendaCart={cliente:null, produto:null, produtoId:null, desconto:0, pagamentos:[]};
@@ -3479,7 +3500,88 @@ function setFiltroEstoque(k){
   renderEstoque();
 }
 window.setFiltroEstoque=setFiltroEstoque;
+function setEstoqueModo(modo){
+  estoqueModo=modo==='acessorios'?'acessorios':'aparelhos';
+  renderEstoque();
+}
+function setFiltroEstoqueAcess(k){
+  filtroEstoqueAcess=k;
+  renderEstoque();
+}
+function estoqueAcessEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function estoqueAcessId(v){return encodeURIComponent(String(v)).replace(/'/g,'%27');}
+function estoqueSwitch(){
+  return `<div class="estoque-switch" role="group" aria-label="Tipo de estoque">
+    <button type="button" class="btn ${estoqueModo==='aparelhos'?'':'secondary'}" aria-pressed="${estoqueModo==='aparelhos'}" onclick="setEstoqueModo('aparelhos')">${vectorIcon('phone')} Aparelhos</button>
+    <button type="button" class="btn ${estoqueModo==='acessorios'?'':'secondary'}" aria-pressed="${estoqueModo==='acessorios'}" onclick="setEstoqueModo('acessorios')">${vectorIcon('headphones')} Acessórios</button>
+  </div>`;
+}
+function renderEstoqueAcessorios(){
+  const todos=db.acessorios||[];
+  const qtd=a=>Math.max(0,Math.floor(Number(a.qtd)||0));
+  const tem=a=>qtd(a)>0 && (a.situacao||'Disponível')==='Disponível';
+  const disponiveis=todos.filter(tem).reduce((n,a)=>n+qtd(a),0);
+  const baixo=todos.filter(a=>tem(a) && qtd(a)<=5).length;
+  const zerados=todos.filter(a=>qtd(a)===0 || a.situacao==='Sem estoque').length;
+  const admin=!!(session&&session.role==='Administrador');
+  const custo=todos.reduce((n,a)=>n+(Number(a.custo)||0)*qtd(a),0);
+  const q=buscaEstoqueAcess.trim().toLocaleLowerCase('pt-BR');
+  const lista=todos.filter(a=>{
+    if(filtroEstoqueAcess==='disp' && !tem(a))return false;
+    if(filtroEstoqueAcess==='baixo' && !(tem(a)&&qtd(a)<=5))return false;
+    if(filtroEstoqueAcess==='zerado' && !(qtd(a)===0||a.situacao==='Sem estoque'))return false;
+    const nome=[a.nome,a.categoria,a.sub,a.fornecedor,a.ean,a.serie].join(' ').toLocaleLowerCase('pt-BR');
+    return !q||nome.includes(q);
+  }).sort((a,b)=>String(a.categoria||'').localeCompare(String(b.categoria||''),'pt-BR')||String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR'));
+  const grupos={};
+  lista.forEach(a=>{const c=a.categoria||'Outros';(grupos[c]||(grupos[c]=[])).push(a)});
+  const renderLinha=a=>{
+    const quantidade=qtd(a),situacao=a.situacao||'Disponível';
+    const status=quantidade<=0||situacao==='Sem estoque'?'Sem estoque':situacao==='Aguardando pedido'?'Aguardando pedido':quantidade<=5?'Estoque baixo':'Disponível';
+    const cor=status==='Disponível'?'var(--green)':status==='Estoque baixo'||status==='Aguardando pedido'?'var(--orange)':'var(--red)';
+    const rawFoto=a.fotos&&a.fotos[0];
+    const foto=rawFoto && temFoto(rawFoto)?`<img src="${estoqueAcessEsc(imgFoto(rawFoto))}" alt="Foto de ${estoqueAcessEsc(a.nome)}" style="width:100%;height:100%;object-fit:contain">`:vectorIcon('headphones');
+    const id=estoqueAcessId(a.id);
+    return `<div class="row">
+      <div class="thumb" style="${rawFoto&&temFoto(rawFoto)?'padding:5px;background:#fff;border:1px solid var(--line)':''}">${foto}</div>
+      <div class="info"><div class="t">${estoqueAcessEsc(a.nome||'Acessório')}</div>
+      <div class="estoque-acess-caption">${estoqueAcessEsc(a.sub||'')}${a.fornecedor?' · '+estoqueAcessEsc(a.fornecedor):''}</div>
+      <div class="estoque-acess-caption" style="color:${cor};font-weight:600">${status} · ${quantidade} un.</div></div>
+      <div class="right"><div class="p money-in">${money(a.venda||0)}${admin?`<div class="estoque-acess-caption" style="font-weight:400;text-align:right">Custo ${money(a.custo||0)}</div>`:''}</div>
+      ${podeEditar()?`<button type="button" class="btn secondary acess-edit" onclick="editarAcessorio(decodeURIComponent('${id}'))">${vectorIcon('edit')} Editar</button>`:''}</div>
+    </div>`;
+  };
+  const conteudo=lista.length?Object.entries(grupos).map(([cat,itens])=>`<div class="sec-title" style="margin:17px 0 8px">${estoqueAcessEsc(cat)} <span style="font-weight:400;color:var(--text2)">(${itens.length})</span></div><div class="list estoque-acess-list">${itens.map(renderLinha).join('')}</div>`).join(''):'<div class="empty">Nenhum acessório encontrado. Ajuste os filtros ou cadastre um novo item.</div>';
+  el('page-estoque').innerHTML=`
+    <div class="module-heading"><div><div class="eyebrow">ESTOQUE</div><h2>Acessórios</h2><p>Consulte quantidades, preços e cadastros, sem sair do Estoque.</p></div></div>
+    ${estoqueSwitch()}
+    <div class="module-metrics">
+      <div class="grid2" style="margin-bottom:2px">
+        <div class="stat"><div class="lbl">${vectorIcon('headphones')} Cadastrados</div><div class="val">${todos.length}</div></div>
+        <div class="stat"><div class="lbl">${vectorIcon('package')} Unidades disponíveis</div><div class="val">${disponiveis}</div></div>
+      </div>
+      <div class="grid2" style="margin:12px 0 4px">
+        <div class="stat"><div class="lbl">${vectorIcon('alert-circle')} Estoque baixo (até 5)</div><div class="val sm">${baixo}</div></div>
+        <div class="stat"><div class="lbl">${vectorIcon('package')} Sem estoque</div><div class="val sm">${zerados}</div></div>
+      </div>
+      ${admin?`<div class="stat" style="margin-top:12px"><div class="lbl">Custo total dos acessórios cadastrados</div><div class="val sm money-in">${money(custo)}</div></div>`:''}
+    </div>
+    <div class="module-actions">
+      ${podeEditar()?`<button class="btn" onclick="openNovoAcessorio()">${vectorIcon('plus')} Cadastrar acessório</button><button class="btn secondary" onclick="itFotoCadastro('acessorio')">${vectorIcon('camera')} Foto inteligente</button><button class="btn secondary" onclick="itImportarAbrir('acessorios')">${vectorIcon('file')} Importar Excel</button>`:''}
+      <button class="btn secondary" onclick="vendaModo='acessorio';go('venda')">${vectorIcon('cart')} Ir para vendas</button>
+    </div>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="estoque-acess-busca" placeholder="Buscar acessório, categoria, fornecedor ou EAN" value="${estoqueAcessEsc(buscaEstoqueAcess)}" oninput="buscaEstoqueAcess=this.value;const pos=this.selectionStart;renderEstoque();const campo=el('estoque-acess-busca');if(campo){campo.focus();try{campo.setSelectionRange(pos,pos)}catch(e){}}">
+    </div>
+    <div class="filters">${[['todos','Todos'],['disp','Disponíveis'],['baixo','Estoque baixo'],['zerado','Sem estoque']].map(([k,l])=>`<button class="chip ${filtroEstoqueAcess===k?'active':''}" onclick="setFiltroEstoqueAcess('${k}')">${l}</button>`).join('')}</div>
+    <div class="sec-title">Cadastros de acessórios <span style="font-size:12px;font-weight:400;color:var(--text2)">(${lista.length} de ${todos.length})</span></div>
+    ${conteudo}
+    <div style="height:20px"></div>`;
+}
 function renderEstoque(){
+   if(estoqueModo==='acessorios'){renderEstoqueAcessorios();return;}
    const invest = db.produtos.filter(p=>p.status!=='Vendido').reduce((s,p)=>s+(Number(p.compra)||0)*qtdAparelho(p),0);
    const disponiveis = db.produtos.filter(p=>p.status==='Disponível').reduce((s,p)=>s+qtdAparelho(p),0);
    const vendidos = (db.vendas||[]).reduce((total,v)=>total+(v.itens||[]).filter(it=>it.prodId).reduce((sum,it)=>sum+(Math.max(1,Number(it.qtd)||1)),0),0);
@@ -3506,6 +3608,7 @@ function renderEstoque(){
 
   el('page-estoque').innerHTML=`
     <div class="module-heading"><div><div class="eyebrow">ESTOQUE</div><h2>Seu estoque, bem à vista.</h2><p>Encontre aparelhos e veja o que precisa de atenção.</p></div></div>
+    ${estoqueSwitch()}
     <div class="module-metrics">
     <div class="grid2" style="margin-bottom:2px">
       <div class="stat"><div class="lbl">${uiIcon('<path d="M3 8h18v12H3zM3 8l3-5h12l3 5M9 12h6"/>')} Investido</div><div class="val sm money-in">${money(invest)}</div></div>
@@ -4177,7 +4280,7 @@ function formAcessorio(a){
       dados.fotos=refs;
       if(a){ Object.assign(a,dados); toast('Acessório atualizado'); }
       else { dados.id=uid(); dados.entrada=todayStr(); db.acessorios.push(dados); toast('Acessório cadastrado'); }
-      saveDB(); closeSheet(); renderVenda();
+      saveDB(); closeSheet(); if(currentTab==='estoque')renderEstoque(); else renderVenda();
     });
   });
   setTimeout(renderFotosAcess,60);
@@ -4185,7 +4288,7 @@ function formAcessorio(a){
     setTimeout(()=>{
       const body=el('sheet-body');
       if(body){ const b=document.createElement('button'); b.className='btn ghost'; b.style.marginTop='10px'; b.style.color='var(--red)'; b.textContent='Excluir acessório';
-        b.onclick=()=>askConfirm('Excluir este acessório?',()=>{ db.acessorios=db.acessorios.filter(x=>x.id!==a.id); carrinhoAcess=carrinhoAcess.filter(x=>x.id!==a.id); saveDB(); closeSheet(); renderVenda(); toast('Excluído'); });
+        b.onclick=()=>askConfirm('Excluir este acessório?',()=>{ db.acessorios=db.acessorios.filter(x=>x.id!==a.id); carrinhoAcess=carrinhoAcess.filter(x=>x.id!==a.id); saveDB(); closeSheet(); if(currentTab==='estoque')renderEstoque(); else renderVenda(); toast('Excluído'); });
         body.appendChild(b);
       }
     },80);
