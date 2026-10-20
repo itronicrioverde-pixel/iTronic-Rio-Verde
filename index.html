@@ -6944,11 +6944,13 @@ function orcPrecoNaLinha(linha){
 }
 const ORC_CORES=[
   ['TITANIO NATURAL','Titânio natural'],['TITANIO DESERTO','Titânio deserto'],['TITANIO BRANCO','Titânio branco'],['TITANIO PRETO','Titânio preto'],
-  ['DESERT TITANIUM','Titânio deserto'],['NATURAL TITANIUM','Titânio natural'],['SPACE GRAY','Cinza espacial'],
-  ['CINZA ESPACIAL','Cinza espacial'],['MEIA NOITE','Meia-noite'],['STARLIGHT','Estelar'],
+  ['DESERT TITANIUM','Titânio deserto'],['NATURAL TITANIUM','Titânio natural'],
+  ['SPACE BLACK','Space Black'],['SPACE GRAY','Cinza espacial'],['CINZA ESPACIAL','Cinza espacial'],
+  ['SKAY BLUE','Sky Blue'],['SKY BLUE','Sky Blue'],['MIDINIGHT','Midnight'],['MIDNIGHT','Midnight'],
+  ['MEIA NOITE','Meia-noite'],['STARLIGHT','Starlight'],['BLASH','Blush'],['BLUSH','Blush'],
   ['PRETA','Preto'],['PRETO','Preto'],['BLACK','Preto'],['BRANCA','Branco'],['BRANCO','Branco'],['WHITE','Branco'],['AZUL','Azul'],['BLUE','Azul'],
   ['VERDE','Verde'],['GREEN','Verde'],['ROSA','Rosa'],['PINK','Rosa'],['ROXO','Roxo'],['PURPLE','Roxo'],
-  ['PRATA','Prata'],['SILVER','Prata'],['DOURADO','Dourado'],['GOLD','Dourado'],['NATURAL','Natural'],
+  ['PRATA','Prata'],['SILVER','Silver'],['DOURADO','Dourado'],['GOLD','Dourado'],['NATURAL','Natural'],
   ['DESERTO','Deserto'],['AMARELO','Amarelo'],['YELLOW','Amarelo'],['VERMELHO','Vermelho'],['RED','Vermelho'],
   ['LARANJA','Laranja'],['ORANGE','Laranja']
 ];
@@ -6963,34 +6965,54 @@ function orcCores(texto){
 }
 function orcArmazenamento(texto){
   const t=orcNorm(texto);
-  const tera=t.match(/\b1\s*(?:TB|T)\b/);
-  if(tera) return '1 TB';
-  const giga=t.match(/\b(64|128|256|512|1024)\s*(?:GB|G)\b/);
-  if(giga) return giga[1]==='1024'?'1 TB':giga[1]+' GB';
-  const semUnidade=t.match(/\b(64|128|256|512|1024)\b/);
-  return semUnidade?(semUnidade[1]==='1024'?'1 TB':semUnidade[1]+' GB'):'';
+  const tera=t.match(/\b([12])\s*(?:TB|T)\b/);
+  if(tera) return tera[1]+' TB';
+  const giga=t.match(/\b(64|128|256|512|1024|2048)\s*(?:GB|G)\b/);
+  if(giga) return giga[1]==='1024'?'1 TB':giga[1]==='2048'?'2 TB':giga[1]+' GB';
+  const semUnidade=t.match(/\b(64|128|256|512|1024|2048)\b/);
+  return semUnidade?(semUnidade[1]==='1024'?'1 TB':semUnidade[1]==='2048'?'2 TB':semUnidade[1]+' GB'):'';
 }
 function orcCondicao(texto){
   const t=orcNorm(texto);
-  if(/\b(CPO|SEMINOVOS?|SEMI NOVOS?|USADOS?|VITRINE|RECONDICIONADOS?)\b/.test(t)) return 'Seminovo';
-  if(/\b(NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/.test(t)) return 'Novo';
+  // Preservar exatamente a condição comercial (CPO não é sinônimo de Seminovo).
+  if(/\bOPEN\s*BOX\b/.test(t))return 'Open Box';
+  if(/\bCPO\b/.test(t))return 'CPO';
+  if(/\b(SEMINOVOS?|SEMI\s+NOVOS?|USADOS?)\b/.test(t))return 'Seminovo';
+  if(/\b(VITRINE|RECONDICIONADOS?)\b/.test(t))return 'Vitrine / Recondicionado';
+  if(/\b(NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/.test(t))return 'Novo';
   return '';
 }
 function orcModelo(texto){
   let t=orcNorm(texto);
+  // A dimensão 13/14/15 de tela e "Pro" de Macs NÃO são modelos de iPhone.
+  if(/\bMACBOOK\b/.test(t)){
+    const serie=/\bNEO\b/.test(t)?'Neo':/\bAIR\b/.test(t)?'Air':/\bPRO\b/.test(t)?'Pro':'';
+    const chip=t.match(/\bM\s*([1-9])\s*(PRO|MAX|ULTRA)?\b/);
+    const tamanho=t.match(/[“"']\s*(1[1-9])\s*[”"']|\b(1[1-9])\s*(?:POLEGADAS|POL|INCH(?:ES)?|[″”])/);
+    const tela=tamanho?(tamanho[1]||tamanho[2]):((t.match(/\b(13|14|15|16)\b/)||[])[1]||'');
+    const ram=t.match(/\b(8|16|18|24|32|36|48|64|96|128)\s*(?:GB|G)?\s*\/\s*(?:128|256|512|1024|2048)\s*(?:GB|G|TB|T)?\b/)||t.match(/\b(8|16|18|24|32|36|48|64|96|128)\s*(?:GB|G)\b/);
+    if(!serie&&!chip)return '';
+    let nome='MacBook'+(serie?' '+serie:'');
+    if(chip)nome+=' M'+chip[1]+(chip[2]?' '+chip[2].toLowerCase().replace(/^./,c=>c.toUpperCase()):'');
+    if(tela)nome+=' '+tela+'″';
+    if(ram)nome+=' '+ram[1]+'GB RAM';
+    return nome;
+  }
   const acessorio=/\b(CAPINHA|CASE|PELICULA|CABO|FONTE|CARREGADOR|SUPORTE)\b/.test(t);
   if(!acessorio){
-    const m=t.match(/\b(?:IPHONE\s*|IP\s*HONE\s*)?(1[1-9])\s*(PRO\s*MAX|PRO|PLUS|MINI|E\b)?\b/);
-    if(m && (/(?:IPHONE|IP\s*HONE)/.test(t)||/\b(PRO|PLUS|MINI)\b/.test(t)||/^\s*1[1-9]\b/.test(t))){
-      return 'iPhone '+m[1]+(m[2]?' '+m[2].replace(/\s+/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):'');
+    const temIphone=/\b(?:IPHONE|IP\s*HONE)\b/.test(t);
+    const apelido=/^\s*1[1-9]\s+(?:(?:PRO\s*MAX)|PRO|PLUS|MINI|PM)\b/.test(t);
+    if(temIphone||apelido){
+      const m=t.match(/\b(?:IPHONE\s*|IP\s*HONE\s*)?(1[1-9])\s*(PRO\s*MAX|PRO|PLUS|MINI|E\b)?\b/);
+      if(m)return 'iPhone '+m[1]+(m[2]?' '+m[2].replace(/\s+/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()):'');
     }
   }
-  t=t.replace(/\b(?:64|128|256|512|1024)\s*(?:GB|G)?\b|\b1\s*(?:TB|T)\b/g,' ')
-    .replace(/\b(CPO|SEMINOVOS?|SEMI NOVOS?|USADOS?|VITRINE|RECONDICIONADOS?|NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/g,' ')
+  t=t.replace(/\b(?:64|128|256|512|1024|2048)\s*(?:GB|G)?\b|\b[12]\s*(?:TB|T)\b/g,' ')
+    .replace(/\b(?:OPEN\s*BOX|CPO|SEMINOVOS?|SEMI\s+NOVOS?|USADOS?|VITRINE|RECONDICIONADOS?|NOVOS?|LACRADOS?|LACRADAS?|ZERADOS?)\b/g,' ')
     .replace(/\b\d+\s*(?:UN|UNIDADES|PCS)\b/g,' ');
   ORC_CORES.forEach(([termo])=>{t=t.replace(new RegExp('\\b'+termo.replace(/ /g,'\\s+')+'\\b','g'),' ');});
   t=t.replace(/[✱*#|•:—–\-\/]/g,' ').replace(/[^A-Z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
-  if(!/[A-Z]{3}/.test(t)) return '';
+  if(!/[A-Z]{3}/.test(t))return '';
   return t.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())
     .replace(/\bIphone\b/g,'iPhone').replace(/\bIpad\b/g,'iPad').replace(/\bMacbook\b/g,'MacBook')
     .replace(/\bAirpods\b/g,'AirPods').replace(/\bApple Watch\b/g,'Apple Watch');
@@ -7051,12 +7073,20 @@ function orcLinhaReferencia(resto){
 }
 function orcInterpretar(texto){
   const ofertas=[],pendentes=[];
-  let contexto=null, condicaoSecao='';
+  let contexto=null,condicaoSecao='';
+  const criar=(modelo,armazenamento,condicao,preco,cores,origem,linhaFonte)=>{
+    const indice=ofertas.length;
+    (cores.length?cores:['Não informada']).forEach(cor=>ofertas.push({
+      id:uid(),modelo,armazenamento:armazenamento||'Não informado',
+      condicao:condicao||'Não informada',cor,preco,origem,linhaFonte,parserVersao:3
+    }));
+    return {inicio:indice,fim:ofertas.length};
+  };
   String(texto||'').split(/\r?\n/).forEach((original,numero)=>{
     const linha=original.trim();if(!linha)return;
     const limpo=orcNorm(linha).replace(/^[*#•\s]+|[*#•\s]+$/g,'').trim();
-    // Cabeçalhos de seção não são ofertas, e encerram contexto de produto anterior.
-    if(/^(?:IPHONES?|IPADS?|MACBOOKS?|MACS?|APPLE WATCH|WATCHES?|AIRPODS|ACESSORIOS|SMARTPHONES|CELULARES|STARLINK|ELETRONICOS|NOVOS?|SEMINOVOS?|LACRADOS?|USADOS?|CPO)(?:\s+(?:NOVOS?|SEMINOVOS?|LACRADOS?|USADOS?))?$/.test(limpo)){
+    if(/^[-–—_=•\s]+$/.test(linha)) {contexto=null;return;}
+    if(/^(?:IPHONES?|IPADS?|MACBOOKS?|MACS?|APPLE WATCH|WATCHES?|AIRPODS|ACESSORIOS|SMARTPHONES|CELULARES|STARLINK|ELETRONICOS|NOVOS?|SEMINOVOS?|LACRADOS?|USADOS?|CPO|OPEN\s*BOX)(?:\s+(?:NOVOS?|SEMINOVOS?|LACRADOS?|USADOS?))?$/.test(limpo)){
       const c=orcCondicao(limpo);if(c)condicaoSecao=c;
       contexto=null;return;
     }
@@ -7067,33 +7097,57 @@ function orcInterpretar(texto){
     if(preco?.ambiguo){pendentes.push({linha:numero+1,texto:linha,motivo:'Mais de um preço possível. Confira manualmente.'});contexto=null;return;}
     const semPreco=preco?linha.slice(0,preco.indice)+' '+linha.slice(preco.fim):linha;
     const modeloExplicito=orcModeloSeguro(semPreco);
-    const armExplicito=orcArmazenamento(semPreco);
-    const condicaoExplicita=orcCondicao(semPreco);
+    const armazenamento=orcArmazenamento(semPreco);
+    const condicao=orcCondicao(semPreco);
     const cores=orcCores(semPreco);
+
     if(!preco){
+      // Cores na linha seguinte pertencem APENAS ao último produto com preço identificado.
+      if(!modeloExplicito&&cores.length&&contexto&& !orcLinhaReferencia(semPreco)){
+        if(contexto.grupo){
+          const grupo=contexto.grupo;
+          const anteriores=ofertas.slice(grupo.inicio,grupo.fim);
+          const ja=anteriores.filter(o=>o.cor!=='Não informada').map(o=>o.cor);
+          const todas=[...new Set([...ja,...cores])];
+          const ref=anteriores[0];
+          if(ref){
+            const lista=todas.map(cor=>({...ref,id:uid(),cor,corLinhaFonte:numero+1,parserVersao:3}));
+            ofertas.splice(grupo.inicio,grupo.fim-grupo.inicio,...lista);
+            grupo.fim=grupo.inicio+lista.length;
+          }
+        }else if(contexto.pendentePreco){
+          contexto.cores=[...new Set([...(contexto.cores||[]),...cores])];
+        }
+        return;
+      }
       if(modeloExplicito){
-        contexto={modelo:modeloExplicito,armazenamento:armExplicito,condicao:condicaoExplicita||condicaoSecao};
-      }else if(/^(?:64|128|256|512|1024|2048)\s*(?:GB|G)?$/.test(limpo)&&contexto){contexto.armazenamento=armExplicito;}
-      else if(orcCondicao(linha)&&!orcLinhaReferencia(linha)){condicaoSecao=orcCondicao(linha);contexto=null;}
-      else if(/R\$|\b\d[\d.,]*\s*K\b/.test(linha))pendentes.push({linha:numero+1,texto:linha,motivo:'Preço não reconhecido'});
+        contexto={modelo:modeloExplicito,armazenamento,condicao:condicao||condicaoSecao,
+          cores,pendentePreco:true,linhaFonte:numero+1};
+      }else if(orcCondicao(linha)&&!orcLinhaReferencia(linha)){
+        condicaoSecao=orcCondicao(linha);contexto=null;
+      }else if(/R\$|\b\d[\d.,]*\s*K\b/.test(linha)){
+        pendentes.push({linha:numero+1,texto:linha,motivo:'Preço não reconhecido'});contexto=null;
+      }else{
+        // Linhas informativas não podem herdar o último aparelho.
+        contexto=null;
+      }
       return;
     }
-    const restante=orcLinhaReferencia(semPreco);
-    const podeHerdar=!!contexto && !restante && (cores.length>0 || !!armExplicito);
-    const modelo=modeloExplicito || (podeHerdar?contexto.modelo:'');
-    if(!modelo){pendentes.push({linha:numero+1,texto:linha,motivo:'Modelo não comprovado na linha. Não foi incluído automaticamente.'});return;}
-    const armazenamento=armExplicito||(modeloExplicito?'':contexto?.armazenamento)||'Não informado';
-    const condicao=condicaoExplicita||(modeloExplicito?condicaoSecao:contexto?.condicao)||condicaoSecao||'Não informada';
-    // Cada cor vira oferta apenas se a cor realmente aparece no texto da lista.
-    (cores.length?cores:['Não informada']).forEach(cor=>ofertas.push({id:uid(),modelo,armazenamento,condicao,cor,preco:preco.valor,origem:linha,linhaFonte:numero+1,parserVersao:2}));
-    if(modeloExplicito)contexto={modelo,armazenamento,condicao};
+    const herdaModelo=!!contexto?.pendentePreco && !modeloExplicito && !orcLinhaReferencia(semPreco);
+    const modelo=modeloExplicito||(herdaModelo?contexto.modelo:'');
+    if(!modelo){pendentes.push({linha:numero+1,texto:linha,motivo:'Modelo não comprovado. Oferta fora da comparação.'});contexto=null;return;}
+    const arm=armazenamento||(modeloExplicito?'':contexto?.armazenamento)||'Não informado';
+    const cond=condicao||(modeloExplicito?condicaoSecao:contexto?.condicao)||condicaoSecao||'Não informada';
+    const todasCores=[...new Set([...(herdaModelo?(contexto?.cores||[]):[]),...cores])];
+    const grupo=criar(modelo,arm,cond,preco.valor,todasCores,linha,numero+1);
+    contexto={modelo,armazenamento:arm,condicao:cond,grupo,pendentePreco:false};
   });
   return {ofertas,pendentes};
 }
 function orcAgrupar(busca=''){
   const termos=orcNorm(busca).replace(/[^A-Z0-9 ]/g,' ').split(/\s+/).filter(Boolean);
   const grupos=new Map();
-  (db.fornecedores||[]).filter(f=>f.parserVersao===2).forEach(f=>{
+  (db.fornecedores||[]).filter(f=>f.parserVersao===3).forEach(f=>{
     (f.ofertas||[]).forEach(o=>{
       if(!o.modelo||!(Number(o.preco)>0)) return;
       const alvo=orcNorm([o.modelo,o.armazenamento,o.condicao,o.cor].join(' ')).replace(/[^A-Z0-9 ]/g,' ');
@@ -7294,14 +7348,14 @@ function renderOrcamentos(){
     <div class="orc-tabs" role="tablist" aria-label="Seções de Orçamentos"><button type="button" role="tab" aria-selected="${orcAba==='comparar'}" class="${orcAba==='comparar'?'active':''}" onclick="orcAbrirAba('comparar')">Fornecedores</button><button type="button" role="tab" aria-selected="${orcAba==='custo'}" class="${orcAba==='custo'?'active':''}" onclick="orcAbrirAba('custo')">Custo da Venda</button></div>
     ${orcAba==='custo'?renderOrcCustoVenda():`
     <div class="orc-toolbar"><button class="btn" onclick="orcAbrirFornecedor()">+ Criar lista de fornecedor</button><button class="btn secondary" onclick="orcGerarLista()">Gerar lista por fornecedor / categoria</button></div>
-    <div class="orc-meta">${fornecedores.length} fornecedor(es) · ${qtd} oferta(s) salvas. ${fornecedores.filter(f=>f.parserVersao!==2).length?'Atenção: '+fornecedores.filter(f=>f.parserVersao!==2).length+' lista(s) foram interpretadas com a regra antiga; abra e reinterprete para revisar itens duvidosos.':'Listas verificadas pelo interpretador rigoroso.'} Os preços não são atualizados automaticamente.</div>
+    <div class="orc-meta">${fornecedores.length} fornecedor(es) · ${qtd} oferta(s) salvas. ${fornecedores.filter(f=>f.parserVersao!==3).length?'Atenção: '+fornecedores.filter(f=>f.parserVersao!==3).length+' lista(s) foram interpretadas com a regra antiga; abra e reinterprete para revisar itens duvidosos.':'Listas verificadas pelo interpretador rigoroso.'} Os preços não são atualizados automaticamente.</div>
     <div class="sec-title">Comparar preços</div>
     <input class="input orc-search" id="orc-busca" type="search" placeholder="Buscar: 17 Pro Max, 256 GB, preto..." value="${orcEsc(orcBusca)}" oninput="orcAtualizarResultados()" aria-label="Pesquisar produtos nas listas">
     <div id="orc-resultados">${orcResultadosHTML()}</div>
     <div class="sec-title">Listas cadastradas</div>
     <div class="orc-suppliers">${fornecedores.length?fornecedores.map(f=>`<div class="orc-card">
       <h3>${orcEsc(f.nome)}</h3><small>${(f.ofertas||[]).length} oferta(s) · ${(f.pendentes||[]).length} linha(s) para revisar · ${orcEsc(f.atualizado||'')}</small>
-      <div class="orc-actions"><button onclick="orcAbrirFornecedor('${f.id}')">${f.parserVersao===2?'Abrir e editar lista':'Revisar interpretação antiga'}</button>${f.parserVersao===2?`<button onclick="orcGerarLista('${f.id}')">Gerar desta lista</button>`:'<small style="color:var(--text2)">Reinterprete antes de exportar</small>'}<button onclick="orcRemoverFornecedor('${f.id}')" style="color:var(--red)">Remover</button></div>
+      <div class="orc-actions"><button onclick="orcAbrirFornecedor('${f.id}')">${f.parserVersao===3?'Abrir e editar lista':'Revisar interpretação antiga'}</button>${f.parserVersao===3?`<button onclick="orcGerarLista('${f.id}')">Gerar desta lista</button>`:'<small style="color:var(--text2)">Reinterprete antes de exportar</small>'}<button onclick="orcRemoverFornecedor('${f.id}')" style="color:var(--red)">Remover</button></div>
     </div>`).join(''):'<div class="empty">Cadastre a primeira lista para começar a comparação.</div>'}</div>`}
     <div style="height:25px"></div>`;
 }
@@ -7315,7 +7369,7 @@ function orcAbrirFornecedor(id){
     <div class="field"><label>Lista recebida (texto)</label><textarea class="input" id="orc-raw" rows="9" placeholder="Cole a lista do WhatsApp aqui, com modelo, capacidade, cor e preço.">${orcEsc(orcDraft.raw)}</textarea></div>
     <input type="file" id="orc-arquivo" accept=".txt,.csv,text/plain,text/csv" style="display:none" onchange="orcLerArquivo(event)">
     <div class="orc-actions"><button onclick="el('orc-arquivo').click()">Importar TXT/CSV</button><button onclick="orcInterpretarDraft()">Interpretar lista</button></div>
-    <div style="color:var(--text2);font-size:12px;line-height:1.45;margin-top:12px">Interpretação rigorosa: só são reconhecidos produtos comprovados na lista. Linhas ambíguas ficam para revisão com o texto original. Confira a prévia antes de salvar; editar o texto e interpretar novamente substitui correções anteriores.</div>
+    <div style="color:var(--text2);font-size:12px;line-height:1.45;margin-top:12px">Interpretação rigorosa v3: MacBooks, cores na linha seguinte, CPO e Open Box preservados. Só são reconhecidos produtos comprovados na lista. Linhas ambíguas ficam para revisão com o texto original. Confira a prévia antes de salvar; editar o texto e interpretar novamente substitui correções anteriores.</div>
     <div id="orc-preview"></div>`;
   openSheet(f?'Editar lista do fornecedor':'Criar lista de fornecedor',html,'Salvar lista',orcSalvarFornecedor);
   orcRenderPreview();
@@ -7332,7 +7386,7 @@ function orcInterpretarDraft(){
   if(!orcDraft) return;
   orcDraft.nome=getV('orc-nome'); orcDraft.raw=getV('orc-raw');
   const result=orcInterpretar(orcDraft.raw);
-  orcDraft.ofertas=result.ofertas;orcDraft.pendentes=result.pendentes;orcDraft.editando=-1;orcDraft.parserVersao=2;
+  orcDraft.ofertas=result.ofertas;orcDraft.pendentes=result.pendentes;orcDraft.editando=-1;orcDraft.parserVersao=3;
   orcRenderPreview();
   toast(result.ofertas.length+' oferta(s) reconhecida(s) · '+result.pendentes.length+' linha(s) para revisar');
 }
@@ -7384,7 +7438,7 @@ function orcGravarFornecedores(novos){
 function orcSalvarFornecedor(){
   if(!podeEditar()||!orcDraft)return;
   const nome=getV('orc-nome'),raw=getV('orc-raw');
-  if(orcDraft.parserVersao!==2){toast('Clique em Interpretar lista com a nova regra antes de salvar');return;}
+  if(orcDraft.parserVersao!==3){toast('Clique em Interpretar lista com a nova regra antes de salvar');return;}
   if(!nome){toast('Informe o nome do fornecedor');return;}
   if(!raw){toast('Cole ou importe uma lista');return;}
   if(raw!==orcDraft.raw){toast('Clique em Interpretar lista antes de salvar o texto alterado');return;}
@@ -7393,7 +7447,7 @@ function orcSalvarFornecedor(){
   if(orcDraft.ofertas.some(o=>!o.modelo||!(Number(o.preco)>0))){toast('Corrija ou exclua as ofertas sem produto/preço');return;}
   const atuais=db.fornecedores||[];
   if(atuais.some(f=>f.id!==orcDraft.id&&orcNorm(f.nome)===orcNorm(nome))){toast('Já existe uma lista com este nome. Abra-a para atualizar.');return;}
-  const registro={id:orcDraft.id,nome,raw,ofertas:orcDraft.ofertas.map(o=>({...o})),pendentes:orcDraft.pendentes.map(p=>({...p})),atualizado:todayStr(),parserVersao:2};
+  const registro={id:orcDraft.id,nome,raw,ofertas:orcDraft.ofertas.map(o=>({...o})),pendentes:orcDraft.pendentes.map(p=>({...p})),atualizado:todayStr(),parserVersao:3};
   const novos=atuais.some(f=>f.id===registro.id)?atuais.map(f=>f.id===registro.id?registro:f):[...atuais,registro];
   if(!orcGravarFornecedores(novos))return;
   orcDraft=null;closeSheet();renderOrcamentos();toast('Lista de '+nome+' salva');
@@ -7408,7 +7462,7 @@ function orcRemoverFornecedor(id){
 let orcListaArquivo='itronic-lista-fornecedores';
 function orcGerarLista(idFornecedor=''){
   if(!podeEditar())return;
-  const fornecedores=(db.fornecedores||[]).filter(f=>f.parserVersao===2);
+  const fornecedores=(db.fornecedores||[]).filter(f=>f.parserVersao===3);
   if(!fornecedores.length){toast('Interprete e salve uma lista com a regra nova antes de exportar');return;}
   const nomes=fornecedores.map(f=>`<option value="${orcEsc(f.id)}" ${f.id===idFornecedor?'selected':''}>${orcEsc(f.nome)}</option>`).join('');
   const cats=['Todas as categorias','iPhones','iPads','MacBooks e Macs','Apple Watch','AirPods e Fones','Acessórios','Starlink','iTronic Store','Outros'];
@@ -7417,7 +7471,8 @@ function orcGerarLista(idFornecedor=''){
     <div class="field"><label>Categoria</label><select class="input" id="orc-list-cat" onchange="orcAtualizarListaGerada()">${cats.map(x=>`<option value="${orcEsc(x)}">${orcEsc(x)}</option>`).join('')}</select></div>
     <div class="field"><label>Organização</label><select class="input" id="orc-list-mode" onchange="orcAtualizarListaGerada()"><option value="completa">Lista completa (todas as categorias juntas)</option><option value="categorias">Separar por categorias</option></select></div>
     <div class="field"><label>Ofertas</label><select class="input" id="orc-list-offers" onchange="orcAtualizarListaGerada()"><option value="todas">Todas as ofertas do fornecedor</option><option value="menores">Menor preço por modelo, capacidade, condição e cor</option></select></div>
-  </div>
+    <div class="field"><label>Acréscimo por aparelho (R$) — opcional</label><input class="input" id="orc-list-markup" type="number" min="0" step="0.01" value="0" oninput="orcAtualizarListaGerada()" placeholder="Ex.: 700"></div>
+  </div><p style="font-size:12px;color:var(--text2);line-height:1.5">Atenção: sem acréscimo, os valores são os preços dos fornecedores. Confira sua precificação antes de enviar ao cliente.</p>
   <p class="orc-list-summary" id="orc-list-summary"></p>
   <textarea class="input" id="orc-list-preview" rows="17" readonly style="white-space:pre-wrap;min-height:260px"></textarea>
   <div class="orc-actions" style="margin-top:12px"><button class="btn" onclick="orcCopiarLista()">Copiar lista</button><button class="btn secondary" onclick="orcBaixarLista()">Baixar TXT</button></div>`;
@@ -7429,13 +7484,15 @@ function orcAtualizarListaGerada(){
   const categoria=el('orc-list-cat')?.value||'Todas as categorias';
   const modo=el('orc-list-mode')?.value||'completa';
   const tipo=el('orc-list-offers')?.value||'todas';
-  const fornecedores=(db.fornecedores||[]).filter(f=>f.parserVersao===2&&(!id||String(f.id)===id));
+  const acrescimo=Math.max(0,orcValor(el('orc-list-markup')?.value||'0'));
+  const fornecedores=(db.fornecedores||[]).filter(f=>f.parserVersao===3&&(!id||String(f.id)===id));
   const unificadas=[];
   fornecedores.forEach(f=>{
     (f.ofertas||[]).forEach(o=>{
-      if(!o.modelo || !(Number(o.preco)>0))return;
+      if(!o.modelo||!(Number(o.preco)>0))return;
       const cat=orcCategoriaLista(o.modelo);
       if(categoria!=='Todas as categorias'&&cat!==categoria)return;
+      // Dados incompletos ficam em revisão; jamais imprimir "Não informada" para o cliente.
       unificadas.push({...o,cat,fornecedor:f.nome});
     });
   });
@@ -7445,30 +7502,50 @@ function orcAtualizarListaGerada(){
     linhas.forEach(o=>{
       const key=[orcNorm(o.modelo),orcNorm(o.armazenamento),orcNorm(o.condicao),orcNorm(o.cor)].join('|');
       const anterior=menores.get(key);
-      if(!anterior || Number(o.preco)<Number(anterior.preco))menores.set(key,o);
+      if(!anterior||Number(o.preco)<Number(anterior.preco))menores.set(key,o);
     });
     linhas=[...menores.values()];
   }
-  const ordena=(a,b)=>a.cat.localeCompare(b.cat,'pt-BR')||a.modelo.localeCompare(b.modelo,'pt-BR',{numeric:true})||String(a.armazenamento).localeCompare(String(b.armazenamento),'pt-BR',{numeric:true})||Number(a.preco)-Number(b.preco)||String(a.cor).localeCompare(String(b.cor),'pt-BR');
-  linhas.sort(ordena);
-  const lista=[`ITRONIC RIO VERDE — ${id?'LISTA DO FORNECEDOR':'COMPARATIVO DE FORNECEDORES'}`,
-    `Fornecedor: ${id?fornecedores[0]?.nome:'Todos — menor preço por modelo, capacidade, condição e cor'}`,
-    `Categoria: ${categoria} · Formato: ${modo==='categorias'?'Por categorias':'Lista completa'}`,
-    `Gerada em: ${new Date().toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}`,''];
-  let anterior='';
+  const disponiveis=new Map();
   linhas.forEach(o=>{
-    if(modo==='categorias'&&o.cat!==anterior){if(anterior)lista.push('');lista.push(o.cat.toUpperCase());anterior=o.cat;}
-    lista.push(`${o.modelo} · ${o.armazenamento||'Não informado'} · ${o.cor||'Não informada'} · ${o.condicao||'Não informada'} — ${money(o.preco)}${id?'':' — '+o.fornecedor}`);
+    const grupoKey=[orcNorm(o.modelo),orcNorm(o.armazenamento),orcNorm(o.condicao),o.cat].join('|');
+    if(!disponiveis.has(grupoKey))disponiveis.set(grupoKey,{
+      modelo:o.modelo,arm:o.armazenamento,cond:o.condicao,cat:o.cat,opcoes:new Map()});
+    const grupo=disponiveis.get(grupoKey);
+    const preçoFinal=Number(o.preco)+acrescimo;
+    const fornecedor=id?'':o.fornecedor;
+    const precoKey=[preçoFinal,fornecedor].join('|');
+    if(!grupo.opcoes.has(precoKey))grupo.opcoes.set(precoKey,{preco:preçoFinal,cores:new Set(),fornecedor});
+    if(o.cor&&orcNorm(o.cor)!=='NAO INFORMADA')grupo.opcoes.get(precoKey).cores.add(o.cor);
   });
-  if(!linhas.length)lista.push('Nenhuma oferta cadastrada neste filtro.');
-  lista.push('', 'Confira disponibilidade e valores diretamente com o fornecedor.');
-  orcListaGerada=lista.join('\n');
-  const aviso=(db.fornecedores||[]).some(f=>f.parserVersao!==2)?' Listas antigas não revisadas ficam fora desta exportação.':' ';
-  const resumo=el('orc-list-summary');if(resumo)resumo.textContent=linhas.length+' oferta(s) nesta lista.'+aviso;
+  const grupos=[...disponiveis.values()].sort((a,b)=>a.cat.localeCompare(b.cat,'pt-BR')||a.modelo.localeCompare(b.modelo,'pt-BR',{numeric:true})||String(a.arm).localeCompare(String(b.arm),'pt-BR',{numeric:true})||String(a.cond).localeCompare(String(b.cond),'pt-BR'));
+  const lista=['*ITRONIC RIO VERDE*',''];
+  if(id)lista.push('Lista de produtos','');
+  let categoriaAnterior='';
+  grupos.forEach(g=>{
+    if(modo==='categorias'&&g.cat!==categoriaAnterior){
+      if(categoriaAnterior)lista.push('');
+      lista.push('*'+g.cat.toUpperCase()+'*','');categoriaAnterior=g.cat;
+    }
+    const arm=g.arm&&!/^N[aã]o informado/i.test(g.arm)?' • '+g.arm.replace(/\s+(GB|TB)\b/g,'$1'):'';
+    const cond=g.cond&&!/^N[aã]o informad/i.test(g.cond)?' — '+g.cond:'';
+    lista.push('*'+g.modelo+arm+cond+'*');
+    [...g.opcoes.values()].sort((a,b)=>a.preco-b.preco).forEach(opt=>{
+      const cor=[...opt.cores].sort((a,b)=>a.localeCompare(b,'pt-BR')).join(', ');
+      lista.push('• '+(cor?cor+' — ':'')+'*'+money(opt.preco)+'*'+(!id&&opt.fornecedor?' ('+opt.fornecedor+')':''));
+    });
+    lista.push('');
+  });
+  if(!grupos.length)lista.push('Nenhuma oferta disponível neste filtro.','');
+  lista.push('_Valores e disponibilidade sujeitos à confirmação._');
+  orcListaGerada=lista.join('\n').replace(/\n{3,}/g,'\n\n');
+  const aviso=(db.fornecedores||[]).some(f=>f.parserVersao!==3)?' Listas antigas não revisadas ficam fora da exportação.':'';
+  const resumo=el('orc-list-summary');if(resumo)resumo.textContent=linhas.length+' variação(ões), '+grupos.length+' produto(s).'+aviso+(acrescimo?' Acréscimo aplicado: '+money(acrescimo)+'.':' ATENÇÃO: preços originais do fornecedor (sem acréscimo).');
   const preview=el('orc-list-preview');if(preview)preview.value=orcListaGerada;
   orcListaArquivo='itronic-'+(id?(fornecedores[0]?.nome||'fornecedor'):'comparativo').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-$/g,'');
 }
 function orcCopiarLista(){
+  if(!(orcValor(el('orc-list-markup')?.value||'0')>0)&&!confirm('ATENÇÃO: esta lista contém preços do fornecedor, sem acréscimo de venda.\n\nDeseja copiar com esses valores mesmo?'))return;
   const done=()=>toast('Lista copiada');
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(orcListaGerada).then(done).catch(()=>copiarFallback(orcListaGerada,done));
   else copiarFallback(orcListaGerada,done);
