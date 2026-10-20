@@ -4772,8 +4772,13 @@ function itDiagnosticoOperacoes(){
  const add=(tipo,desc,id='')=>avisos.push({tipo,desc,id});
  for(const p of (db.produtos||[])){
   if(p.imei){const key=String(p.imei).replace(/\W/g,'');if(idx.has('imei'+key))add('IMEI duplicado',p.modelo+' · '+p.imei,p.id);else idx.set('imei'+key,p.id);}
-  if(p.origemTrocaVendaId){const v=(db.vendas||[]).find(x=>x.id===p.origemTrocaVendaId);if(!v)add('Origem sem venda',p.modelo+' · vínculo não encontrado',p.id);}
+  if(p.origemTrocaVendaId){
+   const v=(db.vendas||[]).find(x=>x.id===p.origemTrocaVendaId);
+   if(!v)add('Origem sem venda',p.modelo+' · vínculo não encontrado',p.id);
+   else if(!(v.pagamentos||[]).some(t=>t.forma==='Entrada aparelho'&&t.usadoProdutoId===p.id))add('Origem inconsistente',p.modelo+' · não está na troca informada',p.id);
+  }
  }
+ const aparelhosRecebidos=new Map();
  for(const v of (db.vendas||[])){
   const pagamentos=(v.pagamentos||[]).reduce((n,p)=>n+Number(p.valor||0),0);
   const recebidosDepois=(v.recebimentos||[]).reduce((n,p)=>n+Number(p.valor||0),0);
@@ -4781,18 +4786,104 @@ function itDiagnosticoOperacoes(){
   if(v.financeiroV2&&diff>0.03)add('Fechamento divergente',v.clienteNome+' · diferença '+money(diff),v.id);
   if(!v.financeiroV2&&(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho'))add('Troca antiga para auditar',v.clienteNome+' · '+money(v.total),v.id);
   const trocas=(v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho');
-  for(const t of trocas){if(!t.usadoProdutoId||!(db.produtos||[]).some(p=>p.id===t.usadoProdutoId))add('Troca sem cadastro',v.clienteNome+' · aparelho não localizado',v.id);}
+  for(const t of trocas){
+   if(!t.usadoProdutoId||!(db.produtos||[]).some(p=>p.id===t.usadoProdutoId))add('Troca sem cadastro',v.clienteNome+' · aparelho não localizado',v.id);
+   if(t.usadoProdutoId){
+    const anterior=aparelhosRecebidos.get(t.usadoProdutoId);
+    if(anterior&&anterior!==v.id)add('Seminovo em duas trocas',v.clienteNome+' · aparelho já vinculado a '+anterior,v.id);
+    aparelhosRecebidos.set(t.usadoProdutoId,v.id);
+   }
+  }
   if(v.financeiroV2){for(const [i,p] of (v.pagamentos||[]).entries()){
    if(['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)&&p.repasseStatus==='recebido'&&!(db.caixa||[]).some(c=>c.refVendaId===v.id&&c.refPagamentoIndex===i))add('Repasse sem caixa',v.clienteNome+' · pagamento '+(i+1),v.id);
   }}
  }
  return avisos;
 }
+/* ===== Auditoria segura das vendas antigas e backup visível no relatório ===== */
+function itExportarBackup(){
+  // Usa o exportador existente: inclui imagens no arquivo, quando disponíveis.
+  return exportBackup();
+}
+function itConferenciaVendaLegada(id){
+ const v=(db.vendas||[]).find(x=>x.id===id);
+ if(!v)return {ok:false,motivos:['Venda não encontrada.']};
+ const trocas=(v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho');
+ const motivos=[];
+ if(v.financeiroV2)motivos.push('A venda já utiliza a regra financeira atual.');
+ if(!trocas.length)motivos.push('Não há aparelho informado como entrada.');
+ const ids=new Set();
+ const vinculados=trocas.map(t=>{
+  if(!t.usadoProdutoId){motivos.push('Há aparelho na troca sem vínculo de estoque.');return {t,p:null};}
+  if(ids.has(t.usadoProdutoId))motivos.push('O mesmo aparelho aparece mais de uma vez como entrada.');
+  ids.add(t.usadoProdutoId);
+  const p=(db.produtos||[]).find(x=>x.id===t.usadoProdutoId);
+  if(!p){motivos.push('Seminovo não localizado no estoque: '+t.usadoProdutoId);return {t,p:null};}
+  if(p.origemTrocaVendaId&&p.origemTrocaVendaId!==id)motivos.push('O seminovo '+(p.modelo||'')+' pertence a outra negociação.');
+  if(p.entradaVendaId&&p.entradaVendaId!==id)motivos.push('O cadastro '+(p.modelo||'')+' está ligado a outra entrada.');
+  if(Math.abs(Number(p.compra||0)-Number(t.valor||0))>0.01)motivos.push('Valor da troca e custo divergem para '+(p.modelo||'seminovo')+'.');
+  return {t,p};
+ });
+ const total=Number(v.total)||0;
+ const pagamentos=(v.pagamentos||[]).reduce((a,t)=>a+(Number(t.valor)||0),0);
+ const falta=Math.max(0,Number(v.aReceber)||0);
+ const recebidosDepois=(v.recebimentos||[]).reduce((n,r)=>n+(Number(r.valor)||0),0);
+ if(Math.abs(total-pagamentos-recebidosDepois-falta)>0.04)motivos.push('Total, pagamentos, recebimentos posteriores e saldo pendente não fecham.');
+ if(!Array.isArray(v.itens)||!v.itens.length)motivos.push('A venda não tem itens com custos registrados.');
+ if(!Number.isFinite(total)||total<=0)motivos.push('Valor da venda inválido.');
+ const atual=lucroVenda(v);
+ const revisto=itLucroCorreto({...v,financeiroV2:true,custosExtras:0});
+ return {v,trocas,vinculados,motivos,ok:!motivos.length,atual,revisto,diferenca:revisto-atual};
+}
+function itAuditarLegado(id){
+ if(!podeAcao('todasVendas'))return toast('Seu perfil não tem permissão para auditar vendas.');
+ const d=itConferenciaVendaLegada(id);if(!d.v)return toast('Venda não encontrada.');
+ const {v,motivos,ok,atual,revisto,diferenca,trocas}=d;
+ const tradeTotal=trocas.reduce((n,t)=>n+(Number(t.valor)||0),0);
+ const html=`<p style="color:var(--text2);line-height:1.5;font-size:12px">Conferência da fórmula de uma venda antiga. Esta tela <b>não altera valores</b>. O aparelho recebido é ativo do estoque, não despesa adicional da primeira venda.</p>
+ <div class="card" style="margin:12px 0;padding:12px 16px">
+ <div class="detail-line"><span class="k">Cliente / venda</span><span class="v">${rpEsc(v.clienteNome||'Consumidor')} · ${money(v.total)}</span></div>
+ <div class="detail-line"><span class="k">Aparelhos na troca</span><span class="v">${money(tradeTotal)}</span></div>
+ <div class="detail-line"><span class="k">Lucro no cálculo antigo</span><span class="v money-in ${atual<0?'neg':'pos'}">${money(atual)}</span></div>
+ <div class="detail-line"><span class="k">Lucro bruto com a regra corrigida</span><span class="v money-in ${revisto<0?'neg':'pos'}">${money(revisto)}</span></div>
+ <div class="detail-line"><span class="k">Diferença do cálculo</span><span class="v money-in">${money(diferenca)}</span></div></div>
+ <p style="font-size:12px;color:var(--text2)">A correção é apenas da classificação de custo da troca; taxas antigas não verificadas e eventuais lançamentos financeiros manuais precisam de conciliação. Nenhuma entrada adicional será criada no caixa.</p>
+ ${motivos.length?`<div style="padding:13px;margin:12px 0;border:1px solid var(--red);border-radius:12px;color:var(--red);font-size:12px"><b>Regularização automática bloqueada:</b><ul style="padding-left:18px;margin:8px 0">${motivos.map(x=>`<li>${rpEsc(x)}</li>`).join('')}</ul>Confira manualmente os vínculos antes de corrigir.</div>`:'<p style="font-size:12px;margin:12px 0;color:var(--text2)">Vínculos e valores da troca conferidos. A regularização deve ser confirmada por usuário autorizado.</p>'}
+ <button class="btn secondary" onclick="itExportarBackup()">Salvar backup completo</button>
+ ${ok?`<button class="btn" style="margin-top:10px" onclick="itMigrarVendaLegada('${rpEsc(String(id).replace(/'/g,''))}')">Regularizar fórmula desta venda</button>`:''}`;
+ openSheet('Auditoria da venda antiga',html);
+}
+function itMigrarVendaLegada(id){
+ if(!podeAcao('todasVendas'))return toast('Sem permissão para regularizar vendas.');
+ const d=itConferenciaVendaLegada(id);
+ if(!d.ok)return toast('Regularização bloqueada: reabra a auditoria e confira as pendências.');
+ const {v,revisto,atual}=d;
+ askConfirm('REGULARIZAÇÃO FINANCEIRA\n\nResultado antigo: '+money(atual)+'\nResultado recalculado: '+money(revisto)+'\n\nMantém a venda, pagamentos, estoque e recebimentos originais. Taxas antigas devem ser verificadas separadamente. Antes de prosseguir, salve também uma cópia externa dos dados. Confirma a regularização desta venda?',()=>{
+  // Backup obrigatório. Não modifica valores do caixa, apenas classifica a mercadoria recebida como ativo.
+  const backup=itBackupDados('antes_regularizacao_'+String(id).replace(/[^a-z0-9]/gi,''));
+  if(!backup)return toast('Não foi possível criar o backup local. Operação cancelada.');
+  const checagem=itConferenciaVendaLegada(id);
+  if(!checagem.ok)return toast('Os dados mudaram. Reabra a auditoria.');
+  for(const {p} of checagem.vinculados){
+   if(!p.origemTrocaVendaId)p.origemTrocaVendaId=id;
+   if(!p.entradaVendaId)p.entradaVendaId=id;
+   if(!p.origemEstoque)p.origemEstoque='Troca em venda';
+  }
+  v.financeiroV2=true;v.versaoFinanceira=3;
+  v.financeiroCaixaLegado=true;
+  v.financeiroMigradoEm=new Date().toISOString();
+  v.financeiroMigradoDe='conferencia_legado';
+  if(!Number.isFinite(Number(v.custosExtras)))v.custosExtras=0;
+  if(typeof itAudit==='function')itAudit('VENDA_LEGADA_REGULARIZADA',id,{lucroAnterior:atual,lucroCorrigido:itLucroCorreto(v),backup});
+  saveDB();closeSheet();render(currentTab);toast('Venda regularizada com backup local.');
+ },'Confirmar regularização');
+}
+
 function itAuditoriaHTML(){
  const a=itDiagnosticoOperacoes();
  const totals={};a.forEach(x=>totals[x.tipo]=(totals[x.tipo]||0)+1);
- const header=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Conferência sem alterar nenhum registro existente. Faça backup antes de corrigir lançamentos antigos.</p><div class="it-audit-actions"><button class="rp-btn" onclick="itExportarBackup()">Baixar backup de todos os dados</button><button class="rp-btn" onclick="renderRelatorios()">Atualizar conferência</button></div>`;
- return rpPanel('Auditoria de integridade','Inconsistências detectadas no estoque, vendas e repasses.',header+(a.length?`<div class="rp-mini-list" style="margin-bottom:13px">${Object.entries(totals).map(([k,n])=>`<div class="rp-linehead"><span>${rpEsc(k)}</span><b>${n}</b></div>`).join('')}</div>`:'<p style="padding:14px;color:var(--text2)">Nenhuma divergência encontrada nas regras verificadas.</p>')+rpGridTable(['Alerta','Referência','Abrir'],a.slice(0,80).map(x=>`<tr>${rpCell(x.tipo)}${rpCell(x.desc)}<td>${x.id&&db.vendas.some(v=>v.id===x.id)?rpLink(x.id,'openVendaDetail','Abrir venda'):x.id&&db.produtos.some(p=>p.id===x.id)?rpLink(x.id,'openProdDetail','Abrir produto'):'—'}</td></tr>`)));
+ const header=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Conferência sem alterar nenhum registro existente. Faça backup antes de corrigir lançamentos antigos.</p><div class="it-audit-actions"><button class="rp-btn" onclick="itExportarBackup()">Salvar backup completo</button><button class="rp-btn" onclick="renderRelatorios()">Atualizar conferência</button></div>`;
+ return rpPanel('Auditoria de integridade','Inconsistências detectadas no estoque, vendas e repasses.',header+(a.length?`<div class="rp-mini-list" style="margin-bottom:13px">${Object.entries(totals).map(([k,n])=>`<div class="rp-linehead"><span>${rpEsc(k)}</span><b>${n}</b></div>`).join('')}</div>`:'<p style="padding:14px;color:var(--text2)">Nenhuma divergência encontrada nas regras verificadas.</p>')+rpGridTable(['Alerta','Referência','Abrir'],a.slice(0,80).map(x=>`<tr>${rpCell(x.tipo)}${rpCell(x.desc)}<td>${x.id&&db.vendas.some(v=>v.id===x.id)?rpLink(x.id,x.tipo==='Troca antiga para auditar'?'itAuditarLegado':'openVendaDetail',x.tipo==='Troca antiga para auditar'?'Auditar venda':'Abrir venda'):x.id&&db.produtos.some(p=>p.id===x.id)?rpLink(x.id,'openProdDetail','Abrir produto'):'—'}</td></tr>`)));
 }
 
 function rpTradeReport(s){
@@ -4807,7 +4898,7 @@ function rpTradeReport(s){
    const root=!isChild;
    if(r.legado)pending++;
    else if(root){realized+=r.realizado;projected+=r.potencial;chains++;available+=r.livres;}
-   if(itLucroCorreto(v)<0)undercost++;
+   if((v.financeiroV2?itLucroCorreto(v):Number(v.total||0)-(v.itens||[]).reduce((n,it)=>n+Number(it.compra||0),0))<0)undercost++;
    const labels=[];if(isChild)labels.push('Continuação de troca');if(r.conflitos.length)labels.push('Revisão necessária');
    rows.push(`<tr>${rpCell(rpFmtDate(v.data))}${rpCell(v.clienteNome||'')}${rpCell((v.itens||[]).map(it=>it.nome).join(', '))}${rpCell(money(linked),true)}${rpCell(r.legado?'Auditar':money(r.realizado),true)}${rpCell(r.legado?'—':money(r.potencial),true)}${rpCell(r.situacao+(labels.length?' · '+labels.join(', '):''))}<td>${rpLink(v.id,'openVendaDetail','Detalhes')} ${r.legado?rpLink(v.id,'itAuditarLegado','Auditar'):''}</td></tr>`);
  }
