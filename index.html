@@ -1804,6 +1804,15 @@ body.it-ai-ready .it-ai-root{display:block}
 .it-lucro-neg{color:#bc4337;font-weight:750}.it-lucro-pos{color:#287f45;font-weight:750}
 .it-lucro-row-btn{color:var(--text);border:1px solid var(--line);padding:6px 8px;background:var(--bg2);border-radius:7px;font-size:11px;cursor:pointer}
 
+
+/* Envio do orçamento: aviso opcional de nota e garantia. */
+#page-simular .sim-quote-options{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:12px;box-shadow:0 5px 20px rgba(18,44,23,.04)}
+#page-simular .sim-quote-option{display:flex;gap:12px;align-items:center;cursor:pointer;color:var(--text);font-size:13px;line-height:1.4}
+#page-simular .sim-quote-option input{accent-color:#27865a;width:20px;height:20px;flex-shrink:0;margin:0;cursor:pointer}
+#page-simular .sim-quote-option strong{display:block;font-size:13px;line-height:1.45}
+#page-simular .sim-quote-option small{display:block;color:var(--text2);font-size:11px;font-weight:500;margin-top:3px}
+#page-simular .sim-quote-note{font-size:12px;line-height:1.55;background:var(--bg2);color:var(--text2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;overflow-wrap:break-word}
+#page-simular .sim-quote-note[hidden]{display:none}
 </style>
 <style id="alavancagem-integrada-estilos">
 
@@ -2297,8 +2306,16 @@ let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
 // cada item: {tipo:'aparelho'|'acessorio', id, qtd}
 let carrinho=[];
 const MODELOS_IPHONE=['iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12 mini','iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13 mini','iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max','iPhone 16e','iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','iPhone 17e','iPhone 18','iPhone 18 Pro','iPhone 18 Pro Max','iPhone 18 Fold'];
-let simState={parcCred:1, semTroca:false, armNovo:'', corNovo:'', condNovo:'', armUsado:'128 GB',
+let simState={parcCred:1, semTroca:false, armNovo:'', corNovo:'', corNovoManual:'', condNovo:'', armUsado:'128 GB', corUsado:'', incluirNotaFiscal:false,
   modNovo:'iPhone 15',modUsado:'iPhone 14',valNovo:'',valUsado:'',valEntrada:''};
+/* Mensagem opcional: inclui-se somente mediante escolha explícita no simulador. */
+const SIM_NOTA_FISCAL='Todos os nossos aparelhos são garantidos e certificados Apple. Nossos aparelhos não são relacrados. Todos os nossos produtos acompanham nota fiscal e garantia de 1 ano.';
+function simAlternarNotaFiscal(mostrar){
+  simState.incluirNotaFiscal=!!mostrar;
+  const preview=el('sim-nota-preview');
+  if(preview)preview.hidden=!simState.incluirNotaFiscal;
+}
+
 let simOferta=null;
 let catsAbertas={}; // quais categorias de acessório estão expandidas
 let catsServAbertas={}; // categorias de serviços expandidas
@@ -7483,7 +7500,7 @@ function simResultadoCotacao(){
  return condSelect+`<div class="sim-quote-best"><div><small>MENOR CUSTO · ${orcEsc(escolha)}</small><strong>${money(melhor.preco)}</strong><span>${orcEsc(melhor.fornecedor)} · ${orcEsc(simState.corNovo)} · ${orcEsc(simState.armNovo)}</span></div><span class="sim-quote-count">${lista.length} fornecedor(es)</span></div><p class="sim-quote-caption">Valor de compra informado pelo fornecedor, <b>não é o preço de venda</b>. Listas não atualizadas automaticamente.</p>${lista.slice(1,5).map(o=>`<div class="sim-quote-rank"><span>${orcEsc(o.fornecedor)}</span><b>${money(o.preco)}</b></div>`).join('')}`;
 }
 function simAtualizarCotacoes(){const slot=el('sim-quote-results');if(slot)slot.innerHTML=simResultadoCotacao();}
-function simMudarModelo(v){simState.modNovo=v;simState.armNovo='';simState.corNovo='';simState.condNovo='';simOferta=null;renderSimulador()}
+function simMudarModelo(v){simState.modNovo=v;simState.armNovo='';simState.corNovo='';simState.corNovoManual='';simState.condNovo='';simOferta=null;renderSimulador()}
 function simMudarArm(v){simState.armNovo=v;simState.condNovo='';simOferta=null;renderSimulador()}
 function simMudarCor(v){
  simState.corNovo=v;simState.condNovo='';simOferta=null;
@@ -7523,6 +7540,7 @@ function renderSimuladorInline(){
       <select class="input" id="sim-arm-novo" onchange="simMudarArm(this.value)">${opArmazenamento(simState.armNovo,simState.modNovo)}</select>
       <label class="mini-lbl" for="sim-cor-novo" style="display:block;margin:12px 0 7px">Cor do aparelho</label>
       <select class="input" id="sim-cor-novo" onchange="simMudarCor(this.value)"><option value="">Selecione a cor do ${orcEsc(simState.modNovo)}</option>${simCoresDisponiveis().map(c=>`<option value="${orcEsc(c)}" ${simNormCor(c)===simNormCor(simState.corNovo)?'selected':''}>${orcEsc(c)}</option>`).join('')}</select>
+      ${!simCoresDisponiveis().length?`<label class="mini-lbl" for="sim-cor-novo-manual" style="display:block;margin:9px 0 6px">Cor para informar no orçamento</label><input class="input" id="sim-cor-novo-manual" placeholder="Ex.: Preto, Azul, Bordô" value="${attr(simState.corNovoManual)}" oninput="simState.corNovoManual=this.value">`:''}
       ${simPaletaVisual()}
       <div class="sim-quote" aria-live="polite"><div class="sim-quote-head"><b>Comparador de fornecedores</b><small>Modelo + armazenamento + cor</small></div><div id="sim-quote-results">${simResultadoCotacao()}</div></div>
       <label class="mini-lbl" for="sim-val-novo" style="display:block;margin:15px 0 7px">Valor de venda para o cliente</label>
@@ -7533,9 +7551,11 @@ function renderSimuladorInline(){
 
     ${simState.semTroca?'':`<div class="sim-card">
       <div style="font-weight:700;font-size:15px;margin-bottom:12px">${vectorIcon('swap')} Aparelho usado <span style="color:var(--text2);font-weight:400;font-size:13px">(entra na troca)</span></div>
-      <select class="input" id="sim-mod-usado" onchange="simState.modUsado=this.value">${opt(simState.modUsado)}</select>
+      <select class="input" id="sim-mod-usado" onchange="simState.modUsado=this.value;simState.corUsado='';renderSimulador()">${opt(simState.modUsado)}</select>
       <label class="mini-lbl" for="sim-arm-usado" style="display:block;margin:12px 0 7px">Armazenamento</label>
       <select class="input" id="sim-arm-usado" onchange="simState.armUsado=this.value">${opArmazenamento(simState.armUsado,simState.modUsado)}</select>
+      <label class="mini-lbl" for="sim-cor-usado" style="display:block;margin:12px 0 7px">Cor do aparelho usado (opcional)</label>
+      <input class="input" id="sim-cor-usado" type="text" placeholder="Ex.: Preto, Titânio natural" value="${attr(simState.corUsado)}" oninput="simState.corUsado=this.value" autocomplete="off">
       <input class="input" id="sim-val-usado" type="text" inputmode="decimal" placeholder="Valor que você paga no usado (R$)" value="${attr(simState.valUsado)}" oninput="simState.valUsado=this.value;calcSimTroca()" style="margin-top:10px">
     </div>`}</div><div class="sim-summary-col">
 
@@ -7552,6 +7572,13 @@ function renderSimuladorInline(){
       <div id="sim-out" style="margin-top:14px"></div>
     </div>
 
+    <div class="sim-quote-options">
+      <label class="sim-quote-option" for="sim-incluir-nota">
+        <input id="sim-incluir-nota" type="checkbox" ${simState.incluirNotaFiscal?'checked':''} onchange="simAlternarNotaFiscal(this.checked)">
+        <span><strong>Incluir mensagem de nota fiscal e garantia</strong><small>Opcional — aparece somente se estiver marcado</small></span>
+      </label>
+      <div id="sim-nota-preview" class="sim-quote-note" ${simState.incluirNotaFiscal?'':'hidden'}>${orcEsc(SIM_NOTA_FISCAL)}</div>
+    </div>
     <button class="btn" onclick="copiarSimTroca()" style="background:#25D366">${vectorIcon('send')} Copiar orçamento pro WhatsApp</button>
     ${podeEditar()?`<button class="btn secondary" onclick="openTaxasCartao()" style="margin-top:8px">${vectorIcon('settings')} Ajustar taxas do cartão</button>`:''}
     <div style="height:20px"></div></div></div>
@@ -7614,6 +7641,8 @@ function textoSimTroca(){
   const modNovo=getV('sim-mod-novo'), modUsado=semTroca?'':getV('sim-mod-usado');
   const armNovo=getV('sim-arm-novo')||simState.armNovo;
   const armUsado=semTroca?'':(getV('sim-arm-usado')||simState.armUsado);
+  const corNovo=(getV('sim-cor-novo-manual')||simState.corNovoManual||getV('sim-cor-novo')||simState.corNovo).trim();
+  const corUsado=semTroca?'':(getV('sim-cor-usado')||simState.corUsado||'').trim();
   const tx=db.taxasCartao||{debito:1.5,imposto:0,credito:[]};
   const imposto=Number(tx.imposto)||0;
   const parc=simState.parcCred||1;
@@ -7625,8 +7654,10 @@ function textoSimTroca(){
   L.push('📱 *'+(semTroca?'Orçamento':'Proposta de troca')+' — iTronic Rio Verde*');
   L.push('');
   L.push((semTroca?'Aparelho: *':'Novo: *')+[modNovo,armNovo].filter(Boolean).join(' ')+'* — '+money(vNovo));
+  L.push('Cor do aparelho: '+(corNovo||'A confirmar'));
   if(!semTroca){
     L.push('Seu usado: '+[modUsado,armUsado].filter(Boolean).join(' ')+' — '+money(vUsado));
+    L.push('Cor do usado: '+(corUsado||'A confirmar'));
   }
   if(entrada>0) L.push('Entrada em dinheiro ou Pix: '+money(entrada));
   L.push('');
@@ -7636,6 +7667,11 @@ function textoSimTroca(){
   L.push('💠 À vista Pix: '+money(saldo));
   L.push('💳 Débito: '+money(vDebito));
   L.push('💳 Crédito '+parc+'x: '+parc+'x de '+money(vCredito/parc)+' (total '+money(vCredito)+')');
+  if(simState.incluirNotaFiscal){
+    L.push('');
+    L.push('📄 *Nota fiscal e garantia*');
+    L.push(SIM_NOTA_FISCAL);
+  }
   L.push('');
   L.push('📲 iTronic Rio Verde');
   return L.join('\n');
