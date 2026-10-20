@@ -1778,6 +1778,32 @@ body.it-ai-ready .it-ai-root{display:block}
 .it-pay-extras .input{width:100%;min-width:0;box-sizing:border-box}
 .it-audit-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 @media(max-width:600px){.it-pay-extras{grid-template-columns:repeat(2,minmax(0,1fr))}.it-pay-extras>div:last-child{grid-column:1/-1}}
+
+/* Dashboard: resultado das vendas com conferência não destrutiva de trocas legadas. */
+.dash-lucro-link{display:inline-flex;align-items:center;gap:4px;margin:6px 0 0;padding:0;border:0;border-bottom:1px solid currentColor;border-radius:0;background:transparent;color:var(--text2);font:inherit;font-size:10px;font-weight:700;cursor:pointer}
+.dash-lucro-note{font-size:10px;line-height:1.35;color:var(--text2);margin-top:4px}
+.dash-lucro-pending{color:#ac6b23;font-weight:750}
+.it-lucro-diagnostico{font-size:12px;color:var(--text)}
+.it-lucro-intro{color:var(--text2);line-height:1.5;margin:2px 0 15px}
+.it-lucro-resumo-line{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0;line-height:1.3}
+.it-lucro-resumo-line span{color:var(--text2)}
+.it-lucro-resumo-line strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.it-lucro-resumo-line small{display:block;font-size:10px;margin-top:3px;font-weight:400}
+.it-lucro-main{padding:12px 14px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;margin:15px 0}
+.it-lucro-summary-chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.it-lucro-summary-chips span{padding:6px 9px;border-radius:9px;border:1px solid var(--line);background:var(--bg2);font-size:10px;font-weight:650}
+.it-lucro-warning{padding:11px 13px;border-radius:12px;border:1px solid #d9aa68;background:rgba(215,165,77,.08);margin:12px 0}
+.it-lucro-warning p{margin:4px 0;line-height:1.45}
+.it-lucro-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.it-lucro-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-width:100%}
+.it-lucro-table{border-collapse:collapse;width:100%;min-width:710px;font-size:11px}
+.it-lucro-table th,.it-lucro-table td{text-align:right;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+.it-lucro-table th:first-child,.it-lucro-table td:first-child{text-align:left}
+.it-lucro-table th{font-size:10px;color:var(--text2);background:var(--bg2)}
+.it-lucro-table td small{display:block;color:var(--text2);max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}
+.it-lucro-neg{color:#bc4337;font-weight:750}.it-lucro-pos{color:#287f45;font-weight:750}
+.it-lucro-row-btn{color:var(--text);border:1px solid var(--line);padding:6px 8px;background:var(--bg2);border-radius:7px;font-size:11px;cursor:pointer}
+
 </style>
 <style id="alavancagem-integrada-estilos">
 
@@ -3127,6 +3153,61 @@ function vendaCaixa(v){
  return Number(v.liquido!=null?v.liquido:v.total)||0;
 }
 
+/* Auditoria não destrutiva do lucro mensal: as trocas antigas usam prévia contábil,
+ * sem regravar db.vendas, estoque ou caixa. Valores de revenda não são realizados. */
+function itResumoLucroMes(vendas,mes){
+ const registros=(vendas||[]).filter(v=>String(v.data||'').slice(0,7)===mes);
+ const resumo={mes,registros:[],qtd:registros.length,lancado:0,previa:0,diferenca:0,receita:0,custo:0,taxas:0,trocasAntigas:0,valorTrocasAntigas:0,semCusto:0,negativas:0};
+ registros.forEach(v=>{
+  const receita=Number(v.total)||0;
+  const itens=Array.isArray(v.itens)?v.itens:[];
+  const custo=itens.reduce((a,it)=>a+(Number(it.compra)||0),0);
+  const troca=(v.pagamentos||[]).reduce((a,p)=>a+(p.forma==='Entrada aparelho'?(Number(p.valor)||0):0),0);
+  const antiga=troca>0&&!v.financeiroV2;
+  const semCusto=!itens.length||itens.some(it=>it.compra==null||it.compra===''||!Number.isFinite(Number(it.compra))||Number(it.compra)<0);
+  const taxas=v.financeiroV2?itTaxasVenda(v):0;
+  const lancado=lucroVenda(v);
+  // Venda legada com troca: prévia do resultado sem descontar outra vez a mercadoria recebida.
+  // Taxas/despesas antigas não cadastradas NÃO são estimadas nem lançadas automaticamente.
+  const previa=antiga?receita-custo:lancado;
+  const linha={id:v.id,data:v.data,cliente:v.clienteNome||'Consumidor',produto:itens.map(x=>x.nome||x.modelo||'Produto').join(' / '),receita,custo,troca,taxas,lancado,previa,antiga,semCusto};
+  resumo.registros.push(linha);
+  resumo.lancado+=lancado;resumo.previa+=previa;resumo.receita+=receita;resumo.custo+=custo;resumo.taxas+=taxas;
+  if(antiga){resumo.trocasAntigas++;resumo.valorTrocasAntigas+=troca;}
+  if(semCusto)resumo.semCusto++;
+  if(previa<0)resumo.negativas++;
+ });
+ resumo.diferenca=resumo.previa-resumo.lancado;
+ return resumo;
+}
+function itAbrirDiagnosticoLucro(){
+ if(!session||session.role!=='Administrador')return toast('Acesso restrito ao administrador.');
+ const mes=todayStr().slice(0,7);
+ const d=itResumoLucroMes(vendasVisiveis(),mes);
+ const r=n=>money(n),fmt=iso=>{const s=String(iso||'');return /^\d{4}-\d{2}-\d{2}/.test(s)?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):'—'};
+ const row=(label,value,note='')=>`<div class="it-lucro-resumo-line"><span>${label}${note?`<small>${note}</small>`:''}</span><strong>${r(value)}</strong></div>`;
+ const warnings=[];
+ if(d.trocasAntigas)warnings.push(`${d.trocasAntigas} venda(s) com troca usam fórmula antiga. A prévia corrige somente a dupla dedução do valor da troca; não altera os registros.`);
+ if(d.semCusto)warnings.push(`${d.semCusto} venda(s) têm itens sem custo válido. Confira antes de confiar na margem.`);
+ if(d.negativas)warnings.push(`${d.negativas} venda(s) apresentam margem negativa mesmo depois da prévia; podem ser perdas reais ou lançamentos a verificar.`);
+ const rows=d.registros.slice().sort((a,b)=>Number(b.antiga)-Number(a.antiga)||Math.abs(b.previa-b.lancado)-Math.abs(a.previa-a.lancado)||String(b.data).localeCompare(String(a.data)));
+ const maxRows=80;
+ const tabela=`<div class="it-lucro-table-wrap"><table class="it-lucro-table"><thead><tr><th>Data / produto</th><th>Venda</th><th>Custo</th><th>Troca</th><th>Lançado</th><th>Prévia correta</th><th>Verificar</th></tr></thead><tbody>${rows.slice(0,maxRows).map(x=>`<tr><td>${rpEsc(fmt(x.data))}<small>${rpEsc(x.produto||x.cliente)}</small></td><td>${r(x.receita)}</td><td>${r(x.custo)}</td><td>${r(x.troca)}</td><td class="${x.lancado<0?'it-lucro-neg':''}">${r(x.lancado)}</td><td class="${x.previa<0?'it-lucro-neg':'it-lucro-pos'}">${r(x.previa)}</td><td>${x.antiga?`<button class="it-lucro-row-btn" onclick="itAuditarLegado('${rpEsc(String(x.id).replace(/'/g,''))}')">Auditar</button>`:x.semCusto?'Conferir custo':x.previa<0?'Abaixo do custo':'OK'}</td></tr>`).join('')}</tbody></table></div>${rows.length>maxRows?`<p style="font-size:11px;color:var(--text2);margin:8px 0">Mostrando ${maxRows} de ${rows.length} vendas. Consulte Relatórios para o histórico completo.</p>`:''}`;
+ const html=`<div class="it-lucro-diagnostico">
+  <p class="it-lucro-intro">Esta análise mostra <b>somente vendas lançadas neste mês</b>. Não inclui despesas fixas gerais da loja, nem lucro futuro de aparelhos que continuam em estoque.</p>
+  ${row('Resultado lançado no sistema',d.lancado,'Inclui fórmulas antigas ainda não regularizadas')}
+  ${row('Correção estimada das trocas antigas',d.diferenca,'Diferença da dupla dedução; não é um novo recebimento')}
+  <div class="it-lucro-main">${row('Resultado das vendas — prévia',d.previa,d.trocasAntigas?'Não auditado; taxas antigas podem estar ausentes':'Com custos e taxas registrados')}</div>
+  <div class="it-lucro-summary-chips"><span>${d.qtd} venda(s)</span><span>${d.trocasAntigas} troca(s) a auditar</span><span>${d.negativas} venda(s) negativa(s) na prévia</span></div>
+  ${warnings.length?`<div class="it-lucro-warning">${warnings.map(w=>`<p>• ${rpEsc(w)}</p>`).join('')}</div>`:'<p style="color:var(--text2);font-size:12px;margin:13px 0">Sem alertas nas verificações automáticas deste mês.</p>'}
+  <div class="it-lucro-buttons"><button class="btn secondary" onclick="itExportarBackup()">Baixar backup completo</button><button class="btn" onclick="closeSheet();go('relatorios');rpSwitchTab('trocas')">Abrir auditoria de trocas</button></div>
+  <h3 style="margin:18px 0 8px;font-size:14px">Composição venda por venda</h3>
+  ${d.registros.length?tabela:'<p style="font-size:12px;color:var(--text2)">Nenhuma venda lançada neste mês.</p>'}
+  <p style="font-size:11px;color:var(--text2);line-height:1.5;margin-top:14px"><b>Atenção:</b> o resultado de vendas não representa lucro líquido da empresa. Um negativo ainda pode ser verdadeiro quando os custos superam as vendas. A prévia não altera cadastros, lançamentos, estoques, cartões ou histórico.</p>
+ </div>`;
+ openSheet('Conferência do lucro do mês',html);
+}
+
 function dashStats(){
   const disp = db.produtos.filter(p=>p.status!=='Vendido');
    const valorEstoque = disp.reduce((s,p)=>s+(Number(p.compra)||0)*qtdAparelho(p),0);
@@ -3181,6 +3262,7 @@ function dashTrendSvg(labels, valores){
 function renderDash(){
   const s=dashStats();
   const isAdmin=session && session.role==='Administrador';
+  const resumoLucro=isAdmin?itResumoLucroMes(vendasVisiveis(),todayStr().slice(0,7)):null;
   const ic=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
   const iconStock=ic('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 10h18"/>');
   const iconSales=ic('<path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/>');
@@ -3217,7 +3299,7 @@ function renderDash(){
       ${kpi(iconStock,'Valor em estoque',money(s.valorEstoque),s.qtd+' aparelhos no estoque')}
       ${kpi(iconToday,'Vendido hoje',money(s.vendaDia),'Vendas do dia')}
       ${kpi(iconSales,'Vendido no mês',money(s.vendaMes),'Mês atual')}
-      ${isAdmin?kpi(iconProfit,'Lucro no mês',money(s.lucroMes),'Resultado do mês'):kpi(iconPhone,'Aparelhos',s.qtd,'Em estoque')}
+      ${isAdmin?kpi(iconProfit,resumoLucro.trocasAntigas?'Resultado das vendas · prévia':'Resultado das vendas no mês',money(resumoLucro.previa),`<div class="dash-lucro-note">${resumoLucro.trocasAntigas?`<span class="dash-lucro-pending">${resumoLucro.trocasAntigas} troca(s) antigas por auditar</span> · cálculo preliminar`:'Após os custos e taxas cadastrados'}</div><button type="button" class="dash-lucro-link" onclick="itAbrirDiagnosticoLucro()">Conferir cálculo →</button>`):kpi(iconPhone,'Aparelhos',s.qtd,'Em estoque')}
     </div>
 
     <div class="dash-focus-grid">
@@ -4882,7 +4964,7 @@ function itMigrarVendaLegada(id){
 function itAuditoriaHTML(){
  const a=itDiagnosticoOperacoes();
  const totals={};a.forEach(x=>totals[x.tipo]=(totals[x.tipo]||0)+1);
- const header=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Conferência sem alterar nenhum registro existente. Faça backup antes de corrigir lançamentos antigos.</p><div class="it-audit-actions"><button class="rp-btn" onclick="itExportarBackup()">Salvar backup completo</button><button class="rp-btn" onclick="renderRelatorios()">Atualizar conferência</button></div>`;
+ const header=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Conferência sem alterar nenhum registro existente. Faça backup antes de corrigir lançamentos antigos.</p><div class="it-audit-actions"><button class="rp-btn" onclick="itExportarBackup()">Salvar backup completo</button><button class="rp-btn" onclick="renderRelatorios()">Atualizar conferência</button>${podeAcao('todasVendas')?'<button class="rp-btn" onclick="itAbrirReinicioMes()">Reiniciar vendas do mês</button>':''}</div>`;
  return rpPanel('Auditoria de integridade','Inconsistências detectadas no estoque, vendas e repasses.',header+(a.length?`<div class="rp-mini-list" style="margin-bottom:13px">${Object.entries(totals).map(([k,n])=>`<div class="rp-linehead"><span>${rpEsc(k)}</span><b>${n}</b></div>`).join('')}</div>`:'<p style="padding:14px;color:var(--text2)">Nenhuma divergência encontrada nas regras verificadas.</p>')+rpGridTable(['Alerta','Referência','Abrir'],a.slice(0,80).map(x=>`<tr>${rpCell(x.tipo)}${rpCell(x.desc)}<td>${x.id&&db.vendas.some(v=>v.id===x.id)?rpLink(x.id,x.tipo==='Troca antiga para auditar'?'itAuditarLegado':'openVendaDetail',x.tipo==='Troca antiga para auditar'?'Auditar venda':'Abrir venda'):x.id&&db.produtos.some(p=>p.id===x.id)?rpLink(x.id,'openProdDetail','Abrir produto'):'—'}</td></tr>`)));
 }
 
@@ -6171,7 +6253,7 @@ function finalizarVenda(totalInformado,faltaInformada){
     db.produtos.push({...e.usadoRascunho,entradaVendaId:venda.id,origemTrocaVendaId:venda.id,entradaClienteId:venda.clienteId,origemEstoque:'Troca em venda',entradaCadastroNovo:true,compra:Number(e.valor)||0,entrada:todayStr()});
    }else{
     const existente=db.produtos.find(x=>x.id===e.usadoProdutoId);
-    if(existente){existente.entradaVendaId=venda.id;existente.origemTrocaVendaId=venda.id;existente.entradaClienteId=venda.clienteId;existente.origemEstoque='Troca em venda';}
+    if(existente){existente.entradaVendaId=venda.id;existente.origemTrocaVendaId=venda.id;existente.entradaClienteId=venda.clienteId;existente.origemEstoque='Troca em venda';delete existente.reinicioPendente;}
    }
   }
   db.vendas.push(venda);
@@ -6362,6 +6444,158 @@ function itAudit(acao,ref,detalhes){
 function itBackupDados(etiqueta){
  try{const key='itronic_backup_'+etiqueta+'_'+Date.now();localStorage.setItem(key,JSON.stringify(db));return key}catch(e){console.warn('Backup local indisponível',e);return '';}
 }
+/* ===== REINÍCIO AUDITÁVEL DE VENDAS DO MÊS =====
+ * Não reseta compras, usuários, clientes nem despesas sem referência de venda.
+ * Simula antes de alterar; vinculações sem origem segura bloqueiam a operação.
+ */
+function itPlanoReinicioMes(base,mes){
+ const saida={mes,vendas:[],itensAparelhos:new Map(),itensAcessorios:new Map(),recebidos:new Map(),caixa:[],contas:[],impedimentos:[],avisos:[],total:0,qtItens:0,valorTrocas:0};
+ if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(mes)){saida.impedimentos.push('Mês inválido.');return saida;}
+ const vendas=(base.vendas||[]).filter(v=>String(v.data||'').slice(0,7)===mes);
+ saida.vendas=vendas;
+ const ids=new Set(vendas.map(v=>String(v.id)));
+ const produtos=new Map((base.produtos||[]).map(p=>[String(p.id),p]));
+ const acessorios=new Map((base.acessorios||[]).map(a=>[String(a.id),a]));
+ const outros=(base.vendas||[]).filter(v=>!ids.has(String(v.id)));
+ if(!vendas.length){saida.avisos.push('Não há vendas neste mês para reiniciar.');return saida;}
+ const adicionar=(map,id,n)=>map.set(String(id),(map.get(String(id))||0)+n);
+ for(const v of vendas){
+  saida.total+=Number(v.total)||0;
+  if(!Array.isArray(v.itens)||!v.itens.length){saida.impedimentos.push('Venda '+v.id+' sem itens vinculados ao estoque.');continue;}
+  for(const it of v.itens){
+   const qtd=it.qtd==null||it.qtd===''?1:Number(it.qtd);
+   if(!Number.isSafeInteger(qtd)||qtd<1){saida.impedimentos.push('Quantidade inválida na venda '+v.id+'.');continue;}
+   saida.qtItens+=qtd;
+   if(it.prodId){
+    if(!produtos.has(String(it.prodId)))saida.impedimentos.push('Aparelho vendido não localizado no estoque: '+(it.nome||it.prodId)+' (venda '+v.id+').');
+    else adicionar(saida.itensAparelhos,it.prodId,qtd);
+   }else if(it.acessId){
+    if(!acessorios.has(String(it.acessId)))saida.impedimentos.push('Acessório vendido não localizado no estoque: '+(it.nome||it.acessId)+' (venda '+v.id+').');
+    else adicionar(saida.itensAcessorios,it.acessId,qtd);
+   }else saida.impedimentos.push('Item sem código de cadastro na venda '+v.id+': '+(it.nome||'não identificado')+'.');
+  }
+  for(const t of (v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho')){
+   saida.valorTrocas+=Number(t.valor)||0;
+   if(!t.usadoProdutoId){saida.impedimentos.push('Troca sem ID do seminovo na venda '+v.id+'. É preciso conferir o cadastro antes do reinício.');continue;}
+   const id=String(t.usadoProdutoId),p=produtos.get(id);
+   if(!p){saida.impedimentos.push('Seminovo da troca não localizado: '+id+' (venda '+v.id+').');continue;}
+   if(saida.recebidos.has(id)&&saida.recebidos.get(id)!==String(v.id))saida.impedimentos.push('Seminovo '+(p.modelo||id)+' vinculado a duas vendas do mês.');
+   saida.recebidos.set(id,String(v.id));
+   if((p.origemTrocaVendaId&&String(p.origemTrocaVendaId)!==String(v.id))||(p.entradaVendaId&&String(p.entradaVendaId)!==String(v.id)))
+    saida.impedimentos.push('Origem conflitante para '+(p.modelo||id)+'.');
+  }
+ }
+ for(const v of outros){
+  const origens=Array.isArray(v.origemCadeiaIds)?v.origemCadeiaIds:[];
+  if(origens.some(x=>ids.has(String(x))))saida.impedimentos.push('Venda '+v.id+' de outro mês depende de uma negociação que seria reiniciada.');
+  for(const it of (v.itens||[]))if(it.prodId&&saida.recebidos.has(String(it.prodId)))
+   saida.impedimentos.push('O seminovo '+(produtos.get(String(it.prodId))?.modelo||it.prodId)+' recebido neste mês foi revendido fora do mês.');
+  for(const t of (v.pagamentos||[]))if(t.usadoProdutoId&&saida.recebidos.has(String(t.usadoProdutoId)))
+   saida.impedimentos.push('Aparelho da troca também está vinculado à venda '+v.id+' de outro mês.');
+ }
+ // Só movimentos explicitamente vinculados podem ser revertidos sem risco.
+ saida.caixa=(base.caixa||[]).filter(c=>c.refVendaId&&ids.has(String(c.refVendaId)));
+ saida.contas=(base.contas||[]).filter(c=>c.refVendaId&&ids.has(String(c.refVendaId)));
+ const manuais=(base.caixa||[]).filter(c=>String(c.data||'').slice(0,7)===mes&&!c.refVendaId).length;
+ if(manuais)saida.avisos.push(manuais+' lançamento(s) manuais do caixa permanecerão; confira os que foram feitos para registrar vendas duplicadas.');
+ const independentes=(base.contas||[]).filter(c=>String(c.criado||c.data||'').slice(0,7)===mes&&!c.refVendaId).length;
+ if(independentes)saida.avisos.push(independentes+' conta(s) sem vínculo de venda serão preservadas.');
+ if(saida.recebidos.size)saida.avisos.push('Os seminovos recebidos serão mantidos cadastrados e terão o vínculo antigo liberado para serem reutilizados ao refazer as vendas.');
+ if(saida.caixa.length)saida.avisos.push('Recebimentos e repasses diretamente vinculados às vendas serão retirados do caixa ativo e mantidos no backup.');
+ saida.impedimentos=[...new Set(saida.impedimentos)];
+ return saida;
+}
+function itAplicarReinicioMes(base,plano,operador,backupRef){
+ if(plano.impedimentos.length||!plano.vendas.length)throw Error('Reinício indisponível: confira a prévia novamente.');
+ const mes=plano.mes,ids=new Set(plano.vendas.map(v=>String(v.id)));
+ const mapP=new Map((base.produtos||[]).map(p=>[String(p.id),p]));
+ const mapA=new Map((base.acessorios||[]).map(a=>[String(a.id),a]));
+ for(const [id,qtd] of plano.itensAparelhos){
+  const p=mapP.get(id);if(!p)throw Error('Aparelho não encontrado na aplicação: '+id);
+  p.qtd=qtdAparelho(p)+qtd;p.status='Disponível';delete p.vendidoEm;
+ }
+ for(const [id,qtd] of plano.itensAcessorios){
+  const a=mapA.get(id);if(!a)throw Error('Acessório não encontrado na aplicação: '+id);
+  a.qtd=(Number(a.qtd)||0)+qtd;
+  if(a.situacao==='Sem estoque')a.situacao='Disponível';
+ }
+ for(const [id,vendaId] of plano.recebidos){
+  const p=mapP.get(id);if(!p)throw Error('Seminovo não encontrado na aplicação: '+id);
+  if(String(p.origemTrocaVendaId||'')===vendaId)delete p.origemTrocaVendaId;
+  if(String(p.entradaVendaId||'')===vendaId)delete p.entradaVendaId;
+  delete p.entradaClienteId;
+  // Após o reinício, o seminovo é um cadastro pré-existente: estornos futuros não podem excluí-lo.
+  delete p.entradaCadastroNovo;
+  p.reinicioPendente={mes,vendaAnteriorId:vendaId,data:new Date().toISOString()};
+  p.origemEstoque='Troca aguardando relançamento';
+  // Não exclui a peça física já cadastrada, para permitir vinculá-la na nova venda.
+  if(p.status==='Vendido'&&qtdAparelho(p)>0)p.status='Disponível';
+ }
+ base.vendas=(base.vendas||[]).filter(v=>!ids.has(String(v.id)));
+ const caixaIds=new Set(plano.caixa.map(c=>String(c.id)));
+ base.caixa=(base.caixa||[]).filter(c=>!(c.refVendaId&&ids.has(String(c.refVendaId))));
+ const contaIds=new Set(plano.contas.map(c=>String(c.id)));
+ base.contas=(base.contas||[]).filter(c=>!(c.refVendaId&&ids.has(String(c.refVendaId))));
+ if(!Array.isArray(base.reiniciosMes))base.reiniciosMes=[];
+ const registro={id:uid(),mes,data:new Date().toISOString(),operador,backupRef,
+  vendasIds:plano.vendas.map(v=>v.id),qtdVendas:plano.vendas.length,faturamentoRevertido:plano.total,
+  aparelhosRestituidos:[...plano.itensAparelhos].map(([id,qtd])=>({id,qtd})),
+  acessoriosRestituidos:[...plano.itensAcessorios].map(([id,qtd])=>({id,qtd})),
+  trocasLiberadas:[...plano.recebidos.keys()],caixaIds:[...caixaIds],contasIds:[...contaIds]};
+ base.reiniciosMes.push(registro);
+ if(!Array.isArray(base.auditoria))base.auditoria=[];
+ base.auditoria.push({id:uid(),data:registro.data,operador,acao:'REINICIO_MES_VENDAS',ref:mes,detalhes:{backupRef,qtdVendas:registro.qtdVendas,caixa:caixaIds.size,contas:contaIds.size}});
+ return registro;
+}
+function itAbrirReinicioMes(){
+ if(!podeAcao('todasVendas')||!rpCanCosts())return toast('Reinício permitido somente a usuários com permissão de gestão.');
+ const mes=todayStr().slice(0,7);
+ openSheet('Reiniciar vendas do mês',`<p style="font-size:13px;color:var(--text2);line-height:1.55">Passo 1: selecione o mês para conferir. Nenhuma alteração acontece na prévia. Para relançar vendas do zero, os itens vendidos voltam ao estoque, e os aparelhos recebidos na troca permanecem cadastrados para novo vínculo.</p>
+ <div class="field" style="margin:14px 0"><label>Mês das vendas</label><input id="it-reinicio-mes" class="input" type="month" value="${mes}" onchange="itMostrarPreviaReinicio()"></div>
+ <div id="it-reinicio-previa"></div>
+ <div style="height:25px"></div>`);
+ itMostrarPreviaReinicio();
+}
+function itMostrarPreviaReinicio(){
+ const mes=el('it-reinicio-mes')?.value||'';
+ const p=itPlanoReinicioMes(db,mes);
+ const box=el('it-reinicio-previa');if(!box)return;
+ const lista=(arr,classe)=>arr.length?`<div style="padding:9px 11px;border:1px solid var(--line);border-radius:11px;margin-top:10px;line-height:1.5" class="${classe}">${arr.map(x=>`<p style="margin:4px 0;font-size:12px">• ${rpEsc(x)}</p>`).join('')}</div>`:'';
+ const qtd=(map)=>[...map.values()].reduce((n,x)=>n+x,0);
+ box.innerHTML=`<div class="card" style="padding:13px 16px"><div class="detail-line"><span class="k">Vendas a retirar do mês</span><b>${p.vendas.length}</b></div>
+ <div class="detail-line"><span class="k">Faturamento a retirar dos relatórios</span><b>${money(p.total)}</b></div>
+ <div class="detail-line"><span class="k">Aparelhos a devolver ao estoque</span><b>${qtd(p.itensAparelhos)} un.</b></div>
+ <div class="detail-line"><span class="k">Acessórios a devolver</span><b>${qtd(p.itensAcessorios)} un.</b></div>
+ <div class="detail-line"><span class="k">Seminovos para revincular</span><b>${p.recebidos.size} un.</b></div>
+ <div class="detail-line"><span class="k">Movimentos de caixa vinculados</span><b>${p.caixa.length}</b></div>
+ <div class="detail-line"><span class="k">Contas vinculadas</span><b>${p.contas.length}</b></div></div>
+ ${p.impedimentos.length?`<p style="font-weight:800;color:#be352e;margin:14px 0 4px">Atenção: reinício bloqueado até resolver ${p.impedimentos.length} pendência(s).</p>`:''}
+ ${lista(p.impedimentos,'it-reset-errors')}${lista(p.avisos,'it-reset-warnings')}
+ ${p.vendas.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12px;font-weight:750">Ver vendas que serão retiradas</summary><div style="max-height:220px;overflow:auto;margin-top:8px">${p.vendas.map(v=>`<div class="detail-line"><span class="k">${rpEsc(v.data||'')} · ${rpEsc(v.clienteNome||'Consumidor')}</span><b>${money(v.total)}</b></div>`).join('')}</div></details>`:''}
+ <p style="font-size:12px;color:var(--text2);line-height:1.5;margin:13px 0">Passo 2: confirme com a equipe que ninguém está registrando vendas. O sistema mantém compras, clientes e despesas independentes. O histórico completo permanece no seu backup, e o reinício é registrado na auditoria.</p>
+ <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;margin:11px 0"><input type="checkbox" id="it-reinicio-ciente" style="margin-top:3px"> Já conferi o backup completo e interrompi novas vendas nos outros dispositivos.</label>
+ <label style="display:block;font-size:12px;font-weight:750;margin:13px 0 5px">Digite <b>REINICIAR ${rpEsc(mes)}</b> para autorizar</label>
+ <input class="input" id="it-reinicio-frase" type="text" autocomplete="off" placeholder="REINICIAR ${rpEsc(mes)}">
+ <button class="btn danger" style="margin-top:14px;width:100%" ${p.impedimentos.length||!p.vendas.length?'disabled':''} onclick="itConfirmarReinicioMes()">Reiniciar ${p.vendas.length} venda(s) deste mês</button>`;
+}
+function itConfirmarReinicioMes(){
+ if(!podeAcao('todasVendas')||!rpCanCosts())return toast('Sem permissão para reiniciar o mês.');
+ const mes=el('it-reinicio-mes')?.value||'',p=itPlanoReinicioMes(db,mes);
+ if(p.impedimentos.length||!p.vendas.length)return toast('Há pendências ou nenhuma venda no mês. Confira a prévia.');
+ if(!el('it-reinicio-ciente')?.checked)return toast('Confirme que verificou o backup e interrompeu novas vendas.');
+ if((el('it-reinicio-frase')?.value||'').trim()!=='REINICIAR '+mes)return toast('Digite a frase de confirmação exatamente como indicada.');
+ if(!confirm('ÚLTIMA CONFIRMAÇÃO\n\nReiniciar '+p.vendas.length+' venda(s) de '+mes+'?\nOs itens vendidos voltarão ao estoque. Seminovos recebidos serão preservados para novo vínculo. Movimentos financeiros vinculados sairão do caixa ativo.\n\nVocê precisará registrar novamente todas as vendas.'))return;
+ const backup=itBackupDados('reinicio_mes_'+mes.replace('-',''));
+ if(!backup)return toast('Não foi possível salvar uma cópia de segurança adicional neste navegador. Operação cancelada.');
+ const copia=JSON.parse(JSON.stringify(db));
+ try{
+  const reg=itAplicarReinicioMes(copia,itPlanoReinicioMes(copia,mes),session?.nome||'Administrador',backup);
+  db=copia;saveDB();resetVenda();carrinho=[];carrinhoAcess=[];
+  closeSheet();render(currentTab);toast(reg.qtdVendas+' venda(s) reiniciada(s). Confira o estoque antes de relançar.');
+ }catch(error){console.error('Falha ao reiniciar mês:',error);toast('Não foi possível reiniciar. Seus lançamentos não foram alterados: '+error.message);}
+}
+/* ===== FIM DO REINÍCIO AUDITÁVEL ===== */
+
 function delVenda(id){
  const v=db.vendas.find(x=>x.id===id);if(!v)return toast('Venda não encontrada.');
  if(!podeAcao('todasVendas'))return toast('Somente usuários autorizados podem estornar vendas.');
