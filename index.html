@@ -1771,6 +1771,13 @@ body.it-ai-ready .it-ai-root{display:block}
 
 @media (max-width:740px){.rp-page .rp-filterrow{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.rp-page .rp-filterbox{padding:16px}.rp-page .rp-filtergroup label{text-align:left}.rp-page .rp-input{height:46px}.rp-page .rp-date-control{height:46px}}
 @media (max-width:520px){.rp-page .rp-filterrow{grid-template-columns:1fr}}
+
+/* V3 — fechamento de venda e auditoria integrados */
+.it-pay-extras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.it-pay-extras>div{min-width:0}.it-pay-extras label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700}
+.it-pay-extras .input{width:100%;min-width:0;box-sizing:border-box}
+.it-audit-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+@media(max-width:600px){.it-pay-extras{grid-template-columns:repeat(2,minmax(0,1fr))}.it-pay-extras>div:last-child{grid-column:1/-1}}
 </style>
 <style id="alavancagem-integrada-estilos">
 
@@ -3089,33 +3096,35 @@ function esvaziarCarrinho(){
 }
 
 /* ============ CÁLCULOS ============ */
-function lucroVenda(v){
-  // Lucro do dia = preço de venda − custo de compra do produto − valor dos aparelhos
-  // que entraram na troca (esses viram estoque; seu lucro só aparece quando forem vendidos).
-  // Ex: iPhone comprado 1500, vendido 1790, sem troca → lucro 290.
-  // Ex: vendeu 2000, custo 1500, entrou 450 num aparelho → lucro 2000-1500-450 = 50.
-  let custo=0;
-  v.itens.forEach(it=>{ custo += Number(it.compra)||0; });
-  let troca=0;
-  if(Array.isArray(v.pagamentos)){
-    troca=v.pagamentos.reduce((s,p)=> s + (p.forma==='Entrada aparelho'?(Number(p.valor)||0):0), 0);
-  }
-  return (Number(v.total)||0) - custo - troca;
+function itTaxasVenda(v){
+ return (v.pagamentos||[]).reduce((s,p)=>s+(['Cartão de crédito','Cartão de débito'].includes(p.forma)?Math.max(0,Number(p.valor)||0)*Math.max(0,Number(p.taxaOperadora)||0)/100:0),0) + Math.max(0,Number(v.custosExtras)||0);
 }
+function itLucroCorreto(v){
+ return (Number(v.total)||0) - (v.itens||[]).reduce((s,it)=>s+(Number(it.compra)||0),0) - itTaxasVenda(v);
+}
+function lucroVenda(v){
+ // Registros anteriores não são migrados silenciosamente: audite-os em Relatórios → Trocas.
+ // As novas vendas usam o princípio de competência: mercadoria recebida é ativo, não despesa da venda.
+ if(v.financeiroV2) return itLucroCorreto(v);
+ const custo=(v.itens||[]).reduce((s,it)=>s+(Number(it.compra)||0),0);
+ const troca=(v.pagamentos||[]).reduce((s,p)=>s+(p.forma==='Entrada aparelho'?(Number(p.valor)||0):0),0);
+ return (Number(v.total)||0)-custo-troca;
+}
+
 function vendaLiquido(v){
   // "Vendido/Faturado" mostra sempre o valor BRUTO da venda (o preço cheio).
   // O que entrou em dinheiro de fato é controlado separadamente pelo caixa.
   return Number(v.total!=null?v.total:v.liquido)||0;
 }
 function vendaCaixa(v){
-  // Dinheiro que de fato entrou no caixa nesta venda:
-  // soma das formas de pagamento MENOS as entradas em aparelho (que viram estoque, não caixa)
-  // e menos o que ficou como conta a receber.
-  if(Array.isArray(v.pagamentos) && v.pagamentos.length){
-    const emDinheiro=v.pagamentos.reduce((s,p)=> s + (p.forma==='Entrada aparelho'?0:(Number(p.valor)||0)), 0);
-    return emDinheiro;
-  }
-  return Number(v.liquido!=null?v.liquido:v.total)||0;
+ if(v.financeiroV2&&!v.financeiroCaixaLegado){
+  // Cartão e boleto não são caixa até conciliação. Repasse/quitacao entra via db.caixa.
+  return (v.pagamentos||[]).reduce((s,p)=>s+(['Pix','Dinheiro'].includes(p.forma)?(Number(p.valor)||0):0),0);
+ }
+ if(Array.isArray(v.pagamentos)&&v.pagamentos.length){
+  return v.pagamentos.reduce((s,p)=>s+(p.forma==='Entrada aparelho'?0:(Number(p.valor)||0)),0);
+ }
+ return Number(v.liquido!=null?v.liquido:v.total)||0;
 }
 
 function dashStats(){
@@ -3708,6 +3717,7 @@ function renderEstoque(){
   let lista = db.produtos.slice().reverse();
   if(filterEstoque==='disp') lista=lista.filter(p=>p.status==='Disponível');
   else if(filterEstoque==='res') lista=lista.filter(p=>p.status==='Reservado');
+  else if(filterEstoque==='aval')lista=lista.filter(p=>p.status==='Em avaliação'||p.status==='Em manutenção');
   else if(filterEstoque==='vend') lista=lista.filter(p=>p.status==='Vendido');
    else if(filterEstoque==='sem') lista=lista.filter(p=>p.status==='Sem estoque'||qtdAparelho(p)===0);
   else if(filterEstoque==='parado') lista=lista.filter(p=>{
@@ -3741,7 +3751,7 @@ function renderEstoque(){
       <input placeholder="Buscar por modelo, IMEI ou série" value="${searchEstoque}" oninput="searchEstoque=this.value;renderEstoque();this.focus()">
     </div>
     <div class="filters">
-      ${['todos:Todos','disp:Disponíveis','res:Reservados','vend:Vendidos','sem:Sem estoque','parado:Parados'].map(f=>{const[k,l]=f.split(':');return `<button class="chip ${filterEstoque===k?'active':''}" onclick="setFiltroEstoque('${k}')">${l}</button>`}).join('')}
+      ${['todos:Todos','disp:Disponíveis','res:Reservados','aval:Em avaliação / manutenção','vend:Vendidos','sem:Sem estoque','parado:Parados'].map(f=>{const[k,l]=f.split(':');return `<button class="chip ${filterEstoque===k?'active':''}" onclick="setFiltroEstoque('${k}')">${l}</button>`}).join('')}
     </div>
     ${lista.length? renderEstoqueAgrupado(lista) :
       `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><div>Nenhum aparelho aqui.<br>Toque em + para cadastrar.</div></div>`}
@@ -4072,13 +4082,13 @@ function renderEstoqueAgrupado(lista){
   `).join('');
 }
 function prodRow(p){
-  const b = p.status==='Disponível'?'disp':(p.status==='Reservado'||p.status==='Sem estoque')?'res':'vend';
+  const b = p.status==='Disponível'?'disp':(p.status==='Reservado'||p.status==='Em avaliação'||p.status==='Em manutenção'||p.status==='Sem estoque')?'res':'vend';
   const thumb = temFoto(p.fotos&&p.fotos[0])? `<img src="${imgFoto(p.fotos[0])}">` : CAT_VECTOR[p.cat]||vectorIcon('package');
   return `<div class="row" onclick="openProdDetail('${p.id}')">
     <div class="thumb">${thumb}</div>
     <div class="info">
       <div class="t">${p.marca||''} ${p.modelo||''}</div>
-<div class="s">${[p.cor,p.armazenamento,p.condicao].filter(Boolean).join(' · ')} · ${qtdAparelho(p)} un.</div>
+<div class="s">${[p.cor,p.armazenamento,p.condicao].filter(Boolean).join(' · ')} · ${qtdAparelho(p)} un.${p.origemTrocaVendaId?' · Recebido em troca':''}</div>
        <span class="badge ${b}">${p.status}</span>
     </div>
     <div class="right"><div><div class="p money-in">${money(p.venda)}</div>${podeEditar()&&Number(p.compra)?`<div class="neg" style="font-size:12px;text-align:right">(${money(p.compra)})</div>`:''}</div>${chev()}</div>
@@ -4555,7 +4565,7 @@ function clExportCSV(){
  * Leitura somente: usa os dados reais do sistema e nunca altera lucroVenda().
  * CRM é local neste navegador; assistência é catálogo, não OS concluída.
  */
-const RP_TABS=[['geral','Visão geral'],['vendas','Vendas'],['estoque','Estoque'],['financeiro','Financeiro'],['crm','CRM'],['clientes','Clientes'],['assistencia','Assistência'],['compras','Compras']];
+const RP_TABS=[['geral','Visão geral'],['vendas','Vendas'],['trocas','Negociações com troca'],['estoque','Estoque'],['financeiro','Financeiro'],['crm','CRM'],['clientes','Clientes'],['assistencia','Assistência'],['compras','Compras']];
 let rpState={period:'mes',from:'',to:'',seller:'',tab:'geral'};
 const rpNum=v=>Number.isFinite(Number(v))?Number(v):0;
 const rpSum=(xs,fn)=>xs.reduce((t,x)=>t+rpNum(fn(x)),0);
@@ -4632,7 +4642,7 @@ function rpSummary(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),canCosts=rp
  const sellerRank={};v.forEach(x=>{const k=x.vendedor||'Sem vendedor';sellerRank[k]=(sellerRank[k]||0)+vendaLiquido(x)});
  const {units}=rpSaleItems(v),cats=rpSaleCats(v),ss=rpStockStats(s.stock,s.accessories);
  const activeCrm=s.crm.filter(crmIsOpen).length,lateCrm=s.crm.filter(crmDue).length;
- const cards=rpKpi('Faturamento registrado',money(t.faturamento),rpDelta(t.faturamento,s.range.from?old.faturamento:null),'good')+rpKpi('Vendas concluídas',rpInt(t.qtd),rpDelta(t.qtd,s.range.from?old.qtd:null))+rpKpi('Ticket médio',money(t.ticket),'Valor médio por venda')+(canCosts?rpKpi('Lucro das vendas',money(t.lucro),'Margem '+rpPct(t.margem),t.lucro<0?'bad':'good'):rpKpi('Produtos em estoque',rpInt(rpSum(s.stock,qtdAparelho)),'Unidades não vendidas'));
+ const cards=rpKpi('Faturamento registrado',money(t.faturamento),rpDelta(t.faturamento,s.range.from?old.faturamento:null),'good')+rpKpi('Vendas concluídas',rpInt(t.qtd),rpDelta(t.qtd,s.range.from?old.qtd:null))+rpKpi('Ticket médio',money(t.ticket),'Valor médio por venda')+(canCosts?rpKpi('Lucro das vendas',money(t.lucro),'Margem '+rpPct(t.margem)+' · Legados pendentes de auditoria',t.lucro<0?'bad':'good'):rpKpi('Produtos em estoque',rpInt(rpSum(s.stock,qtdAparelho)),'Unidades não vendidas'));
  const salesBlock=rpPanel('Evolução de vendas','Faturamento registrado por data; baseado nos lançamentos existentes.',rpChart(v,canCosts),rpTxt(s.range.from)?rpFmtDate(s.range.from)+' – '+rpFmtDate(s.range.to):'Histórico');
  const topBlock=rpPanel('Produtos mais vendidos','Ranking por unidades vendidas, sem estimativas.',rpBarLabels(units,rpInt,6));
  const catBlock=rpPanel('Participação por categoria','Faturamento distribuído proporcionalmente pelos itens de cada venda.',rpBarLabels(cats,money,6));
@@ -4644,7 +4654,7 @@ function rpSummary(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),canCosts=rp
 }
 function rpSales(s){const v=s.v,t=rpTotals(v),old=rpTotals(s.prev),data=rpSaleItems(v),category=rpSaleCats(v),payments=rpPayments(v),canCosts=rpCanCosts(),totPay=rpSum(Object.values(payments),x=>x);const n=rpSum(v,x=>rpSum(x.itens||[],it=>it.qtd||1));
  const cards=[rpKpi('Faturamento',money(t.faturamento),rpDelta(t.faturamento,s.range.from?old.faturamento:null),'good'),rpKpi('Vendas',rpInt(t.qtd),'Pedidos finalizados'),rpKpi('Unidades vendidas',rpInt(n),'Itens registrados'),rpKpi('Ticket médio',money(t.ticket),'Por venda')];
- if(canCosts)cards.push(rpKpi('Lucro das vendas',money(t.lucro),'Cálculo original do sistema',t.lucro<0?'bad':'good'),rpKpi('Margem das vendas',rpPct(t.margem),'Lucro / faturamento'),rpKpi('Custo de compra dos itens',money(t.custo),'Somatório informado nas vendas'),rpKpi('Aparelhos aceitos em troca',money(t.troca),'Abatimento considerado no lucro'));
+ if(canCosts)cards.push(rpKpi('Lucro das vendas',money(t.lucro),'Após custos informados · vendas antigas exigem auditoria',t.lucro<0?'bad':'good'),rpKpi('Margem das vendas',rpPct(t.margem),'Resultado após despesas informadas / faturamento'),rpKpi('Custo de compra dos itens',money(t.custo),'Somatório informado nas vendas'),rpKpi('Aparelhos aceitos em troca',money(t.troca),'Patrimônio recebido no estoque · não é custo adicional'));
  const pay=Object.entries(payments).sort((a,b)=>b[1]-a[1]),gauge=pay.length?`<div class="rp-gauge">${pay.map(([k,x],i)=>`<span style="width:${totPay?x/totPay*100:0}%;background:${['#315f4b','#9cce59','#d4bb7b','#92b1ad','#dd9b8e','#94a4bd'][i%6]}" title="${rpEsc(k)}: ${money(x)}"></span>`).join('')}</div>`:'';
  return `<div class="rp-kpis">${cards.join('')}</div><div class="rp-layout">${rpPanel('Evolução do faturamento','Compare os períodos com base na data da venda.',rpChart(v,canCosts))}${rpPanel('Formas de pagamento','Lançamentos das vendas; incluem trocas em aparelhos, quando existentes.',gauge+rpBarLabels(payments,money,7))}</div><div class="rp-layout equal">${rpPanel('Mix de vendas','Participação no faturamento por categoria.',rpBarLabels(category,money,8))}${rpPanel('Produtos mais vendidos','Ranking por quantidade de unidades.',rpBarLabels(data.units,rpInt,8))}</div>${rpPanel('Últimas vendas','Até 30 registros; filtre ou exporte o CSV para ver a lista completa.',rpGridTable(['Data','Cliente','Produto','Vendedor','Faturado',...(canCosts?['Lucro']:[])],rpOrderRows(v,30)))}`;
 }
@@ -4654,7 +4664,7 @@ function rpInventory(s){const stock=s.stock,acc=s.accessories,ss=rpStockStats(st
  return `<div class="rp-kpis">${cards.join('')}</div><div class="rp-layout equal">${rpPanel('Idade do estoque de aparelhos','Aging baseado na data de entrada.',rpBarLabels(ss.ages,rpInt,5))}${rpPanel('Estoque por categoria','Aparelhos atualmente não vendidos.',rpBarLabels(bycat,rpInt,8))}</div><div class="rp-layout equal">${rpPanel('Estoque com risco de ruptura','Acessórios com até 3 unidades cadastradas.',zero.length?rpGridTable(['Acessório','Saldo'],zero.slice(0,16).map(a=>`<tr>${rpCell(a.nome||'Sem nome')}${rpCell(rpInt(a.qtd),true)}</tr>`)):'<div class="rp-empty">Nenhum acessório com saldo de 3 ou menos.</div>')}${rpPanel('Como interpretar','Indicadores e limites dos dados.','<div class="rp-empty-notice">A posição do estoque é <b>atual</b>, mesmo quando o período selecionado é passado. Os valores são calculados conforme custo e preço cadastrados, sem previsão de impostos, despesas futuras ou perdas. Produtos sem data de entrada não entram no cálculo de dias parados.</div>')}</div>${rpPanel('Aparelhos em estoque','Até 30 aparelhos ordenados pela maior idade; CSV contém todos.',rpGridTable(['Produto','Categoria','Status','Qtde','Entrada','Idade',...(canCosts?['Custo un.']:[]),'Preço un.'],rows))}`;
 }
 function rpFinance(s){if(!rpCanFinance())return '<div class="rp-empty">Seu perfil não possui permissão de financeiro.</div>';
- const ins=s.cash.filter(x=>x.tipo==='entrada'),outs=s.cash.filter(x=>x.tipo==='saida'),sumIn=rpSum(ins,x=>x.valor),sumOut=rpSum(outs,x=>x.valor),net=sumIn-sumOut;const pending=(db.contas||[]).filter(x=>x.status!=='pago'),pay=pending.filter(x=>x.tipo==='pagar'),receive=pending.filter(x=>x.tipo==='receber');const late=pending.filter(x=>rpISO(x.venc)&&x.venc<todayStr());const catOut={};outs.forEach(x=>{const c=x.cat||'Outros';catOut[c]=(catOut[c]||0)+rpNum(x.valor)});const hasSales=s.v.length>0;const periodReceivable=rpSum(s.v,x=>x.aReceber);const cards=[rpKpi('Entradas de caixa',money(sumIn),'Vendas recebidas + entradas manuais','good'),rpKpi('Saídas de caixa',money(sumOut),'Saídas manuais registradas'),rpKpi('Saldo de movimentações',money(net),'Entradas menos saídas',net<0?'bad':'good'),rpKpi('Valores a receber de vendas',money(periodReceivable),'Dívidas no registro das vendas'),rpKpi('Contas a pagar pendentes',money(rpSum(pay,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas a receber pendentes',money(rpSum(receive,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas vencidas',rpInt(late.length),'Contas abertas até hoje',late.length?'bad':''),rpKpi('Movimentos manuais',rpInt(s.rawCash.length),'Entradas e saídas no período')];
+ const ins=s.cash.filter(x=>x.tipo==='entrada'),outs=s.cash.filter(x=>x.tipo==='saida'),sumIn=rpSum(ins,x=>x.valor),sumOut=rpSum(outs,x=>x.valor),net=sumIn-sumOut;const pending=(db.contas||[]).filter(x=>x.status!=='pago'),pay=pending.filter(x=>x.tipo==='pagar'),receive=pending.filter(x=>x.tipo==='receber');const late=pending.filter(x=>rpISO(x.venc)&&x.venc<todayStr());const catOut={};outs.forEach(x=>{const c=x.cat||'Outros';catOut[c]=(catOut[c]||0)+rpNum(x.valor)});const hasSales=s.v.length>0;const periodReceivable=rpSum(s.v,x=>x.aReceber);const cards=[rpKpi('Entradas de caixa',money(sumIn),'Vendas recebidas + entradas manuais','good'),rpKpi('Saídas de caixa',money(sumOut),'Saídas manuais registradas'),rpKpi('Saldo de movimentações',money(net),'Entradas menos saídas',net<0?'bad':'good'),rpKpi('Valores a receber de vendas',money(periodReceivable),'Saldo pendente dos clientes')+rpKpi('Cartões/boletos aguardando repasse',money(rpSum(db.vendas||[],v=>v.financeiroV2&&!v.financeiroCaixaLegado?rpSum(v.pagamentos||[],p=>['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)&&p.repasseStatus!=='recebido'?p.valor:0):0)),'Não é dinheiro em caixa ainda'),rpKpi('Contas a pagar pendentes',money(rpSum(pay,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas a receber pendentes',money(rpSum(receive,x=>x.valor)),'Saldo em aberto hoje'),rpKpi('Contas vencidas',rpInt(late.length),'Contas abertas até hoje',late.length?'bad':''),rpKpi('Movimentos manuais',rpInt(s.rawCash.length),'Entradas e saídas no período')];
  const rows=s.cash.slice(0,30).map(x=>`<tr>${rpCell(rpFmtDate(x.data))}${rpCell(x.auto?'Venda':x.cat||'Outros')}${rpCell(x.desc||'—')}${rpCell(x.auto?'Automático':'Manual')}${rpCell(x.tipo==='entrada'?'Entrada':'Saída')}${rpCell(money(x.valor),true)}</tr>`);
  const due=late.slice().sort((a,b)=>String(a.venc).localeCompare(String(b.venc))).slice(0,12).map(x=>`<tr>${rpCell(rpFmtDate(x.venc))}${rpCell(x.tipo==='pagar'?'A pagar':'A receber')}${rpCell(x.desc||'—')}${rpCell(money(x.valor),true)}</tr>`);
  return `<div class="rp-kpis">${cards.join('')}</div><p class="rp-section-intro">Caixa e contas são visões diferentes. O saldo de caixa representa <b>movimentação registrada</b>, não lucro líquido ou conciliação bancária. Contas pendentes são mostradas na posição atual, independentemente do período escolhido.</p><div class="rp-layout equal">${rpPanel('Saídas por categoria','Classificação informada ao lançar os movimentos de caixa.',rpBarLabels(catOut,money,8))}${rpPanel('Contas vencidas','Pendências existentes até hoje.',rpGridTable(['Vencimento','Tipo','Descrição','Valor'],due))}</div>${rpPanel('Extrato de movimentações','Até 30 registros; exportação completa em CSV.',rpGridTable(['Data','Categoria','Descrição','Origem','Tipo','Valor'],rows))}`;
@@ -4680,12 +4690,138 @@ function rpDateFilterText(iso){
 }
 function rpUpdateFilter(field,value){if(!['period','from','to','seller'].includes(field))return;const previous=rpRange();if((field==='from'||field==='to')&&rpState.period!=='personalizado'){rpState.from=previous.from||'';rpState.to=previous.to||'';}rpState[field]=value;if(field==='from'||field==='to')rpState.period='personalizado';renderRelatorios();}
 function rpSetPreset(value){const previous=rpRange();rpState.period=value;if(value==='personalizado'){rpState.from=rpState.from||previous.from||todayStr();rpState.to=rpState.to||previous.to||todayStr();}renderRelatorios()}
-function rpTabAllowed(k){if(k==='financeiro')return rpCanFinance();if(k==='crm')return rpHas('crm');if(k==='clientes')return rpHas('clientes');if(k==='assistencia')return rpHas('assistencia');if(k==='compras')return podeAcao('compras');return true;}
+function rpTabAllowed(k){if(k==='trocas')return rpCanCosts();if(k==='financeiro')return rpCanFinance();if(k==='crm')return rpHas('crm');if(k==='clientes')return rpHas('clientes');if(k==='assistencia')return rpHas('assistencia');if(k==='compras')return podeAcao('compras');return true;}
+
+/* NEGOCIAÇÕES CONECTADAS — resultado realizado não soma projeções. */
+function itLucroItemVenda(v,prodId){
+ const itens=v.itens||[];const totalItens=itens.reduce((n,it)=>n+Math.max(0,Number(it.venda)||0),0);
+ const relacionadas=itens.filter(it=>it.prodId===prodId);
+ if(!relacionadas.length)return 0;
+ const valor=relacionadas.reduce((n,it)=>n+(Number(it.venda)||0),0);
+ const custo=relacionadas.reduce((n,it)=>n+(Number(it.compra)||0),0);
+ // Na venda com vários produtos, desconto e custos operacionais são rateados pela participação em receita.
+ const parte=totalItens>0?valor/totalItens:1/Math.max(1,itens.length);
+ return Math.round(((Number(v.total)||0)*parte-custo-itTaxasVenda(v)*parte)*100)/100;
+}
+function itVendaDoAparelho(prodId){
+ return (db.vendas||[]).find(v=>(v.itens||[]).some(it=>it.prodId===prodId))||null;
+}
+function itResultadoCadeia(vendaId){
+ const inicial=(db.vendas||[]).find(v=>v.id===vendaId);
+ const out={realizado:0,potencial:0,totalProjetado:0,itensPendentes:[],passos:[],situacao:'',legado:false,conflitos:[],estoqueRecebido:0,livres:0};
+ if(!inicial)return out;
+ const visitados=new Set(), prodVisitados=new Set();
+ function andar(v,prodOrigem,nivel){
+  if(visitados.has(v.id)){out.conflitos.push('Ciclo ou venda repetida: '+v.id);return;}
+  visitados.add(v.id);
+  const antigos=(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho')&&!v.financeiroV2;
+  if(antigos){out.legado=true;out.conflitos.push('Venda antiga com troca pendente de auditoria: '+v.id);return;}
+  const lucro=prodOrigem?itLucroItemVenda(v,prodOrigem):lucroVenda(v);
+  out.realizado+=lucro;
+  out.passos.push({nivel,id:v.id,data:v.data,cliente:v.clienteNome,aparelho:prodOrigem||(v.itens||[]).map(it=>it.nome).join(' / '),valor:v.total,lucro});
+  const trocas=(v.pagamentos||[]).filter(p=>p.forma==='Entrada aparelho');
+  if(!trocas.length)return;
+  if(prodOrigem&&(v.itens||[]).length!==1){out.conflitos.push('Venda com vários itens e nova troca: rateio da origem requer conferência ('+v.id+')');return;}
+  for(const e of trocas){
+    const id=e.usadoProdutoId;
+    if(!id||prodVisitados.has(id)){out.conflitos.push('Seminovo sem ID ou repetido na cadeia de '+v.id);continue;}
+    prodVisitados.add(id);
+    const p=(db.produtos||[]).find(x=>x.id===id);
+    if(!p){out.conflitos.push('Seminovo não encontrado: '+id);continue;}
+    const custo=Number(e.valor)||0;
+    if(Math.abs(Number(p.compra||0)-custo)>0.01)out.conflitos.push('Custo divergente no seminovo '+(p.modelo||id));
+    out.estoqueRecebido+=custo;
+    const prox=itVendaDoAparelho(id);
+    if(prox){
+      out.passos.push({nivel:nivel+1,estoque:true,nome:[p.marca,p.modelo].filter(Boolean).join(' '),id:p.id,custo,revendido:true});
+      andar(prox,id,nivel+2);
+    }else if(p.status==='Disponível'&&qtdAparelho(p)>0){
+      const preco=Number(p.venda)||0;
+      out.livres++;
+      if(preco>0){out.potencial+=preco-custo;out.itensPendentes.push({id:p.id,nome:[p.marca,p.modelo].filter(Boolean).join(' '),custo,preco,ganho:preco-custo,status:p.status});}
+      else out.conflitos.push('Sem preço de revenda: '+(p.modelo||id));
+      out.passos.push({nivel:nivel+1,estoque:true,nome:[p.marca,p.modelo].filter(Boolean).join(' '),id:p.id,custo,preco,status:p.status});
+    }else{
+      out.passos.push({nivel:nivel+1,estoque:true,nome:[p.marca,p.modelo].filter(Boolean).join(' '),id:p.id,custo,preco:p.venda,status:p.status});
+      out.conflitos.push('Seminovo ainda não disponível para venda / sem venda vinculada: '+(p.modelo||id)+' · '+p.status);
+    }
+  }
+ }
+ andar(inicial,null,0);
+ out.realizado=Math.round(out.realizado*100)/100;
+ out.potencial=Math.round(out.potencial*100)/100;
+ out.totalProjetado=Math.round((out.realizado+out.potencial)*100)/100;
+ out.situacao=out.legado?'Pendente de auditoria':out.conflitos.length?'Conferir vínculo / avaliação':out.livres?'Aguardando revenda':'Cadeia concluída';
+ return out;
+}
+function itResumoVendaCadeiaHTML(id){
+ const v=(db.vendas||[]).find(x=>x.id===id);
+ if(!v||!(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho'))return '';
+ const t=itResultadoCadeia(id);
+ return `<div class="sec-title">Resultado da negociação conectada</div><div class="card" style="padding:10px 15px">
+ <div class="detail-line"><span class="k">Lucro realizado até agora</span><span class="v money-in ${t.realizado>=0?'pos':'neg'}">${t.legado?'Auditar':money(t.realizado)}</span></div>
+ <div class="detail-line"><span class="k">Margem futura em seminovos disponíveis</span><span class="v money-in">${t.legado?'—':money(t.potencial)}</span></div>
+ <div class="detail-line"><span class="k"><b>Total estimado da cadeia</b></span><span class="v money-in">${t.legado?'A revisar':money(t.totalProjetado)}</span></div>
+ <div style="font-size:11px;color:var(--text2);padding:8px 0">${rpEsc(t.situacao)} · A projeção só considera aparelhos disponíveis com preço de revenda cadastrado; taxas futuras ainda não são conhecidas.</div>
+ ${t.passos.map(a=>`<div class="detail-line"><span class="k" style="padding-left:${Math.min(32,a.nivel*12)}px">${a.estoque?'↳ '+rpEsc(a.nome)+' · '+(a.revendido?'Revendido':rpEsc(a.status||'')):'Venda · '+rpEsc(a.data||'')}</span><span class="v money-in">${a.estoque?money(a.custo):money(a.lucro)}</span></div>`).join('')}
+ ${t.conflitos.length?`<div style="font-size:12px;color:var(--red);padding:10px 0">Atenção: ${t.conflitos.map(rpEsc).join(' · ')}</div>`:''}</div>`;
+}
+/* Sem alteração automática dos dados legados: diagnóstico somente-leitura */
+function itDiagnosticoOperacoes(){
+ const avisos=[],idx=new Map();
+ const add=(tipo,desc,id='')=>avisos.push({tipo,desc,id});
+ for(const p of (db.produtos||[])){
+  if(p.imei){const key=String(p.imei).replace(/\W/g,'');if(idx.has('imei'+key))add('IMEI duplicado',p.modelo+' · '+p.imei,p.id);else idx.set('imei'+key,p.id);}
+  if(p.origemTrocaVendaId){const v=(db.vendas||[]).find(x=>x.id===p.origemTrocaVendaId);if(!v)add('Origem sem venda',p.modelo+' · vínculo não encontrado',p.id);}
+ }
+ for(const v of (db.vendas||[])){
+  const pagamentos=(v.pagamentos||[]).reduce((n,p)=>n+Number(p.valor||0),0);
+  const recebidosDepois=(v.recebimentos||[]).reduce((n,p)=>n+Number(p.valor||0),0);
+  const diff=Math.abs((Number(v.total)||0)-pagamentos-recebidosDepois-Number(v.aReceber||0));
+  if(v.financeiroV2&&diff>0.03)add('Fechamento divergente',v.clienteNome+' · diferença '+money(diff),v.id);
+  if(!v.financeiroV2&&(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho'))add('Troca antiga para auditar',v.clienteNome+' · '+money(v.total),v.id);
+  const trocas=(v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho');
+  for(const t of trocas){if(!t.usadoProdutoId||!(db.produtos||[]).some(p=>p.id===t.usadoProdutoId))add('Troca sem cadastro',v.clienteNome+' · aparelho não localizado',v.id);}
+  if(v.financeiroV2){for(const [i,p] of (v.pagamentos||[]).entries()){
+   if(['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)&&p.repasseStatus==='recebido'&&!(db.caixa||[]).some(c=>c.refVendaId===v.id&&c.refPagamentoIndex===i))add('Repasse sem caixa',v.clienteNome+' · pagamento '+(i+1),v.id);
+  }}
+ }
+ return avisos;
+}
+function itAuditoriaHTML(){
+ const a=itDiagnosticoOperacoes();
+ const totals={};a.forEach(x=>totals[x.tipo]=(totals[x.tipo]||0)+1);
+ const header=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Conferência sem alterar nenhum registro existente. Faça backup antes de corrigir lançamentos antigos.</p><div class="it-audit-actions"><button class="rp-btn" onclick="itExportarBackup()">Baixar backup de todos os dados</button><button class="rp-btn" onclick="renderRelatorios()">Atualizar conferência</button></div>`;
+ return rpPanel('Auditoria de integridade','Inconsistências detectadas no estoque, vendas e repasses.',header+(a.length?`<div class="rp-mini-list" style="margin-bottom:13px">${Object.entries(totals).map(([k,n])=>`<div class="rp-linehead"><span>${rpEsc(k)}</span><b>${n}</b></div>`).join('')}</div>`:'<p style="padding:14px;color:var(--text2)">Nenhuma divergência encontrada nas regras verificadas.</p>')+rpGridTable(['Alerta','Referência','Abrir'],a.slice(0,80).map(x=>`<tr>${rpCell(x.tipo)}${rpCell(x.desc)}<td>${x.id&&db.vendas.some(v=>v.id===x.id)?rpLink(x.id,'openVendaDetail','Abrir venda'):x.id&&db.produtos.some(p=>p.id===x.id)?rpLink(x.id,'openProdDetail','Abrir produto'):'—'}</td></tr>`)));
+}
+
+function rpTradeReport(s){
+ if(!rpCanCosts())return '<div class="rp-empty">Sem acesso aos custos de trocas.</div>';
+ const rows=[],cards=[];let pending=0,available=0,projected=0,realized=0,chains=0,undercost=0;
+ const vendas=s.v.filter(v=>(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho'));
+ for(const v of vendas){
+   const ts=(v.pagamentos||[]).filter(p=>p.forma==='Entrada aparelho');
+   const linked=ts.reduce((n,p)=>n+Number(p.valor||0),0);
+   const r=itResultadoCadeia(v.id);
+   const isChild=(v.origemCadeiaIds||[]).length>0 || (v.itens||[]).some(it=>(db.produtos||[]).find(p=>p.id===it.prodId)?.origemTrocaVendaId);
+   const root=!isChild;
+   if(r.legado)pending++;
+   else if(root){realized+=r.realizado;projected+=r.potencial;chains++;available+=r.livres;}
+   if(itLucroCorreto(v)<0)undercost++;
+   const labels=[];if(isChild)labels.push('Continuação de troca');if(r.conflitos.length)labels.push('Revisão necessária');
+   rows.push(`<tr>${rpCell(rpFmtDate(v.data))}${rpCell(v.clienteNome||'')}${rpCell((v.itens||[]).map(it=>it.nome).join(', '))}${rpCell(money(linked),true)}${rpCell(r.legado?'Auditar':money(r.realizado),true)}${rpCell(r.legado?'—':money(r.potencial),true)}${rpCell(r.situacao+(labels.length?' · '+labels.join(', '):''))}<td>${rpLink(v.id,'openVendaDetail','Detalhes')} ${r.legado?rpLink(v.id,'itAuditarLegado','Auditar'):''}</td></tr>`);
+ }
+ const allLegacy=(db.vendas||[]).filter(v=>!v.financeiroV2&&(v.pagamentos||[]).some(p=>p.forma==='Entrada aparelho')).length;
+ const boxes=rpKpi('Negociações com troca',rpInt(vendas.length),'Inclui continuações de troca')+rpKpi('Seminovos disponíveis nas cadeias',rpInt(available),'Somente cadeias raiz do período')+rpKpi('Lucro realizado nas cadeias',money(realized),'Somente cadeias raiz, sem duplicar revendas',realized<0?'bad':'good')+rpKpi('Margem futura prevista no estoque',money(projected),'Não compõe o lucro realizado')+rpKpi('Resultado total projetado das cadeias',money(realized+projected),'Realizado + futuro, não somar ao lucro atual','good')+rpKpi('Trocas antigas a auditar',rpInt(allLegacy),'Não são migradas automaticamente',allLegacy?'warn':'')+rpKpi('Vendas abaixo do custo (antes de despesas)',rpInt(undercost),'Podem se compensar na revenda');
+ const intro=`<p style="font-size:12px;color:var(--text2);line-height:1.55;margin:7px 0 13px"><b>Regra iTronic:</b> dinheiro + cartão + troca = valor da venda. O aparelho recebido é estoque, não uma despesa adicional. Lucro da venda e margem futura são apresentados separadamente. As cadeias continuam quando o seminovo é revendido recebendo outro aparelho. Os totais de cadeia abaixo contam apenas vendas raiz; a tabela detalha cada operação e pode repetir resultados de cadeias, portanto não deve ser somada verticalmente.</p>`;
+ const canceled=(db.vendasEstornadas||[]).slice(-8).reverse().map(x=>`<tr>${rpCell(rpFmtDate(x.data))}${rpCell(x.clienteNome||'')}${rpCell(money(x.total),true)}${rpCell(rpFmtDate(x.estornadoEm))}</tr>`);
+ return `<div class="rp-kpis">${boxes}</div>`+rpPanel('Cadeias de negociações e resultados','Realizado versus potencial de revenda.',intro+rpGridTable(['Data','Cliente','Aparelho vendido','Valor da troca','Realizado na cadeia','Margem futura','Situação','Abrir'],rows))+itAuditoriaHTML()+rpPanel('Estornos com histórico','Cancelamentos exigem conferência financeira e de estoque.',rpGridTable(['Data da venda','Cliente','Total','Estornado em'],canceled));
+}
 function renderRelatorios(){
  const page=el('page-relatorios');if(!page)return;if(!rpHas('relatorios')){page.innerHTML='<div class="rp-empty">Acesso não autorizado.</div>';return}
  if(!rpTabAllowed(rpState.tab))rpState.tab='geral';
  const s=rpSource(),t=rpState.tab,r=s.range,allowSeller=s.canAll;
- const renderers={geral:rpSummary,vendas:rpSales,estoque:rpInventory,financeiro:rpFinance,crm:rpCRM,clientes:rpCustomers,assistencia:rpAssistance,compras:rpPurchases};
+ const renderers={geral:rpSummary,vendas:rpSales,trocas:rpTradeReport,estoque:rpInventory,financeiro:rpFinance,crm:rpCRM,clientes:rpCustomers,assistencia:rpAssistance,compras:rpPurchases};
  const sellerOptions=[...new Set(s.all.map(x=>x.vendedor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
  page.classList.add('rp-page');
  page.innerHTML=`<header class="rp-top"><div><div class="rp-eyebrow">iTronic Rio Verde / Inteligência do negócio</div><h2 class="rp-title">Central de Relatórios</h2><p class="rp-subtitle">Resultados reais de vendas, operação, estoque e relacionamento. Filtre, compare, imprima e exporte seus indicadores.</p></div><div class="rp-tools"><button class="rp-btn" onclick="renderRelatorios()" title="Atualizar indicadores">${rpIcon('refresh')} Atualizar</button><button class="rp-btn" onclick="rpPrint()">${rpIcon('printer')} Imprimir / PDF</button><button class="rp-btn primary" onclick="rpExportCSV()">${rpIcon('download')} Exportar CSV</button></div></header>
@@ -4900,7 +5036,7 @@ function openProduto(prod){
       ${fld('Valor de compra','pr-compra',{val:p.compra,ph:'0,00',inputmode:'decimal'})}
       ${fld('Preço de venda','pr-venda',{val:p.venda,ph:'0,00',inputmode:'decimal'})}
     </div>
-    ${selFld('Status','pr-status',['Disponível','Reservado','Sem estoque','Vendido'],p.status||'Disponível')}
+    ${selFld('Status','pr-status',['Disponível','Em avaliação','Em manutenção','Reservado','Sem estoque','Vendido'],p.status||'Disponível')}
     <div class="field"><label>Observações</label><textarea class="input" id="pr-obs" rows="2" placeholder="opcional">${p.obs||''}</textarea></div>
   `;
   openSheet(prod?'Editar aparelho':'Novo aparelho', html, 'Salvar', ()=>saveProduto(prod?prod.id:null));
@@ -5118,6 +5254,7 @@ function saveProduto(id){
   const dupSerie = serie && db.produtos.some(p=>p.id!==id && p.serie===serie);
   if(dupImei){ toast('IMEI já cadastrado'); return; }
   if(dupSerie){ toast('Número de série já cadastrado'); return; }
+  if(id){const original=db.produtos.find(p=>p.id===id);if(original?.origemTrocaVendaId&&Math.abs(Number(original.compra||0)-Number(getN('pr-compra')||0))>0.009){toast('O custo do seminovo recebido na troca está vinculado à venda original e não pode ser editado aqui.');return;}}
   const data={
     cat:getV('pr-cat'),marca:getV('pr-marca'),modelo,cor:getV('pr-cor'),
     armazenamento:getV('pr-arm'),condicao:getV('pr-cond'),imei,serie,
@@ -5139,6 +5276,18 @@ function saveProduto(id){
     if(el('es-telatipo')) data.telaTipo=getV('es-telatipo');
     if(el('es-ciclos')) data.ciclos=getV('es-ciclos');
     if(el('es-fonte')) data.fonte=getV('es-fonte');
+  }
+  // Negociação em aberto: o seminovo fica como rascunho, sem movimentar o estoque.
+  if(usadoPagIndex!==null&&pagState[usadoPagIndex]){
+   const i=usadoPagIndex,item=pagState[i];
+   const previous=item.usadoRascunho||{};
+   const draft={...previous,...data,id:previous.id||uid(),condicao:'Seminovo',status:data.status==='Disponível'?'Disponível':data.status||'Em avaliação',qtd:1};
+   if(!Number(draft.compra)||Number(draft.compra)<=0){toast('Informe o custo do seminovo recebido na troca.');return;}
+   item.usadoRascunho=draft;item.usadoProdutoId=draft.id;item.valor=Number(draft.compra);
+   item.usadoProduto={marca:draft.marca,modelo:draft.modelo,condicao:draft.condicao,fotos:draft.fotos||[]};
+   usadoPagIndex=null;
+   closeSheet();drawPagamento();toast('Seminovo preparado. Entrará no estoque ao concluir a venda.');
+   return;
   }
   converterFotosParaRefs(data.fotos, (refs)=>{
    data.fotos=refs;
@@ -5185,6 +5334,8 @@ function openProdDetail(id){
       <div class="detail-line"><span class="k">Armazenamento</span><span class="v">${p.armazenamento||'—'}</span></div>
        <div class="detail-line"><span class="k">Condição</span><span class="v">${p.condicao||'—'}</span></div>
        <div class="detail-line"><span class="k">Quantidade em estoque</span><span class="v">${qtdAparelho(p)} ${qtdAparelho(p)===1?'unidade':'unidades'}</span></div>
+      ${p.origemCompraId?`<div class="detail-line"><span class="k">Origem</span><span class="v">Compra de fornecedor · ${rpEsc(p.fornecedor||'')}</span></div>`:''}
+      ${p.origemTrocaVendaId?`<div class="detail-line"><span class="k">Origem</span><span class="v">Troca na venda · <button class="btn secondary" style="width:auto;padding:7px 10px" onclick="openVendaDetail('${p.origemTrocaVendaId}')">Ver negociação</button></span></div>`:''}
       <div class="detail-line"><span class="k">IMEI</span><span class="v">${p.imei||'—'}</span></div>
       <div class="detail-line"><span class="k">Nº de série</span><span class="v">${p.serie||'—'}</span></div>
       ${p.bateria?`<div class="detail-line"><span class="k">Saúde da bateria</span><span class="v">${p.bateria}%</span></div>`:''}
@@ -5608,6 +5759,10 @@ function selProduto(id){ vendaCart.produto=db.produtos.find(p=>p.id===id); venda
 
 /* ============ PAGAMENTO ============ */
 const FORMAS=['Pix','Dinheiro','Cartão de crédito','Cartão de débito','Entrada aparelho','Boleto'];
+let pagCustos={impostoPerc:0,comissaoPerc:0,outros:0};
+function itExtrasVenda(total){return Math.round((Math.max(0,Number(total)||0)*(Math.max(0,Number(pagCustos.impostoPerc)||0)+Math.max(0,Number(pagCustos.comissaoPerc)||0))/100+Math.max(0,Number(pagCustos.outros)||0))*100)/100;}
+function itTaxaClienteAdicional(v){return (v.pagamentos||[]).reduce((n,p)=>n+(p.forma==='Cartão de crédito'?(Number(p.valor)||0)*(Number(p.taxa)||0)/100:0),0);}
+
 let pagState=[];
 let usadoPagIndex=null; // índice da linha de pagamento que está cadastrando um aparelho de troca
 function produtoAtualVenda(){
@@ -5623,7 +5778,7 @@ function openPagamento(){
   if(!vendaCart.cliente){ toast('Escolha o cliente'); return; }
   const p=produtoAtualVenda();
   if(!p){ toast('Escolha o aparelho'); return; }
-  pagState=[];
+  pagState=[];pagCustos={impostoPerc:0,comissaoPerc:0,outros:0};
   drawPagamento();
 }
 function drawPagamento(){
@@ -5633,27 +5788,38 @@ function drawPagamento(){
   const falta=total-pago;
   const liquidoTotal=pagState.reduce((s,p)=>s+liquidoDe(p),0);
   const custoProd=Number(prod.compra)||0;
-  const trocaVal=pagState.reduce((s,p)=>s+(p.forma==='Entrada aparelho'?(Number(p.valor)||0):0),0);
-  const lucroVendaAtual=total-custoProd-trocaVal;
+  const taxasPrevistas=itTaxasVenda({pagamentos:pagState,custosExtras:itExtrasVenda(total)});
+  const lucroVendaAtual=total-custoProd-taxasPrevistas;
   const html=`
     <div class="card" style="padding:2px 16px">
       <div class="detail-line"><span class="k">Produto</span><span class="v money-in">${money(prod.venda)}</span></div>
       <div class="detail-line"><span class="k">Custo (paguei)</span><span class="v money-in neg" style="font-size:13px">(${money(custoProd)})</span></div>
       <div class="detail-line"><span class="k">Desconto</span><span class="v money-in">- ${money(vendaCart.desconto)}</span></div>
       <div class="detail-line"><span class="k">Valor final</span><span class="v money-in" style="font-size:17px">${money(total)}</span></div>
-      <div class="detail-line"><span class="k">Lucro da venda</span><span class="v money-in ${lucroVendaAtual>=0?'pos':'neg'}" id="pag-lucro" style="font-weight:700">${money(lucroVendaAtual)}</span></div>
+      <div class="detail-line"><span class="k">Lucro previsto após taxas do cartão</span><span class="v money-in ${lucroVendaAtual>=0?'pos':'neg'}" id="pag-lucro" style="font-weight:700">${money(lucroVendaAtual)}</span></div>
     </div>
 
+    <p style="color:var(--text2);font-size:12px;margin:10px 4px">Troca = ativo no estoque, não custo extra da venda. Cartões ficam pendentes até o repasse. O lucro abaixo desconta somente as despesas informadas.</p>
     <div class="sec-title">Formas de pagamento</div>
     <div id="pag-list">${pagState.map((p,i)=>pagCard(p,i)).join('')}</div>
     <div class="pill-select" style="margin-top:4px">
       ${FORMAS.map(f=>`<div class="p" onclick="addForma('${f}')">+ ${f}</div>`).join('')}
     </div>
 
+    <div class="card" style="margin-top:14px;padding:14px 16px">
+      <b style="font-size:13px">Custos da operação</b><p style="font-size:11px;color:var(--text2);margin:5px 0 12px">Informe comissões, impostos e despesas para a margem após custos ficar correta. Zero significa não informado ou não aplicável.</p>
+      <div class="it-pay-extras">
+        <div><label>Imposto (%)</label><input class="input" type="number" min="0" max="100" step="0.01" value="${pagCustos.impostoPerc||''}" placeholder="0" oninput="pagCustos.impostoPerc=Number(this.value)||0;drawTotals()"></div>
+        <div><label>Comissão (%)</label><input class="input" type="number" min="0" max="100" step="0.01" value="${pagCustos.comissaoPerc||''}" placeholder="0" oninput="pagCustos.comissaoPerc=Number(this.value)||0;drawTotals()"></div>
+        <div><label>Outras despesas (R$)</label><input class="input" type="number" min="0" step="0.01" value="${pagCustos.outros||''}" placeholder="0" oninput="pagCustos.outros=Number(this.value)||0;drawTotals()"></div>
+      </div>
+      <div class="detail-line"><span class="k">Despesas + taxas da operação</span><span class="v money-in neg" id="pag-extras-total">${money(taxasPrevistas)}</span></div>
+    </div>
     <div class="card" style="margin-top:16px" id="pag-totais">
       <div class="detail-line"><span class="k">Total pago</span><span class="v money-in">${money(pago)}</span></div>
       <div class="detail-line"><span class="k">${falta>0?'Falta':falta<0?'Troco/excedente':'Fechado'}</span><span class="v money-in ${falta>0?'neg':'pos'}">${money(Math.abs(falta))}</span></div>
-      <div class="detail-line"><span class="k">Você recebe (líquido)</span><span class="v money-in">${money(liquidoTotal)}</span></div>
+      <div class="detail-line"><span class="k">Pix / Dinheiro imediato</span><span class="v money-in">${money(pagState.reduce((s,p)=>s+(['Pix','Dinheiro'].includes(p.forma)?Number(p.valor)||0:0),0))}</span></div>
+      <div class="detail-line"><span class="k">Cartão/Boleto a conciliar</span><span class="v money-in">${money(pagState.reduce((s,p)=>s+(['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)?Number(p.valor)||0:0),0))}</span></div>
     </div>
     ${falta>0?`<label style="display:flex;align-items:center;gap:8px;margin:12px 4px;font-size:14px;color:var(--text2)"><input type="checkbox" id="pag-receber" style="width:18px;height:18px"> Deixar ${money(falta)} como conta a receber</label>`:''}
     <button class="btn" onclick="finalizarVenda(${total},${falta})" style="margin-top:8px">Finalizar venda</button>
@@ -5662,6 +5828,7 @@ function drawPagamento(){
 }
 function pagCard(p,i){
   const isCartao=p.forma==='Cartão de crédito';
+  const isDebito=p.forma==='Cartão de débito';
   const isUsado=p.forma==='Entrada aparelho';
   return `<div class="card" style="padding:14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -5675,8 +5842,10 @@ function pagCard(p,i){
         <div><div class="mini-lbl">Taxa do cartão (%)</div><input class="input" type="number" inputmode="decimal" value="${p.taxa||''}" placeholder="ex: 16" oninput="pagState[${i}].taxa=parseFloat(this.value)||0;drawTotals()"></div>
         <div><div class="mini-lbl">Parcelas</div><input class="input" type="number" inputmode="numeric" value="${p.parcelas||''}" placeholder="1" oninput="pagState[${i}].parcelas=parseInt(this.value)||1;drawTotals()"></div>
       </div>
+      <div class="field" style="margin-top:10px"><label>Taxa da operadora descontada da loja (%)</label><input class="input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="${p.taxaOperadora||''}" placeholder="ex: 5,37" oninput="pagState[${i}].taxaOperadora=parseFloat(this.value)||0;drawTotals()"></div>
       <div id="cartao-out-${i}" style="margin-top:12px">${cartaoResumo(p)}</div>
     `:''}
+    ${isDebito?`<div class="field" style="margin-top:10px"><label>Taxa da operadora (%)</label><input class="input" type="number" min="0" max="100" step="0.01" value="${p.taxaOperadora||''}" placeholder="ex: 1,5" oninput="pagState[${i}].taxaOperadora=parseFloat(this.value)||0;drawTotals()"></div>`:''}
     ${isUsado?`
       ${p.usadoProduto?`
         <div class="card" style="padding:2px 16px;background:var(--bg2);box-shadow:none;margin-top:6px">
@@ -5684,10 +5853,11 @@ function pagCard(p,i){
           <div class="detail-line"><span class="k">Condição</span><span class="v">${p.usadoProduto.condicao||'—'}</span></div>
           <div class="detail-line"><span class="k">Fotos</span><span class="v">${(p.usadoProduto.fotos||[]).length} foto(s)</span></div>
         </div>
-        <button class="btn ghost" style="margin-top:8px" onclick="cadastrarUsado(${i})">Editar cadastro do aparelho</button>
+        <div style="font-size:12px;color:var(--text2);margin-top:6px">Custo da troca: ${money(p.valor)} · ${p.usadoRascunho?'Entra no estoque apenas ao finalizar':'Cadastro existente vinculado'}</div>
+        <button class="btn ghost" style="margin-top:8px" onclick="cadastrarUsado(${i})">${p.usadoRascunho?'Editar rascunho':'Ver / alterar vínculo'}</button>
       `:`
-        <div style="font-size:13px;color:var(--text2);margin-top:8px">Cadastre o aparelho que está entrando na troca. Ele vai direto para o estoque.</div>
-        <button class="btn" style="margin-top:8px" onclick="cadastrarUsado(${i})">Cadastrar aparelho completo</button>
+        <div style="font-size:13px;color:var(--text2);margin-top:8px">Escolha um seminovo cadastrado ou crie um novo. O estoque só será alterado ao finalizar.</div>
+        <button class="btn" style="margin-top:8px" onclick="itSelecionarTroca(${i})">Vincular aparelho / Cadastrar seminovo</button>
       `}
     `:''}
   </div>`;
@@ -5724,16 +5894,44 @@ function addForma(f){
   pagState.push({forma:f, valor:valorInicial, parcelas:1, usadoEstoque:true});
   drawPagamento();
 }
-function cadastrarUsado(i){
-  // abre o cadastro completo de produto para o aparelho que está entrando na troca.
-  // quando salvar, o produto entra no estoque e o valor da linha de pagamento
-  // passa a ser o valor de compra informado (o quanto você aceitou pelo aparelho).
-  const existente = pagState[i].usadoProdutoId
-    ? db.produtos.find(p=>p.id===pagState[i].usadoProdutoId)
-    : null;
-  usadoPagIndex = i;
-  openProduto(existente || null);
+function itSelecionarTroca(i){
+ const item=pagState[i];if(!item||item.forma!=='Entrada aparelho')return;
+ const normal=v=>String(v||'').replace(/[^0-9a-z]/gi,'').toLowerCase();
+ const list=(db.produtos||[]).filter(p=>['Disponível','Em avaliação','Em manutenção','Reservado'].includes(p.status)&&qtdAparelho(p)===1&&!p.entradaVendaId&&!p.origemTrocaVendaId&&p.condicao==='Seminovo');
+ const html=`<p style="color:var(--text2);font-size:13px;margin-bottom:12px">Se o seminovo já está cadastrado, vincule-o sem criar duplicidade. Se não, cadastre um rascunho para esta venda.</p>
+ <button class="btn" onclick="itNovoSeminovoTroca(${i})">+ Cadastrar novo seminovo</button>
+ <div class="field" style="margin-top:15px"><label>Buscar no estoque por IMEI, modelo, armazenamento ou cor</label><input class="input" id="it-busca-troca" placeholder="Buscar aparelho existente..." oninput="itFiltrarTroca()"></div>
+ <div id="it-lista-troca" class="list">${list.length?list.map(p=>`<div class="row it-row-troca" data-busca="${normal([p.modelo,p.imei,p.serie,p.cor,p.armazenamento].join(' '))}" onclick="itVincularSeminovo(${i},'${p.id}')"><div class="thumb">${vectorIcon('phone')}</div><div class="info"><div class="t">${rpEsc(p.marca||'')} ${rpEsc(p.modelo)}</div><div class="s">${rpEsc([p.cor,p.armazenamento,p.imei].filter(Boolean).join(' · '))}</div></div><div class="right money-in">${money(p.compra)}</div></div>`).join(''):'<div class="empty">Nenhum seminovo livre para vinculação.</div>'}</div>`;
+ openSheet('Aparelho recebido na troca',html);
 }
+function itFiltrarTroca(){
+ const q=String(el('it-busca-troca')?.value||'').replace(/[^0-9a-z]/gi,'').toLowerCase();
+ document.querySelectorAll('.it-row-troca').forEach(row=>row.style.display=(row.dataset.busca||'').includes(q)?'':'none');
+}
+function itVincularSeminovo(i,id){
+ const p=(db.produtos||[]).find(x=>x.id===id);if(!p||!['Disponível','Em avaliação','Em manutenção','Reservado'].includes(p.status)||qtdAparelho(p)!==1||p.entradaVendaId||p.origemTrocaVendaId)return toast('Cadastro indisponível para vínculo.');
+ if(pagState.some((x,n)=>n!==i&&x.usadoProdutoId===id))return toast('Este seminovo já está vinculado a outra entrada nesta venda.');
+ if(carrinho.some(x=>x.tipo==='aparelho'&&x.id===id)||vendaCart.produtoId===id)return toast('Este aparelho já está sendo vendido nesta operação.');
+ const item=pagState[i];if(!item)return;
+ if(!confirm('Vincular '+[p.marca,p.modelo].filter(Boolean).join(' ')+' como APARELHO RECEBIDO nesta venda?\n\nUse apenas se ele já foi PRÉ-CADASTRADO para a troca. Se foi comprado anteriormente e já pertence à loja, NÃO o vincule: isso duplicaria a aquisição no controle financeiro.'))return;
+  item.usadoProdutoId=id;item.usadoRascunho=null;item.usadoProduto={marca:p.marca,modelo:p.modelo,condicao:p.condicao,fotos:p.fotos||[]};item.valor=Number(p.compra)||0;
+ closeSheet();drawPagamento();toast('Seminovo existente vinculado à troca.');
+}
+function itNovoSeminovoTroca(i){
+ if(!pagState[i])return;
+ usadoPagIndex=i;
+ openProduto(pagState[i].usadoRascunho||null);
+ const cat=el('pr-cond');if(cat){cat.value='Seminovo';refreshEstado('estado-box','pr-cat','pr-cond')}
+ const status=el('pr-status');if(status)status.value='Em avaliação';
+ const qtd=el('pr-qtd');if(qtd)qtd.value='1';
+}
+function cadastrarUsado(i){
+ const item=pagState[i];if(!item)return;
+ if(item.usadoRascunho)return itNovoSeminovoTroca(i);
+ if(item.usadoProdutoId)return itSelecionarTroca(i);
+ itSelecionarTroca(i);
+}
+
 function drawTotals(){
   // atualiza os resumos de cartão ao vivo sem redesenhar os inputs (não perde o foco)
   pagState.forEach((p,i)=>{
@@ -5754,14 +5952,16 @@ function drawTotals(){
       box.innerHTML=`
       <div class="detail-line"><span class="k">Total pago</span><span class="v money-in">${money(pago)}</span></div>
       <div class="detail-line"><span class="k">${falta>0?'Falta':falta<0?'Troco/excedente':'Fechado'}</span><span class="v money-in ${falta>0?'neg':'pos'}">${money(Math.abs(falta))}</span></div>
-      <div class="detail-line"><span class="k">Você recebe (líquido)</span><span class="v money-in">${money(liquidoTotal)}</span></div>`;
+      <div class="detail-line"><span class="k">Pix / Dinheiro imediato</span><span class="v money-in">${money(pagState.reduce((s,p)=>s+(['Pix','Dinheiro'].includes(p.forma)?Number(p.valor)||0:0),0))}</span></div>
+      <div class="detail-line"><span class="k">Cartão/Boleto a conciliar</span><span class="v money-in">${money(pagState.reduce((s,p)=>s+(['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)?Number(p.valor)||0:0),0))}</span></div>`;
     }
     // atualiza o lucro da venda ao vivo (venda − custo − entrada de aparelho)
     const lucroBox=el('pag-lucro');
     if(lucroBox){
       const custoProd=Number(prod.compra)||0;
-      const trocaVal=pagState.reduce((s,p)=>s+(p.forma==='Entrada aparelho'?(Number(p.valor)||0):0),0);
-      const lu=total-custoProd-trocaVal;
+      const extras=itTaxasVenda({pagamentos:pagState,custosExtras:itExtrasVenda(total)});
+      const extraBox=el('pag-extras-total');if(extraBox)extraBox.textContent=money(extras);
+      const lu=total-custoProd-extras;
       lucroBox.textContent=money(lu);
       lucroBox.classList.remove('pos','neg');
       lucroBox.classList.add(lu>=0?'pos':'neg');
@@ -5799,11 +5999,34 @@ function finalizarVendaCarrinho(){
   pagState=[];
   drawPagamento();
 }
-function finalizarVenda(total,falta){
+function finalizarVenda(totalInformado,faltaInformada){
+  const atual=produtoAtualVenda();
+  const total=(Number(atual?.venda)||0)-(Number(vendaCart.desconto)||0);
+  const falta=total-pagState.reduce((n,x)=>n+(Number(x.valor)||0),0);
   const pago=pagState.reduce((s,p)=>s+(Number(p.valor)||0),0);
   if(pagState.length===0){ toast('Adicione uma forma de pagamento'); return; }
+  if(pagState.some(x=>!Number.isFinite(Number(x.valor))||Number(x.valor)<=0)){toast('Todos os pagamentos devem ter valor maior que zero.');return;}
+  if(pago>total+0.009){toast('O pagamento excede o valor da venda em '+money(pago-total)+'. Corrija antes de concluir.');return;}
+  if(pagState.some(x=>Number(x.taxaOperadora)<0||Number(x.taxaOperadora)>100)){toast('Confira a taxa da operadora.');return;}
+  if([pagCustos.impostoPerc,pagCustos.comissaoPerc,pagCustos.outros].some(x=>!Number.isFinite(Number(x))||Number(x)<0)||Number(pagCustos.impostoPerc)>100||Number(pagCustos.comissaoPerc)>100){toast('Confira impostos, comissão e outras despesas.');return;}
   const usadoSemCadastro=pagState.some(x=>x.forma==='Entrada aparelho' && !x.usadoProdutoId);
-  if(usadoSemCadastro){ toast('Cadastre o aparelho da troca'); return; }
+  if(usadoSemCadastro){ toast('Cadastre ou vincule o aparelho da troca'); return; }
+  const entradas=pagState.filter(x=>x.forma==='Entrada aparelho');
+  const entradaIds=new Set();
+  for(const e of entradas){
+   const registro=e.usadoRascunho||(db.produtos||[]).find(x=>x.id===e.usadoProdutoId);
+   if(!registro){toast('Não foi encontrado um dos seminovos vinculados.');return;}
+   if(entradaIds.has(e.usadoProdutoId)){toast('O mesmo seminovo aparece duas vezes na troca.');return;}
+   entradaIds.add(e.usadoProdutoId);
+   if(!['Disponível','Em avaliação','Em manutenção','Reservado'].includes(registro.status)||qtdAparelho(registro)!==1){toast('Seminovo da troca inválido ou sem unidade.');return;}
+   if(!e.usadoRascunho && (registro.entradaVendaId||registro.origemTrocaVendaId)){toast('Seminovo já vinculado a outra venda.');return;}
+   if(Math.abs((Number(e.valor)||0)-(Number(registro.compra)||0))>0.01){toast('Valor da troca diferente do custo do seminovo. Atualize o cadastro ou a entrada.');return;}
+   if(carrinho.some(x=>x.tipo==='aparelho'&&x.id===e.usadoProdutoId)||vendaCart.produtoId===e.usadoProdutoId){toast('O seminovo da entrada não pode ser o mesmo item vendido.');return;}
+   if(e.usadoRascunho){
+    const conflicts=(db.produtos||[]).some(x=>x.id!==registro.id&&((registro.imei&&x.imei===registro.imei)||(registro.serie&&x.serie===registro.serie)));
+    if(conflicts){toast('IMEI/série do seminovo já cadastrado. Vincule o existente.');return;}
+   }
+  }
   let aReceber=0;
   if(falta>0){
     const chk=el('pag-receber');
@@ -5839,11 +6062,29 @@ function finalizarVenda(total,falta){
     tipo: ehCarrinho?'carrinho':(ehAcessorio?'acessorio':'aparelho'),
     obs: vendaCart.obs||'',
     total, desconto:vendaCart.desconto||0,
-    pagamentos:pagState.map(x=>({...x})),
-    liquido: aReceber>0? liquido : liquido,
-    aReceber
+    pagamentos:pagState.map(x=>({...x,usadoRascunho:undefined,repasseStatus:['Cartão de crédito','Cartão de débito','Boleto'].includes(x.forma)?'pendente':undefined})),
+    liquido, aReceber,
+    financeiroV2:true,versaoFinanceira:3,taxasOperadora:itTaxasVenda({pagamentos:pagState}),custosExtras:itExtrasVenda(total),
+    custosExtrasDetalhe:{...pagCustos},formaPagamentoClienteJuros:itTaxaClienteAdicional({pagamentos:pagState}),
+    criadoEm:new Date().toISOString(),recebimentos:[],
+    trocaIds:entradas.map(x=>x.usadoProdutoId),
+    origemCadeiaIds:[...new Set(itensVenda.map(it=>(db.produtos||[]).find(p=>p.id===it.prodId)?.origemTrocaVendaId).filter(Boolean))]
   };
+  const pixDinheiro=pagState.reduce((n,x)=>n+(['Pix','Dinheiro'].includes(x.forma)?Number(x.valor)||0:0),0);
+  const trocar=entradas.reduce((n,x)=>n+(Number(x.valor)||0),0);
+  const cardPendente=pagState.reduce((n,x)=>n+(['Cartão de crédito','Cartão de débito','Boleto'].includes(x.forma)?Number(x.valor)||0:0),0);
+  if(!confirm('CONFIRMAR VENDA\n\nTotal: '+money(total)+'\nPix/dinheiro: '+money(pixDinheiro)+'\nCartões/boleto (a conciliar): '+money(cardPendente)+'\nTrocas recebidas: '+money(trocar)+'\nSaldo a receber: '+money(aReceber)+'\nResultado após custos informados: '+money(itLucroCorreto(venda))+'\n\nO estoque e o histórico serão atualizados. Confirmar operação?'))return;
+  // Salva a negociação e materializa suas entradas na mesma atualização do banco local.
+  for(const e of entradas){
+   if(e.usadoRascunho){
+    db.produtos.push({...e.usadoRascunho,entradaVendaId:venda.id,origemTrocaVendaId:venda.id,entradaClienteId:venda.clienteId,origemEstoque:'Troca em venda',entradaCadastroNovo:true,compra:Number(e.valor)||0,entrada:todayStr()});
+   }else{
+    const existente=db.produtos.find(x=>x.id===e.usadoProdutoId);
+    if(existente){existente.entradaVendaId=venda.id;existente.origemTrocaVendaId=venda.id;existente.entradaClienteId=venda.clienteId;existente.origemEstoque='Troca em venda';}
+   }
+  }
   db.vendas.push(venda);
+  if(typeof itAudit==='function')itAudit('VENDA_CRIADA',venda.id,{total:venda.total,valorTrocas:entradas.reduce((n,x)=>n+Number(x.valor||0),0)});
   if(ehCarrinho){
     carrinho.forEach(it=>{
       if(it.tipo==='aparelho'){ const pr=db.produtos.find(x=>x.id===it.id); if(pr){ pr.qtd=Math.max(0,qtdAparelho(pr)-1); pr.status=pr.qtd>0?'Disponível':'Vendido'; pr.vendidoEm=todayStr(); } }
@@ -5957,13 +6198,16 @@ function openVendaDetail(id){
       <div class="detail-line"><span class="k">Total</span><span class="v money-in">${money(v.total)}</span></div>
       ${v.aReceber>0?`<div class="detail-line"><span class="k">A receber</span><span class="v money-in neg">${money(v.aReceber)}</span></div>`:''}
       <div class="detail-line"><span class="k">Vendedor</span><span class="v">${v.vendedor||'—'}</span></div>
-      ${isAdmin?`<div class="detail-line"><span class="k">Lucro</span><span class="v money-in ${lucroVenda(v)>=0?'pos':'neg'}">${money(lucroVenda(v))}</span></div>`:''}
+      ${isAdmin?`<div class="detail-line"><span class="k">Lucro da venda após custos informados</span><span class="v money-in ${lucroVenda(v)>=0?'pos':'neg'}">${money(lucroVenda(v))}</span></div>${v.financeiroV2?`<div class="detail-line"><span class="k">Taxas e custos da operação</span><span class="v money-in">${money(itTaxasVenda(v))}</span></div>`:''}`:''}
     </div>
     <div class="sec-title">Pagamento</div>
     <div class="card" style="padding:2px 16px">
-      ${v.pagamentos.map(p=>`<div class="detail-line"><span class="k">${p.forma}${p.forma==='Cartão de crédito'&&p.parcelas>1?' '+p.parcelas+'x':''}${p.taxa?' ('+p.taxa+'%)':''}</span><span class="v money-in">${money(p.valor)}</span></div>`).join('')}
+      ${(v.pagamentos||[]).map((p,i)=>`<div class="detail-line"><span class="k">${p.forma}${p.forma==='Cartão de crédito'&&p.parcelas>1?' '+p.parcelas+'x':''}${p.taxa?' (juros cliente '+p.taxa+'%)':''}${p.taxaOperadora?' · taxa operadora '+p.taxaOperadora+'%':''}</span><span class="v money-in">${money(p.valor)}</span></div>${v.financeiroV2&&['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma)?`<div style="padding:6px 0 12px;text-align:right;color:var(--text2);font-size:12px">${p.repasseStatus==='recebido'?'✓ Repasse recebido em '+fmtData(p.repasseEm):`<button class="btn secondary" style="display:inline-block;width:auto;padding:8px 12px;font-size:12px" onclick="itConfirmarRepasse('${v.id}',${i})">Conciliar repasse</button>`}</div>`:''}`).join('')}
     </div>
-    ${v.aReceber>0?`<button class="btn" onclick="quitarVenda('${v.id}')" style="margin-top:14px;background:var(--green)">Marcar como recebido</button>`:''}
+    ${(v.pagamentos||[]).some(x=>x.forma==='Entrada aparelho')?`<div class="sec-title">Aparelhos da troca</div><div class="card" style="padding:10px 15px">${(v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho').map(x=>{const p=db.produtos.find(y=>y.id===x.usadoProdutoId);return `<div class="detail-line"><span class="k">${rpEsc([p?.marca||x.usadoProduto?.marca,p?.modelo||x.usadoProduto?.modelo].filter(Boolean).join(' '))}<small style="display:block;color:var(--text2)">${p?.status||'Cadastro não encontrado'} · Custo ${money(x.valor)}</small></span><span class="v"><button class="btn ghost" style="width:auto;padding:7px 10px" onclick="openProdDetail('${x.usadoProdutoId}')">Ver estoque</button></span></div>`}).join('')}</div>`:''}
+    ${v.financeiroV2&&isAdmin?itResumoVendaCadeiaHTML(v.id):''}
+    ${Array.isArray(v.recebimentos)&&v.recebimentos.length?`<div class="sec-title">Recebimentos posteriores</div><div class="card" style="padding:3px 15px">${v.recebimentos.map(x=>`<div class="detail-line"><span class="k">${rpEsc(x.forma||'Pix')} · ${rpEsc(x.data||'')}</span><span class="v money-in">${money(x.valor)}</span></div>`).join('')}</div>`:''}
+    ${v.aReceber>0?`<button class="btn" onclick="itAbrirRecebimento('${v.id}')" style="margin-top:14px;background:var(--green)">Registrar recebimento parcial ou total</button>`:''}
     <button class="btn" onclick="cupomVenda('${v.id}')" style="margin-top:14px">${vectorIcon('receipt')} Comprovante (salvar/imprimir)</button>
     <button class="btn danger" onclick="delVenda('${v.id}')" style="margin-top:8px">Remover venda</button>
     <div style="height:30px"></div>
@@ -5971,23 +6215,96 @@ function openVendaDetail(id){
   openSheet('Venda', html);
 }
 function quitarVenda(id){
-  const v=db.vendas.find(x=>x.id===id);
-  v.liquido=vendaLiquido(v)+ (Number(v.aReceber)||0);
-  v.aReceber=0; saveDB(); closeSheet(); render(currentTab); toast('Conta recebida ✓');
+ const v=db.vendas.find(x=>x.id===id);if(!v)return;
+ const valor=Number(v.aReceber)||0;if(valor<=0)return toast('Não há saldo pendente.');
+ if(!confirm('Confirmar recebimento de '+money(valor)+' via Pix ou dinheiro? Esse valor será lançado no caixa e associado à venda.'))return;
+ if(!Array.isArray(db.caixa))db.caixa=[];
+ db.caixa.push({id:uid(),tipo:'entrada',cat:'Recebimento de venda',desc:'Recebimento pendente · '+(v.clienteNome||''),valor,data:todayStr(),hora:new Date().toLocaleTimeString('pt-BR'),quem:session?.nome||'',refVendaId:v.id,origem:'quitarVenda'});
+ if(!Array.isArray(v.recebimentos))v.recebimentos=[];
+ v.recebimentos.push({valor,data:todayStr(),forma:'Pix/Dinheiro',operador:session?.nome||''});
+ v.aReceber=0;
+ if(typeof itAudit==='function')itAudit('SALDO_RECEBIDO',v.id,{valor});
+ saveDB();closeSheet();render(currentTab);toast('Recebimento lançado no caixa.');
+}
+
+/* iTronic Financeiro v3 — registros parciais sem recontar a venda original */
+function itAbrirRecebimento(id){
+ const v=(db.vendas||[]).find(x=>x.id===id);if(!v||!(Number(v.aReceber)>0))return toast('Não há saldo a receber.');
+ if(!podeAcao('todasVendas')&&v.vendedor!==session?.nome)return toast('Sem permissão para esta venda.');
+ openSheet('Receber saldo da venda',`<p style="margin-bottom:12px;color:var(--text2)">Cliente: <b>${rpEsc(v.clienteNome||'')}</b><br>Saldo em aberto: <b>${money(v.aReceber)}</b></p>
+ <div class="field"><label>Valor recebido agora</label><input class="input" id="it-recebimento-valor" type="number" inputmode="decimal" min="0.01" max="${v.aReceber}" step="0.01" value="${Number(v.aReceber).toFixed(2)}"></div>
+ <div class="field"><label>Forma real de recebimento</label><select class="input" id="it-recebimento-forma"><option>Pix</option><option>Dinheiro</option></select></div>
+ <p style="font-size:12px;color:var(--text2);margin:10px 0">Esta operação cria uma única entrada no caixa e reduz o saldo a receber. Para cartões, use a conciliação de repasse correspondente.</p>
+ <button class="btn" onclick="itRegistrarRecebimento('${v.id}')">Confirmar recebimento</button>`);
+}
+function itRegistrarRecebimento(id){
+ const v=(db.vendas||[]).find(x=>x.id===id);if(!v)return;
+ const val=Number(el('it-recebimento-valor')?.value),forma=el('it-recebimento-forma')?.value;
+ if(!Number.isFinite(val)||val<=0||val>Number(v.aReceber||0)+0.001)return toast('Valor inválido ou superior ao saldo da venda.');
+ if(!['Pix','Dinheiro'].includes(forma))return toast('Escolha Pix ou Dinheiro.');
+ if(!confirm('Confirmar '+money(val)+' recebidos por '+forma+'?'))return;
+ if(!Array.isArray(db.caixa))db.caixa=[];
+ db.caixa.push({id:uid(),tipo:'entrada',cat:'Recebimento de venda',desc:'Recebimento pendente · '+(v.clienteNome||''),valor:val,data:todayStr(),hora:new Date().toLocaleTimeString('pt-BR'),quem:session?.nome||'',refVendaId:v.id,origem:'itRecebimentoParcial',forma});
+ (v.recebimentos||(v.recebimentos=[])).push({valor:val,data:todayStr(),forma,operador:session?.nome||''});
+ v.aReceber=Math.max(0,Math.round((Number(v.aReceber||0)-val)*100)/100);
+ itAudit('RECEBIMENTO_PARCIAL',id,{valor:val,forma,saldo:v.aReceber});saveDB();closeSheet();render(currentTab);toast('Recebimento salvo e saldo atualizado.');
+}
+
+function itConfirmarRepasse(id,indice){
+ const v=db.vendas.find(x=>x.id===id);const p=v?.pagamentos?.[indice];
+ if(!v?.financeiroV2||!p||!['Cartão de crédito','Cartão de débito','Boleto'].includes(p.forma))return;
+ if(p.repasseStatus==='recebido')return toast('Repasse já conciliado.');
+ const taxa=['Cartão de crédito','Cartão de débito'].includes(p.forma)?Math.max(0,Number(p.valor)||0)*(Number(p.taxaOperadora)||0)/100:0;
+ const net=(Number(p.valor)||0)-taxa;
+ if(!confirm('Confirmar que o repasse de '+money(net)+' foi recebido na conta?\n\nValor bruto: '+money(p.valor)+'\nTaxa operadora: '+money(taxa)))return;
+ p.repasseStatus='recebido';p.repasseEm=todayStr();
+ if(!Array.isArray(db.caixa))db.caixa=[];
+ db.caixa.push({id:uid(),tipo:'entrada',cat:'Repasse de '+p.forma,desc:'Conciliação da venda '+id,valor:net,data:todayStr(),hora:new Date().toLocaleTimeString('pt-BR'),refVendaId:id,refPagamentoIndex:indice,origem:'repasseCartao',quem:session?.nome||''});
+ if(typeof itAudit==='function')itAudit('REPASSE_CONFIRMADO',id,{indice,liquido:net});
+ saveDB();openVendaDetail(id);render(currentTab);toast('Repasse conciliado.');
+}
+
+function itAudit(acao,ref,detalhes){
+ if(!Array.isArray(db.auditoria))db.auditoria=[];
+ db.auditoria.push({id:uid(),data:new Date().toISOString(),operador:session?.nome||'',acao,ref,detalhes});
+}
+function itBackupDados(etiqueta){
+ try{const key='itronic_backup_'+etiqueta+'_'+Date.now();localStorage.setItem(key,JSON.stringify(db));return key}catch(e){console.warn('Backup local indisponível',e);return '';}
 }
 function delVenda(id){
-  askConfirm('Remover esta venda? O aparelho volta ao estoque.', ()=>{
-    const v=db.vendas.find(x=>x.id===id);
-     v.itens.forEach(it=>{ const p=db.produtos.find(x=>x.id===it.prodId); if(p){p.qtd=qtdAparelho(p)+Math.max(1,Number(it.qtd)||1);p.status='Disponível';} });
-    db.vendas=db.vendas.filter(x=>x.id!==id); saveDB(); closeSheet(); render(currentTab); toast('Venda removida');
-  });
+ const v=db.vendas.find(x=>x.id===id);if(!v)return toast('Venda não encontrada.');
+ if(!podeAcao('todasVendas'))return toast('Somente usuários autorizados podem estornar vendas.');
+ if(!v.financeiroV2&&(v.pagamentos||[]).some(x=>x.forma==='Entrada aparelho'))return toast('Venda antiga com troca: faça auditoria antes do estorno para evitar diferenças de estoque.');
+ if((db.caixa||[]).some(x=>x.refVendaId===id))return toast('Há repasses ou recebimentos financeiros vinculados. Concilie o estorno financeiro antes de cancelar esta venda.');
+ const trades=(v.pagamentos||[]).filter(x=>x.forma==='Entrada aparelho');
+ for(const t of trades){
+  const p=db.produtos.find(x=>x.id===t.usadoProdutoId);
+  if(!p||p.origemTrocaVendaId!==id||p.status!=='Disponível'||qtdAparelho(p)!==1||db.vendas.some(x=>x.id!==id&&(x.itens||[]).some(it=>it.prodId===p.id)))return toast('Aparelho da troca alterado ou revendido. Bloqueado estorno automático: faça uma conferência manual.');
+ }
+ askConfirm('Estornar a venda? O sistema devolverá os itens vendidos ao estoque e desfará as entradas dos seminovos ainda disponíveis. O histórico ficará preservado.',()=>{
+  const backup=itBackupDados('antes_estorno');
+  if(!backup){toast('Não foi possível criar o backup local. Estorno interrompido.');return;}
+  for(const it of (v.itens||[])){
+   if(it.prodId){const p=db.produtos.find(x=>x.id===it.prodId);if(p){p.qtd=qtdAparelho(p)+Math.max(1,Number(it.qtd)||1);p.status='Disponível';delete p.vendidoEm;}}
+   if(it.acessId){const a=(db.acessorios||[]).find(x=>x.id===it.acessId);if(a){a.qtd=(Number(a.qtd)||0)+Math.max(1,Number(it.qtd)||1);if(a.situacao==='Sem estoque')a.situacao='Disponível';}}
+  }
+  for(const t of trades){const p=db.produtos.find(x=>x.id===t.usadoProdutoId);if(!p)continue;
+   if(p.entradaCadastroNovo)db.produtos=db.produtos.filter(x=>x.id!==p.id);
+   else {delete p.entradaVendaId;delete p.origemTrocaVendaId;delete p.entradaClienteId;delete p.origemEstoque;}
+  }
+  if(!Array.isArray(db.vendasEstornadas))db.vendasEstornadas=[];
+  db.vendasEstornadas.push({...v,estornadoEm:new Date().toISOString(),estornadoPor:session?.nome||'',backupOrigem:backup});
+  db.vendas=db.vendas.filter(x=>x.id!==id);
+  itAudit('VENDA_ESTORNADA',id,{backup});saveDB();closeSheet();render(currentTab);toast('Estorno registrado com histórico.');
+ },'Estornar');
 }
 
 /* ============ COMPRA ============ */
 let compraItens=[];
+let compraLancamentoCaixa=false;
 function openCompra(){
   if(!podeEditar()){ toast('Só o administrador'); return; }
-  compraItens=[];
+  compraItens=[];compraLancamentoCaixa=false;
   drawCompra();
 }
 function drawCompra(){
@@ -6000,6 +6317,7 @@ function drawCompra(){
     <div id="compra-list">${compraItens.map((it,i)=>`<div class="card" style="padding:12px"><div style="display:flex;justify-content:space-between"><b>${it.modelo||'Aparelho '+(i+1)}</b><button onclick="compraItens.splice(${i},1);drawCompra()" style="color:var(--red)">×</button></div><div style="color:var(--text2);font-size:13px;margin-top:2px">${it.condicao||'Novo'} · ${it.imei||'sem IMEI'} · ${money(it.compra)}</div></div>`).join('')}</div>
     <button class="btn secondary" onclick="addCompraItem()">+ Adicionar aparelho</button>
     <div class="card" style="margin-top:14px"><div class="detail-line"><span class="k">Total da compra</span><span class="v money-in">${money(total)}</span></div></div>
+    <label style="display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text);margin:13px 1px"><input type="checkbox" style="width:18px;height:18px;flex:none" ${compraLancamentoCaixa?'checked':''} onchange="compraLancamentoCaixa=this.checked"><span><b>Registrar saída financeira desta compra</b><small style="display:block;color:var(--text2);margin-top:4px">Marque apenas se a loja já pagou por Pix ou dinheiro e ainda não registrou a mesma saída no caixa. Evita lançar duas vezes.</small></span></label>
     <button class="btn" onclick="salvarCompra()" style="margin-top:8px">Registrar compra</button>
   `;
   openSheet('Registrar compra', html);
@@ -6074,16 +6392,32 @@ function confirmCompraItem(ctx){
   const ps=el('co-pag'); if(ps)ps.value=ctx.pag||'Pix';
 }
 function salvarCompra(){
-  if(compraItens.length===0){ toast('Adicione ao menos um aparelho'); return; }
-  const forn=getV('co-forn'), data=getV('co-data')||todayStr(), pag=getV('co-pag');
-  const total=compraItens.reduce((s,i)=>s+(Number(i.compra)||0),0);
-  db.compras.push({id:uid(),fornecedor:forn,data,pagamento:pag,total,qtd:compraItens.length});
-  compraItens.forEach(it=>{
-    db.produtos.push({id:uid(),cat:it.cat,marca:'Apple',modelo:it.modelo,cor:it.cor,armazenamento:it.armazenamento,
-      condicao:it.condicao||'Novo',imei:it.imei,serie:'',fornecedor:forn,entrada:data,compra:it.compra,venda:it.venda,status:'Disponível',obs:'',fotos:it.fotos||[],
-      troca:it.troca,trocaTipo:it.trocaTipo,bateria:it.bateria,bateriaTipo:it.bateriaTipo,avaria:it.avaria,tampa:it.tampa,detalhes:it.detalhes,telaTipo:it.telaTipo,ciclos:it.ciclos,fonte:it.fonte});
-  });
-  saveDB(); closeSheet(); toast(compraItens.length+' aparelho(s) no estoque'); render(currentTab);
+ if(!podeEditar())return toast('Sem permissão para compras.');
+ if(!compraItens.length)return toast('Adicione pelo menos um aparelho.');
+ const forn=getV('co-forn').trim(), data=getV('co-data')||todayStr(), pag=getV('co-pag');
+ if(!forn)return toast('Informe o fornecedor.');
+ if(compraItens.some(x=>!(x.modelo||'').trim()||!Number.isFinite(Number(x.compra))||Number(x.compra)<=0))return toast('Cada aparelho precisa de modelo e custo de aquisição válido.');
+ if(compraLancamentoCaixa&&!['Pix','Dinheiro'].includes(pag))return toast('A saída direta de caixa só está disponível para pagamentos em Pix ou Dinheiro. Cartões e boletos precisam de conciliação na data do desembolso.');
+ const total=compraItens.reduce((n,it)=>n+(Number(it.compra)||0),0);
+ if(!confirm('REGISTRAR COMPRA\n\nFornecedor: '+forn+'\nAparelhos: '+compraItens.length+'\nCusto total: '+money(total)+'\nPagamento informado: '+pag+'\nSaída no caixa agora: '+(compraLancamentoCaixa?'SIM':'NÃO')+'\n\nConfirmar entrada no estoque?'))return;
+ const compra={id:uid(),fornecedor:forn,data,pagamento:pag,total,qtd:compraItens.length,itens:[],saidaCaixaRegistrada:!!compraLancamentoCaixa};
+ for(const it of compraItens){
+  const produto={id:uid(),cat:it.cat,marca:'Apple',modelo:it.modelo,cor:it.cor,armazenamento:it.armazenamento,
+   condicao:it.condicao||'Novo',imei:it.imei,serie:'',fornecedor:forn,entrada:data,compra:Number(it.compra),venda:Number(it.venda)||0,qtd:1,
+   status:it.condicao==='Seminovo'?'Em avaliação':'Disponível',origemCompraId:compra.id,origemEstoque:'Compra de fornecedor',obs:'',fotos:it.fotos||[],
+   troca:it.troca,trocaTipo:it.trocaTipo,bateria:it.bateria,bateriaTipo:it.bateriaTipo,avaria:it.avaria,tampa:it.tampa,detalhes:it.detalhes,telaTipo:it.telaTipo,ciclos:it.ciclos,fonte:it.fonte};
+  db.produtos.push(produto);
+  compra.itens.push({prodId:produto.id,modelo:produto.modelo,imei:produto.imei,compra:produto.compra,condicao:produto.condicao});
+ }
+ db.compras.push(compra);
+ if(compraLancamentoCaixa){
+  if(!Array.isArray(db.caixa))db.caixa=[];
+  db.caixa.push({id:uid(),tipo:'saida',cat:'Compra de estoque',desc:'Compra de aparelhos · '+forn,valor:total,data:todayStr(),hora:new Date().toLocaleTimeString('pt-BR'),origem:'compraEstoque',refCompraId:compra.id,forma:pag,quem:session?.nome||''});
+ }
+ itAudit('COMPRA_ESTOQUE',compra.id,{total,quantidade:compra.itens.length,caixa:!!compraLancamentoCaixa});
+ const count=compraItens.length;
+ compraItens=[];compraLancamentoCaixa=false;
+ saveDB();closeSheet();render(currentTab);toast(count+' aparelho(s) cadastrados com origem da compra.');
 }
 
 /* ============ ORÇAMENTOS / LISTAS DE FORNECEDORES ============ */
