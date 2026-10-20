@@ -6556,27 +6556,165 @@ function itAbrirReinicioMes(){
  <div style="height:25px"></div>`);
  itMostrarPreviaReinicio();
 }
+/* Reinício excepcional, autorizado pelo administrador com backup já realizado.
+ * Alvo: vendas + movimento financeiro de UM mês. Não remove cadastros,
+ * compras, serviços ou movimentos de outros meses sem vínculo de venda.
+ */
+function itPlanoZeragemMes(base,mes){
+ const padrao=itPlanoReinicioMes(base,mes);
+ const ids=new Set(padrao.vendas.map(v=>String(v.id)));
+ const caixa=(base.caixa||[]).filter(c=>String(c.data||'').slice(0,7)===mes||(c.refVendaId&&ids.has(String(c.refVendaId))));
+ const contas=(base.contas||[]).filter(c=>String(c.criado||c.data||'').slice(0,7)===mes||(c.refVendaId&&ids.has(String(c.refVendaId))));
+ const prods=new Map((base.produtos||[]).map(p=>[String(p.id),p]));
+ const acess=new Map((base.acessorios||[]).map(a=>[String(a.id),a]));
+ const futuros=(base.vendas||[]).filter(v=>!ids.has(String(v.id)));
+ const restaurarP=new Map(),restaurarA=new Map(),trocas=new Map();
+ const pendencias=[];
+ function soma(map,id,n){map.set(id,(map.get(id)||0)+n)}
+ for(const venda of padrao.vendas){
+  for(const item of (venda.itens||[])){
+   const qtd=item.qtd==null?1:Number(item.qtd),id=String(item.prodId||item.acessId||'');
+   if(!Number.isSafeInteger(qtd)||qtd<1){pendencias.push('Quantidade inválida em '+String(venda.id)+' · conferir estoque manualmente.');continue}
+   if(item.prodId){
+    const obj=prods.get(id);
+    if(!obj){pendencias.push('Aparelho vendido não encontrado: '+(item.nome||id)+' · cadastro manual necessário.');continue}
+    const revendido= futuros.some(v=>(v.itens||[]).some(i=>String(i.prodId||'')===id));
+    if(revendido){pendencias.push('Aparelho também vendido fora do mês: '+(obj.modelo||id)+' · não será devolvido automaticamente.');continue}
+    soma(restaurarP,id,qtd);
+   }else if(item.acessId){
+    if(acess.has(id))soma(restaurarA,id,qtd);
+    else pendencias.push('Acessório vendido não encontrado: '+(item.nome||id)+' · conferir manualmente.');
+   }else pendencias.push('Item sem código na venda '+String(venda.id)+' · conferir manualmente.');
+  }
+  for(const trade of (venda.pagamentos||[]).filter(t=>t.forma==='Entrada aparelho')){
+   const id=String(trade.usadoProdutoId||'');
+   if(!id||!prods.has(id)){pendencias.push('Seminovo da troca não localizado: '+(id||'sem código')+' (venda '+venda.id+') · não será recriado.');continue}
+   if(trocas.has(id)&&trocas.get(id)!==String(venda.id)){
+    pendencias.push('Seminovo em mais de uma troca: '+id+' · conferir manualmente.');continue;
+   }
+   trocas.set(id,String(venda.id));
+  }
+ }
+ // Cadastros cuja origem aponta à venda reiniciada também precisam ter o vínculo liberado,
+ // inclusive quando a venda antiga perdeu o ID do pagamento/troca.
+ for(const produto of (base.produtos||[])){
+  const origem=String(produto.origemTrocaVendaId||produto.entradaVendaId||'');
+  const id=String(produto.id);
+  if(origem&&ids.has(origem)&&!trocas.has(id)){
+   trocas.set(id,origem);
+   pendencias.push('Origem de troca recuperada pelo cadastro '+(produto.modelo||id)+' · confira o aparelho antes de relançar.');
+  }
+ }
+ for(const v of futuros){
+  if((v.origemCadeiaIds||[]).some(id=>ids.has(String(id)))) pendencias.push('Venda de outro mês depende de venda reiniciada: '+v.id+'. Conferir cadeia manualmente.');
+ }
+ return {mes,padrao,caixa,contas,restaurarP,restaurarA,trocas,pendencias:[...new Set(pendencias)]};
+}
+function itExecutarZeragemMes(base,plano,operador,backupRef){
+ const ids=new Set(plano.padrao.vendas.map(v=>String(v.id)));
+ const prods=new Map((base.produtos||[]).map(p=>[String(p.id),p]));
+ const acess=new Map((base.acessorios||[]).map(a=>[String(a.id),a]));
+ for(const [id,qtd] of plano.restaurarP){
+  const p=prods.get(id);if(!p)continue;
+  p.qtd=qtdAparelho(p)+qtd;
+  // Só restaura estoque de um aparelho que deixou de estar vendido.
+  if(['Vendido','Sem estoque'].includes(p.status)||!p.status)p.status='Disponível';
+  delete p.vendidoEm;
+ }
+ for(const [id,qtd] of plano.restaurarA){
+  const a=acess.get(id);if(!a)continue;
+  a.qtd=(Number(a.qtd)||0)+qtd;
+  if(a.situacao==='Sem estoque')a.situacao='Disponível';
+ }
+ for(const [id,vendaId] of plano.trocas){
+  const p=prods.get(id);if(!p)continue;
+  if(String(p.origemTrocaVendaId||'')===vendaId)delete p.origemTrocaVendaId;
+  if(String(p.entradaVendaId||'')===vendaId)delete p.entradaVendaId;
+  if(!p.origemTrocaVendaId&&!p.entradaVendaId){
+   delete p.entradaClienteId;
+   delete p.entradaCadastroNovo;
+   p.reinicioPendente={mes:plano.mes,vendaAnteriorId:vendaId,data:new Date().toISOString()};
+   p.origemEstoque='Troca aguardando relançamento';
+  }
+ }
+ const caixaIds=new Set(plano.caixa.map(x=>String(x.id)));
+ const contasIds=new Set(plano.contas.map(x=>String(x.id)));
+ base.vendas=(base.vendas||[]).filter(v=>!ids.has(String(v.id)));
+ base.caixa=(base.caixa||[]).filter(c=>!caixaIds.has(String(c.id)));
+ base.contas=(base.contas||[]).filter(c=>!contasIds.has(String(c.id)));
+ // Compra continua registrada, mas o desembolso cancelado pode ser lançado novamente.
+ for(const compra of (base.compras||[])){
+  if(plano.caixa.some(c=>c.refCompraId&&String(c.refCompraId)===String(compra.id))){
+   compra.saidaCaixaRegistrada=false;
+   compra.saidaCaixaReiniciadaEm=new Date().toISOString();
+  }
+ }
+ if(!Array.isArray(base.reiniciosMes))base.reiniciosMes=[];
+ const registro={id:uid(),mes:plano.mes,data:new Date().toISOString(),operador,backupRef,
+  modo:'LIMPEZA_FORCADA_MOVIMENTACOES',vendasIds:plano.padrao.vendas.map(v=>v.id),
+  qtdVendas:plano.padrao.vendas.length,faturamentoRevertido:plano.padrao.total,
+  aparelhosRestituidos:[...plano.restaurarP].map(([id,qtd])=>({id,qtd})),
+  acessoriosRestituidos:[...plano.restaurarA].map(([id,qtd])=>({id,qtd})),
+  trocasLiberadas:[...plano.trocas.keys()],caixaIds:[...caixaIds],contasIds:[...contasIds],
+  pendencias:plano.pendencias};
+ base.reiniciosMes.push(registro);
+ if(!Array.isArray(base.auditoria))base.auditoria=[];
+ base.auditoria.push({id:uid(),data:registro.data,operador,acao:'LIMPEZA_FORCADA_MOVIMENTACOES',ref:plano.mes,
+  detalhes:{backupRef,qtdVendas:registro.qtdVendas,caixa:caixaIds.size,contas:contasIds.size,pendencias:plano.pendencias.length}});
+ return registro;
+}
 function itMostrarPreviaReinicio(){
  const mes=el('it-reinicio-mes')?.value||'';
  const p=itPlanoReinicioMes(db,mes);
+ const z=itPlanoZeragemMes(db,mes);
  const box=el('it-reinicio-previa');if(!box)return;
  const lista=(arr,classe)=>arr.length?`<div style="padding:9px 11px;border:1px solid var(--line);border-radius:11px;margin-top:10px;line-height:1.5" class="${classe}">${arr.map(x=>`<p style="margin:4px 0;font-size:12px">• ${rpEsc(x)}</p>`).join('')}</div>`:'';
  const qtd=(map)=>[...map.values()].reduce((n,x)=>n+x,0);
  box.innerHTML=`<div class="card" style="padding:13px 16px"><div class="detail-line"><span class="k">Vendas a retirar do mês</span><b>${p.vendas.length}</b></div>
  <div class="detail-line"><span class="k">Faturamento a retirar dos relatórios</span><b>${money(p.total)}</b></div>
- <div class="detail-line"><span class="k">Aparelhos a devolver ao estoque</span><b>${qtd(p.itensAparelhos)} un.</b></div>
- <div class="detail-line"><span class="k">Acessórios a devolver</span><b>${qtd(p.itensAcessorios)} un.</b></div>
- <div class="detail-line"><span class="k">Seminovos para revincular</span><b>${p.recebidos.size} un.</b></div>
- <div class="detail-line"><span class="k">Movimentos de caixa vinculados</span><b>${p.caixa.length}</b></div>
- <div class="detail-line"><span class="k">Contas vinculadas</span><b>${p.contas.length}</b></div></div>
- ${p.impedimentos.length?`<p style="font-weight:800;color:#be352e;margin:14px 0 4px">Atenção: reinício bloqueado até resolver ${p.impedimentos.length} pendência(s).</p>`:''}
+ <div class="detail-line"><span class="k">Aparelhos identificados para restituição</span><b>${qtd(z.restaurarP)} un.</b></div>
+ <div class="detail-line"><span class="k">Acessórios identificados para restituição</span><b>${qtd(z.restaurarA)} un.</b></div>
+ <div class="detail-line"><span class="k">Seminovos localizados para revincular</span><b>${z.trocas.size} un.</b></div>
+ <div class="detail-line"><span class="k">TODOS os lançamentos de caixa do mês + vinculados</span><b>${z.caixa.length}</b></div>
+ <div class="detail-line"><span class="k">Contas criadas no mês + vinculadas</span><b>${z.contas.length}</b></div></div>
+ ${p.impedimentos.length?`<p style="font-weight:800;color:#be352e;margin:14px 0 4px">Modo normal bloqueado: ${p.impedimentos.length} pendência(s). Você pode usar a limpeza forçada abaixo.</p>`:''}
  ${lista(p.impedimentos,'it-reset-errors')}${lista(p.avisos,'it-reset-warnings')}
  ${p.vendas.length?`<details style="margin-top:12px"><summary style="cursor:pointer;font-size:12px;font-weight:750">Ver vendas que serão retiradas</summary><div style="max-height:220px;overflow:auto;margin-top:8px">${p.vendas.map(v=>`<div class="detail-line"><span class="k">${rpEsc(v.data||'')} · ${rpEsc(v.clienteNome||'Consumidor')}</span><b>${money(v.total)}</b></div>`).join('')}</div></details>`:''}
- <p style="font-size:12px;color:var(--text2);line-height:1.5;margin:13px 0">Passo 2: confirme com a equipe que ninguém está registrando vendas. O sistema mantém compras, clientes e despesas independentes. O histórico completo permanece no seu backup, e o reinício é registrado na auditoria.</p>
+ <p style="font-size:12px;color:var(--text2);line-height:1.5;margin:13px 0">Reinício normal: mantém compras, clientes, despesas independentes e exige vínculos consistentes. Para zerar todas as movimentações do mês, use a opção extraordinária abaixo.</p>
  <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;margin:11px 0"><input type="checkbox" id="it-reinicio-ciente" style="margin-top:3px"> Já conferi o backup completo e interrompi novas vendas nos outros dispositivos.</label>
- <label style="display:block;font-size:12px;font-weight:750;margin:13px 0 5px">Digite <b>REINICIAR ${rpEsc(mes)}</b> para autorizar</label>
+ <label style="display:block;font-size:12px;font-weight:750;margin:13px 0 5px">Digite <b>REINICIAR ${rpEsc(mes)}</b> para autorizar o reinício normal</label>
  <input class="input" id="it-reinicio-frase" type="text" autocomplete="off" placeholder="REINICIAR ${rpEsc(mes)}">
- <button class="btn danger" style="margin-top:14px;width:100%" ${p.impedimentos.length||!p.vendas.length?'disabled':''} onclick="itConfirmarReinicioMes()">Reiniciar ${p.vendas.length} venda(s) deste mês</button>`;
+ <button class="btn danger" style="margin-top:14px;width:100%" ${p.impedimentos.length||!p.vendas.length?'disabled':''} onclick="itConfirmarReinicioMes()">Reiniciar ${p.vendas.length} venda(s) (modo normal)</button>
+ <div style="margin-top:24px;padding:15px;border:1px solid #d88272;border-radius:15px;background:rgba(196,57,44,.055)">
+ <b style="font-size:14px;color:#af3026">Limpeza forçada · zerar movimentações de ${rpEsc(mes)}</b>
+ <p style="font-size:12px;line-height:1.55;margin-top:8px">Essa opção <b>ignora cadastros de aparelhos não localizados</b>. Remove as vendas, TODOS os lançamentos de caixa datados deste mês (inclusive despesas e entradas manuais) e contas criadas no mês, além de seus movimentos vinculados. Compras, serviços, clientes e produtos cadastrados são mantidos. Os itens não localizados <b>não serão recriados</b>: confira e cadastre manualmente.</p>
+ ${lista(z.pendencias,'it-reset-warnings')}
+ <label style="display:flex;gap:9px;align-items:flex-start;font-size:12px;margin:12px 0"><input id="it-zero-ciente" type="checkbox" style="margin-top:3px"> Já salvei o backup fora do sistema; autorizo apagar todos esses movimentos e corrigirei manualmente os produtos ausentes.</label>
+ <label style="display:block;font-size:12px;font-weight:750;margin:13px 0 5px">Digite <b>ZERAR MOVIMENTACOES ${rpEsc(mes)}</b> para autorizar</label>
+ <input class="input" id="it-zero-frase" type="text" autocomplete="off" placeholder="ZERAR MOVIMENTACOES ${rpEsc(mes)}">
+ <button class="btn danger" style="width:100%;margin-top:14px" ${(!p.vendas.length&&!z.caixa.length&&!z.contas.length)?'disabled':''} onclick="itConfirmarZeragemMes()">Zerar ${p.vendas.length} venda(s) e ${z.caixa.length+z.contas.length} movimento(s) financeiro(s)</button>
+ </div>`;
+}
+function itConfirmarZeragemMes(){
+ if(!podeAcao('todasVendas')||!rpCanCosts())return toast('Sem permissão de administrador para limpar o mês.');
+ const mes=el('it-reinicio-mes')?.value||'',p=itPlanoZeragemMes(db,mes);
+ if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(mes))return toast('Mês inválido.');
+ if(!p.padrao.vendas.length&&!p.caixa.length&&!p.contas.length)return toast('Não há movimentações a limpar nesse mês.');
+ if(!el('it-zero-ciente')?.checked)return toast('Confirme o backup externo e a autorização de limpeza forçada.');
+ if((el('it-zero-frase')?.value||'').trim()!=='ZERAR MOVIMENTACOES '+mes)return toast('Digite a frase de confirmação indicada.');
+ const resumo=`ZERAGEM FORÇADA DE ${mes}\n\n${p.padrao.vendas.length} vendas\n${p.caixa.length} lançamentos de caixa (inclusive manuais)\n${p.contas.length} contas criadas no mês ou vinculadas\n${p.pendencias.length} pendências para revisão manual.\n\nCompras, serviços, clientes e cadastros de produtos serão preservados.\n\nEsta operação não pode ser desfeita sem restaurar o backup. CONFIRMAR?`;
+ if(!confirm(resumo))return;
+ // Tenta backup adicional; se a quota local estiver cheia, o usuário já confirmou possuir backup EXTERNO.
+ const backup=itBackupDados('limpeza_forcada_'+mes.replace('-',''))||'backup_externo_confirmado';
+ const anterior=db, copia=JSON.parse(JSON.stringify(db));
+ try{
+  const reg=itExecutarZeragemMes(copia,itPlanoZeragemMes(copia,mes),session?.nome||'Administrador',backup);
+  db=copia;
+  try{saveDB()}catch(falha){db=anterior;throw falha}
+  resetVenda();carrinho=[];carrinhoAcess=[];
+  closeSheet();render(currentTab);
+  toast('Movimentações de '+mes+' zeradas. '+reg.pendencias.length+' item(ns) para conferir no estoque.');
+ }catch(e){console.error('Falha na zeragem forçada:',e);toast('Falha ao reiniciar: '+e.message)}
 }
 function itConfirmarReinicioMes(){
  if(!podeAcao('todasVendas')||!rpCanCosts())return toast('Sem permissão para reiniciar o mês.');
