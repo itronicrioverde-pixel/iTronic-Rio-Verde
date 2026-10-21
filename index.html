@@ -1148,7 +1148,7 @@ body.dark #page-painel .pp-legend .pp-dot.profit{background:#bde778}
 /* Datas dos relatórios: apresentação controlada para alinhar no Safari/iOS,
    mantendo o input date nativo interativo sobre o texto. */
 .rp-page .rp-date-control{height:48px;position:relative;display:flex;align-items:center;min-width:0;width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.rp-page .rp-date-display{box-sizing:border-box;width:100%;display:flex;align-items:center;min-height:100%;padding:0 16px;font-size:12px;font-weight:650;line-height:1.2;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.rp-page .rp-date-display{box-sizing:border-box;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%;padding:0 16px;font-size:12px;font-weight:650;line-height:1.2;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .rp-page .rp-date-native{position:absolute;inset:0;width:100%;height:100%;padding:0;margin:0;opacity:0;cursor:pointer;z-index:2;font-size:16px;color:transparent;background:transparent}
 .rp-page .rp-date-control:focus-within{border-color:var(--brand-deep);box-shadow:0 0 0 3px rgba(165,219,0,.13)}
 
@@ -1507,6 +1507,13 @@ body.dark .rp-page .rp-tab.active{background:var(--brand);color:var(--brand-ink)
 .cl-entry .cl-tiny-button{margin-top:9px;font-size:11px;color:var(--blue);font-weight:800}
 .cl-help{font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:15px}
 .cl-profile-form-extra{border-radius:13px;background:var(--bg2);padding:13px;margin:10px 0 17px}
+/* Cadastro de clientes: alternância entre CPF e CNPJ com campos próprios */
+.cl-customer-type{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 18px}
+.cl-customer-type button{border:1px solid var(--line);background:var(--bg2);color:var(--text2);border-radius:12px;min-height:44px;padding:10px;font-size:12px;font-weight:750;cursor:pointer}
+.cl-customer-type button.active{color:var(--text);border-color:var(--brand-deep);background:color-mix(in srgb,var(--brand) 12%,var(--card));box-shadow:0 0 0 1px color-mix(in srgb,var(--brand-deep) 13%,transparent)}
+.cl-type-section[hidden]{display:none!important}
+.cl-type-caption{margin:-4px 0 14px;color:var(--text2);font-size:11px;line-height:1.5}
+
 .cl-profile-form-extra h3{font-size:13px;margin:0 0 11px}
 @media(max-width:980px){#page-clientes .cl-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#page-clientes .cl-charts{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){
@@ -2312,7 +2319,7 @@ let carrinhoAcess=[]; // itens de acessório no carrinho: {id, qtd}
 // cada item: {tipo:'aparelho'|'acessorio', id, qtd}
 let carrinho=[];
 const MODELOS_IPHONE=['iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12 mini','iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13 mini','iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max','iPhone 16e','iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','iPhone 17e','iPhone 18','iPhone 18 Pro','iPhone 18 Pro Max','iPhone 18 Fold'];
-let simState={parcCred:1, semTroca:false, armNovo:'', corNovo:'', corNovoManual:'', condNovo:'', armUsado:'128 GB', corUsado:'', incluirNotaFiscal:false,
+let simState={parcCred:1, semTroca:false, armNovo:'', corNovo:'', corNovoManual:'', condNovo:'', armUsado:'128 GB', incluirNotaFiscal:false,
   modNovo:'iPhone 15',modUsado:'iPhone 14',valNovo:'',valUsado:'',valEntrada:''};
 /* Mensagem opcional: inclui-se somente mediante escolha explícita no simulador. */
 const SIM_NOTA_FISCAL='Todos os nossos aparelhos são garantidos e certificados Apple. Nossos aparelhos não são relacrados. Todos os nossos produtos acompanham nota fiscal e garantia de 1 ano.';
@@ -3853,7 +3860,7 @@ function renderEstoque(){
     <div class="sec-title">Aparelhos</div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input placeholder="Buscar por modelo, IMEI ou série" value="${searchEstoque}" oninput="searchEstoque=this.value;renderEstoque();this.focus()">
+      <input id="estoque-busca" placeholder="Buscar por modelo, IMEI ou série" value="${orcEsc(searchEstoque)}" oninput="searchEstoque=this.value;const pos=this.selectionStart;renderEstoque();const campo=el('estoque-busca');if(campo){campo.focus();campo.setSelectionRange(pos,pos)}">
     </div>
     <div class="filters">
       ${['todos:Todos','disp:Disponíveis','res:Reservados','aval:Em avaliação / manutenção','vend:Vendidos','sem:Sem estoque','parado:Parados'].map(f=>{const[k,l]=f.split(':');return `<button class="chip ${filterEstoque===k?'active':''}" onclick="setFiltroEstoque('${k}')">${l}</button>`}).join('')}
@@ -4630,7 +4637,7 @@ function clPaint(resetSearch=true){
   if(segment==='arquivados'?!c.arquivado:c.arquivado)return false;
   if(segment==='vip'&&!k.vip||segment==='recorrentes'&&!k.recurring||segment==='inativos'&&!k.inactive||segment==='semcompras'&&!k.none||segment==='retornos'&&!leads.some(x=>crmIsOpen(x)&&crmDue(x)))return false;
   if(!normalized)return true;
-  return clName([c.nome,c.cpf,c.telefone,c.whatsapp,c.email,c.tags,c.responsavel,...st.items.map(x=>[x.item.nome,x.item.imei,x.item.serie].join(' ')),...(c.aparelhos||[]).map(x=>[x.modelo,x.imei,x.serie].join(' '))].join(' ')).includes(normalized);
+  return clName([c.nome,c.nomeFantasia,c.cnpj,c.inscricaoEstadual,c.contatoEmpresa,c.cpf,c.telefone,c.whatsapp,c.email,c.tags,c.responsavel,...st.items.map(x=>[x.item.nome,x.item.imei,x.item.serie].join(' ')),...(c.aparelhos||[]).map(x=>[x.modelo,x.imei,x.serie].join(' '))].join(' ')).includes(normalized);
  });
  matching.sort((a,b)=>{
   if(clState.order==='nome')return String(a.cliente.nome).localeCompare(String(b.cliente.nome),'pt-BR');
@@ -4640,7 +4647,7 @@ function clPaint(resetSearch=true){
  });
  const activeRows=rows.filter(st=>!st.cliente.arquivado),totalSpent=activeRows.reduce((sum,s)=>sum+s.total,0),biggest=activeRows.slice().sort((a,b)=>b.total-a.total)[0];
  const filters=[['todos','Todos'],['vip','VIP'],['recorrentes','Recorrentes'],['inativos','Inativos'],['semcompras','Sem compras'],['retornos','Follow-ups vencidos'],['arquivados','Arquivados']];
- root.innerHTML=`<div class="cl-head"><div><div class="cl-overline">ITRONIC RIO VERDE · RELACIONAMENTO</div><h2>Inteligência de Clientes</h2><p>Histórico de compras, perfil comercial e oportunidades de recompra no mesmo lugar.</p></div><div class="cl-head-actions"><button class="cl-btn ghost" onclick="clExportCSV()">${vectorIcon('receipt')} Exportar CSV</button><button class="cl-btn primary" onclick="openCliente()">${plusIcon()} Novo cliente</button></div></div>
+ root.innerHTML=`<div class="cl-head"><div><div class="cl-overline">ITRONIC RIO VERDE · RELACIONAMENTO</div><h2>Inteligência de Clientes</h2><p>Histórico de compras, perfil comercial e oportunidades de recompra no mesmo lugar.</p></div><div class="cl-head-actions"><button class="cl-btn ghost" onclick="clExportCSV()">${vectorIcon('receipt')} Exportar CSV</button><button class="cl-btn primary" onclick="openCliente()">${plusIcon()} Novo cliente / empresa</button></div></div>
  ${clKpis(rows,crmById)}
  <div class="cl-charts"><section class="cl-card"><div class="cl-card-title"><div><h3>Maiores clientes da loja</h3><p>Compras associadas aos cadastros · histórico disponível</p></div><span class="cl-subcap">${money(totalSpent)}</span></div>
  ${activeRows.some(st=>st.total>0)?`<div class="cl-rank">${activeRows.slice().sort((a,b)=>b.total-a.total).filter(x=>x.total>0).slice(0,5).map((s,i)=>`<button class="cl-rank-row" onclick="openClienteDetail(decodeURIComponent('${clID(s.id)}'))"><span class="cl-rank-head"><span><b class="cl-rank-num">${i+1}</b>${clEsc(s.cliente.nome)}</span><strong>${money(s.total)}</strong></span><span class="cl-bar"><i style="width:${(100*s.total/Math.max(1,biggest.total)).toFixed(1)}%"></i></span></button>`).join('')}</div>`:'<div class="cl-quiet">Sem vendas vinculadas a clientes. O gráfico será preenchido com as vendas registradas.</div>'}
@@ -4648,9 +4655,9 @@ function clPaint(resetSearch=true){
  <div class="cl-segments">${[['VIP',activeRows.filter(x=>clStatus(x).vip).length,'#275a40'],['Recorrentes',activeRows.filter(x=>clStatus(x).recurring).length,'#6fa476'],['Inativos',activeRows.filter(x=>clStatus(x).inactive).length,'#d8ab55'],['Sem compras',activeRows.filter(x=>x.count===0).length,'#b8c7b7']].map(([label,count,color])=>`<div class="cl-segment"><span><i style="background:${color}"></i>${label}</span><b>${count}</b></div>`).join('')}</div>
  <div class="cl-note">As categorias podem se sobrepor: um cliente VIP também pode estar inativo. VIP: ${money(clConfig().vip)} em compras; inatividade: ${clConfig().inactiveDays} dias. <button onclick="clSettings()">Ajustar critérios</button></div></section></div>
  <section class="cl-card cl-directory"><div class="cl-card-title"><div><h3>Carteira de clientes</h3><p>${matching.length} resultado(s) · total e ticket médio calculados sobre vendas autorizadas</p></div><div class="cl-directory-controls"><select class="cl-sort" onchange="clSort(this.value)"><option value="gasto" ${clState.order==='gasto'?'selected':''}>Maior gasto</option><option value="recente" ${clState.order==='recente'?'selected':''}>Compra recente</option><option value="compras" ${clState.order==='compras'?'selected':''}>Mais compras</option><option value="nome" ${clState.order==='nome'?'selected':''}>Nome A–Z</option></select></div></div>
- <div class="cl-search"><span>${vectorIcon('person')}</span><input id="cl-search" type="search" autocomplete="off" placeholder="Buscar nome, CPF, telefone, aparelho, IMEI..." value="${clEsc(clState.q)}" oninput="clSearch(this.value)" aria-label="Pesquisar clientes"></div>
+ <div class="cl-search"><span>${vectorIcon('person')}</span><input id="cl-search" type="search" autocomplete="off" placeholder="Buscar nome, CPF, CNPJ, empresa, telefone, IMEI..." value="${clEsc(clState.q)}" oninput="clSearch(this.value)" aria-label="Pesquisar clientes"></div>
  <div class="cl-filters">${filters.map(([key,label])=>`<button class="cl-filter ${segment===key?'selected':''}" onclick="clSelectFilter('${key}')">${label}</button>`).join('')}</div>
- ${matching.length?`<div class="cl-table-wrap"><table class="cl-table"><thead><tr><th>Cliente</th><th>Classificação</th><th>Compras</th><th>Total gasto</th><th>Última compra</th><th></th></tr></thead><tbody>${matching.map(st=>{const c=st.cliente,k=clTag(st);return `<tr onclick="openClienteDetail(decodeURIComponent('${clID(st.id)}'))" tabindex="0" onkeydown="if(event.key==='Enter')openClienteDetail(decodeURIComponent('${clID(st.id)}'))"><td><div class="cl-person">${clAvatar(c)}<span><strong>${clEsc(c.nome||'Sem nome')}</strong><small>${clEsc(c.telefone||c.whatsapp||'Sem telefone')}${c.responsavel?' · '+clEsc(c.responsavel):''}</small></span></div></td><td><span class="cl-status ${k}">${clLabel(st)}</span></td><td><b>${st.count}</b><small>${st.count?money(st.total/st.count)+' / compra':'—'}</small></td><td class="cl-money">${money(st.total)}</td><td>${st.last?fmtData(st.last):'—'}</td><td>${chev()}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="cl-quiet">Nenhum cliente encontrado. Ajuste os filtros ou cadastre um novo cliente.</div>'}
+ ${matching.length?`<div class="cl-table-wrap"><table class="cl-table"><thead><tr><th>Cliente</th><th>Classificação</th><th>Compras</th><th>Total gasto</th><th>Última compra</th><th></th></tr></thead><tbody>${matching.map(st=>{const c=st.cliente,k=clTag(st);return `<tr onclick="openClienteDetail(decodeURIComponent('${clID(st.id)}'))" tabindex="0" onkeydown="if(event.key==='Enter')openClienteDetail(decodeURIComponent('${clID(st.id)}'))"><td><div class="cl-person">${clAvatar(c)}<span><strong>${clEsc(c.nome||'Sem nome')}</strong><small>${c.tipoPessoa==='PJ'||c.cnpj?'Empresa · '+clEsc(c.nomeFantasia||c.cnpj||'CNPJ')+' · ':''}${clEsc(c.telefone||c.whatsapp||'Sem telefone')}${c.responsavel?' · '+clEsc(c.responsavel):''}</small></span></div></td><td><span class="cl-status ${k}">${clLabel(st)}</span></td><td><b>${st.count}</b><small>${st.count?money(st.total/st.count)+' / compra':'—'}</small></td><td class="cl-money">${money(st.total)}</td><td>${st.last?fmtData(st.last):'—'}</td><td>${chev()}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="cl-quiet">Nenhum cliente encontrado. Ajuste os filtros ou cadastre um novo cliente.</div>'}
  <div class="cl-bottom">Clientes arquivados permanecem no histórico das vendas. Os atendimentos do CRM ainda são locais a este navegador.</div></section>`;
  if(!resetSearch){const n=el('cl-search');if(n){n.focus();n.setSelectionRange(Math.min(pos,n.value.length),Math.min(pos,n.value.length));}}
 }
@@ -4661,8 +4668,8 @@ function clSettings(){
 }
 function clExportCSV(){
  if(session?.role!=='Administrador')return toast('Somente o administrador pode exportar a carteira completa.');
- const stats=clAllStats(),head=['Nome','Telefone','WhatsApp','E-mail','CPF','Total gasto','Quantidade compras','Última compra','Classificação','Responsável','Tags','Marketing autorizado'];
- const csv=[head,...[...stats.values()].map(st=>{const c=st.cliente;return [c.nome,c.telefone,c.whatsapp,c.email,c.cpf,st.total.toFixed(2),st.count,st.last,clLabel(st),c.responsavel,c.tags,c.marketingConsent?'Sim':'Não'];})].map(arr=>arr.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+ const stats=clAllStats(),head=['Nome / Razão social','Tipo','Nome fantasia','CNPJ','Inscrição estadual','Contato empresa','Telefone','WhatsApp','E-mail','CPF','Total gasto','Quantidade compras','Última compra','Classificação','Responsável','Tags','Marketing autorizado'];
+ const csv=[head,...[...stats.values()].map(st=>{const c=st.cliente;return [c.nome,c.tipoPessoa==='PJ'||c.cnpj?'Empresa (CNPJ)':'Pessoa física (CPF)',c.nomeFantasia||'',c.cnpj||'',c.inscricaoEstadual||'',c.contatoEmpresa||'',c.telefone,c.whatsapp,c.email,c.cpf,st.total.toFixed(2),st.count,st.last,clLabel(st),c.responsavel,c.tags,c.marketingConsent?'Sim':'Não'];})].map(arr=>arr.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
  const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='itronic-clientes-'+todayStr()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 /* ============ RELATÓRIOS ============ */
@@ -4721,7 +4728,7 @@ function rpDelta(n,previous){if(previous===null||previous===undefined)return 'Se
 function rpBarLabels(s,formatter=rpInt,count=6){let ar=Object.entries(s).sort((a,b)=>b[1]-a[1]).slice(0,count);if(!ar.length)return `<div class="rp-empty">Ainda não há dados para este período.</div>`;const max=Math.max(...ar.map(x=>x[1]),1);return '<div class="rp-mini-list">'+ar.map(([name,val])=>`<div><div class="rp-linehead"><span title="${rpEsc(name)}">${rpEsc(name)}</span><b>${formatter(val)}</b></div><div class="rp-track"><i style="width:${Math.max(1,val/max*100)}%"></i></div></div>`).join('')+'</div>'}
 function rpKpi(label,value,note='',tone=''){return `<div class="rp-kpi ${tone}"><span>${rpEsc(label)}</span><strong>${value}</strong><small>${rpEsc(note)}</small></div>`}
 function rpPanel(title,subtitle,content,tag=''){return `<section class="rp-panel"><div class="rp-head"><div><h3>${rpEsc(title)}</h3>${subtitle?`<p>${rpEsc(subtitle)}</p>`:''}</div>${tag?`<span class="rp-tag">${rpEsc(tag)}</span>`:''}</div>${content}</section>`}
-function rpGridTable(headers,rows){if(!rows.length)return '<div class="rp-empty">Nenhum registro encontrado para os filtros selecionados.</div>';return `<div class="rp-tablewrap"><table class="rp-table"><thead><tr>${headers.map((h,i)=>`<th class="${i?'':'rp-first'}">${rpEsc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
+function rpGridTable(headers,rows){if(!rows.length)return '<div class="rp-empty">Nenhum registro encontrado para os filtros selecionados.</div>';return `<div class="rp-tablewrap"><table class="rp-table"><thead><tr>${headers.map((h,i)=>`<th class="${['Faturado','Lucro'].includes(h)?'rp-right':i?'':'rp-first'}">${rpEsc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
 function rpCell(v,align=false){return `<td${align?' class="rp-right"':''}>${rpEsc(v)}</td>`}
 function rpLink(id,fn,title){return `<button class="rp-table-btn" onclick="${fn}('${rpEsc(String(id).replace(/'/g,''))}')">${rpEsc(title)}</button>`}
 function rpChart(v,canCosts){
@@ -5781,14 +5788,42 @@ function clReadPhoto(e){
   };img.onerror=()=>toast('Não foi possível abrir a imagem.');img.src=String(reader.result||'');
  };reader.onerror=()=>toast('Erro ao ler a foto.');reader.readAsDataURL(file);
 }
-function clRemovePhoto(){clPendingPhoto='';const avatar=el('cl-photo-preview');if(avatar)avatar.innerHTML=clEsc(clInitials(getV('cl-nome')));}
+function clRemovePhoto(){clPendingPhoto='';const avatar=el('cl-photo-preview');if(avatar)avatar.innerHTML=clEsc(clInitials(getV('cl-tipo')==='PJ'?getV('cl-razao'):getV('cl-nome')));}
+function clSetTipoPessoa(tipo){
+ const pj=tipo==='PJ';const t=el('cl-tipo');if(t)t.value=pj?'PJ':'PF';
+ const pf=el('cl-fields-pf'),company=el('cl-fields-pj');if(pf)pf.hidden=pj;if(company)company.hidden=!pj;
+ for(const [id,active] of [['cl-tipo-pf',!pj],['cl-tipo-pj',pj]]){const b=el(id);if(b){b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));}}
+}
+function clCnpjValido(value){
+ const x=String(value||'').replace(/\D/g,'');if(x.length!==14||/^(\d)\1{13}$/.test(x))return false;
+ for(let end=12;end<=13;end++){
+  const weights=end===12?[5,4,3,2,9,8,7,6,5,4,3,2]:[6,5,4,3,2,9,8,7,6,5,4,3,2];
+  const sum=weights.reduce((acc,w,i)=>acc+Number(x[i])*w,0);const digit=(sum%11<2)?0:11-sum%11;
+  if(digit!==Number(x[end]))return false;
+ }
+ return true;
+}
 function openCliente(cli){
  if(!podeAcessarModulo('clientes'))return toast('Sem acesso a Clientes.');
  const c=cli||{};clPendingPhoto=c.foto||'';
  const html=`
  <div class="cl-profile-form-extra"><h3>Foto do cliente (opcional)</h3><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div class="cl-profile-avatar" id="cl-photo-preview">${clPendingPhoto?`<img src="${clEsc(clPendingPhoto)}" alt="Foto do cliente">`:clEsc(clInitials(c.nome))}</div><div><input id="cl-photo-file" type="file" accept="image/png,image/jpeg,image/webp" onchange="clReadPhoto(event)" style="max-width:220px;font-size:12px"><button type="button" onclick="clRemovePhoto()" style="display:block;margin-top:7px;font-size:11px;color:var(--text2);text-decoration:underline">Remover foto</button><small style="display:block;font-size:10px;color:var(--text2);margin-top:5px">A foto é compactada para não sobrecarregar o Firebase.</small></div></div></div>
- ${fld('Nome completo *','cl-nome',{val:c.nome,ph:'Nome e sobrenome'})}
- <div class="form-row">${fld('CPF','cl-cpf',{val:c.cpf,ph:'000.000.000-00',inputmode:'numeric'})}${fld('Nascimento','cl-nascimento',{val:c.nascimento,type:'date'})}</div>
+ <div class="cl-customer-type" role="group" aria-label="Tipo de cliente">
+  <button type="button" id="cl-tipo-pf" class="${c.tipoPessoa==='PJ'||c.cnpj?'':'active'}" aria-pressed="${c.tipoPessoa==='PJ'||c.cnpj?'false':'true'}" onclick="clSetTipoPessoa('PF')">Pessoa física · CPF</button>
+  <button type="button" id="cl-tipo-pj" class="${c.tipoPessoa==='PJ'||c.cnpj?'active':''}" aria-pressed="${c.tipoPessoa==='PJ'||c.cnpj?'true':'false'}" onclick="clSetTipoPessoa('PJ')">Empresa · CNPJ</button>
+ </div>
+ <input type="hidden" id="cl-tipo" value="${c.tipoPessoa==='PJ'||c.cnpj?'PJ':'PF'}">
+ <div class="cl-type-section" id="cl-fields-pf" ${c.tipoPessoa==='PJ'||c.cnpj?'hidden':''}>
+  ${fld('Nome completo *','cl-nome',{val:c.tipoPessoa==='PJ'||c.cnpj?'':c.nome,ph:'Nome e sobrenome'})}
+  <div class="form-row">${fld('CPF','cl-cpf',{val:c.cpf,ph:'000.000.000-00',inputmode:'numeric'})}${fld('Nascimento','cl-nascimento',{val:c.nascimento,type:'date'})}</div>
+ </div>
+ <div class="cl-type-section" id="cl-fields-pj" ${c.tipoPessoa==='PJ'||c.cnpj?'':'hidden'}>
+  <div class="cl-type-caption">Cadastre a empresa para emitir propostas e vincular compras ao CNPJ.</div>
+  ${fld('Razão social *','cl-razao',{val:c.tipoPessoa==='PJ'||c.cnpj?c.nome:'',ph:'Razão social da empresa'})}
+  ${fld('Nome fantasia','cl-fantasia',{val:c.nomeFantasia,ph:'Nome comercial (opcional)'})}
+  <div class="form-row">${fld('CNPJ *','cl-cnpj',{val:c.cnpj,ph:'00.000.000/0000-00',inputmode:'numeric'})}${fld('Inscrição estadual','cl-ie',{val:c.inscricaoEstadual,ph:'Inscrição estadual ou ISENTO'})}</div>
+  ${fld('Contato na empresa','cl-contato',{val:c.contatoEmpresa,ph:'Nome da pessoa responsável pelo contato'})}
+ </div>
  <div class="form-row">${fld('Telefone','cl-tel',{val:c.telefone,ph:'(64) 99999-9999',inputmode:'tel'})}${fld('WhatsApp','cl-wpp',{val:c.whatsapp,ph:'Se diferente',inputmode:'tel'})}</div>
  ${fld('E-mail','cl-email',{val:c.email,ph:'cliente@exemplo.com',type:'email'})}
  <div class="sec-title" style="margin:18px 4px 9px">Relacionamento</div>
@@ -5803,7 +5838,7 @@ function openCliente(cli){
  <div class="form-row">${fld('Cidade','cl-cidade',{val:c.cidade,ph:'Cidade'})}${fld('UF','cl-uf',{val:c.uf,ph:'GO'})}</div>
  <div class="field"><label>Observações</label><textarea class="input" id="cl-obs" rows="3" placeholder="Notas de atendimento">${clEsc(c.obs||'')}</textarea></div>
  <div style="height:22px"></div>`;
- openSheet(cli?'Editar cliente':'Novo cliente',html,'Salvar',()=>saveCliente(cli?cli.id:null));
+ openSheet(cli?'Editar cliente / empresa':'Novo cliente / empresa',html,'Salvar',()=>saveCliente(cli?cli.id:null));
 }
 function buscarCep(){
  const cep=(getV('cl-cep')||'').replace(/\D/g,'');if(cep.length!==8){toast('Digite um CEP com 8 números');return;}
@@ -5815,16 +5850,21 @@ function buscarCep(){
  }).catch(()=>toast('Sem internet para buscar o CEP'));
 }
 function clFindDuplicate(data,id){
- const cpf=clDigits(data.cpf),phones=new Set([clPhone(data.telefone),clPhone(data.whatsapp)].filter(Boolean));
- return (db.clientes||[]).find(c=>String(c.id)!==String(id||'')&&(
-  (cpf.length===11&&clDigits(c.cpf)===cpf)||[clPhone(c.telefone),clPhone(c.whatsapp)].some(n=>n&&phones.has(n))
- ));
+ const cpf=clDigits(data.cpf),cnpj=clDigits(data.cnpj),phones=new Set([clPhone(data.telefone),clPhone(data.whatsapp)].filter(Boolean));
+ return (db.clientes||[]).find(c=>{
+  if(String(c.id)===String(id||''))return false;
+  if(cnpj.length===14)return clDigits(c.cnpj)===cnpj;
+  return (cpf.length===11&&clDigits(c.cpf)===cpf)||(!(c.tipoPessoa==='PJ'||c.cnpj)&&[clPhone(c.telefone),clPhone(c.whatsapp)].some(n=>n&&phones.has(n)));
+ });
 }
 function saveCliente(id){
  if(!podeAcessarModulo('clientes'))return toast('Sem permissão.');
- const nome=getV('cl-nome');if(!nome){toast('Informe o nome completo.');el('cl-nome')?.focus();return;}
- const data={nome,cpf:getV('cl-cpf'),nascimento:getV('cl-nascimento'),telefone:getV('cl-tel'),whatsapp:getV('cl-wpp'),email:getV('cl-email'),responsavel:getV('cl-resp'),tags:getV('cl-tags'),preferencias:getV('cl-preferencias'),marketingConsent:!!el('cl-consent')?.checked,
+ const tipoPessoa=getV('cl-tipo')==='PJ'?'PJ':'PF',nome=tipoPessoa==='PJ'?getV('cl-razao'):getV('cl-nome');
+ if(!nome){toast(tipoPessoa==='PJ'?'Informe a razão social.':'Informe o nome completo.');el(tipoPessoa==='PJ'?'cl-razao':'cl-nome')?.focus();return;}
+ const data={tipoPessoa,nome,cpf:tipoPessoa==='PF'?getV('cl-cpf'):'',nascimento:tipoPessoa==='PF'?getV('cl-nascimento'):'',cnpj:tipoPessoa==='PJ'?getV('cl-cnpj'):'',nomeFantasia:tipoPessoa==='PJ'?getV('cl-fantasia'):'',inscricaoEstadual:tipoPessoa==='PJ'?getV('cl-ie'):'',contatoEmpresa:tipoPessoa==='PJ'?getV('cl-contato'):'',
+  telefone:getV('cl-tel'),whatsapp:getV('cl-wpp'),email:getV('cl-email'),responsavel:getV('cl-resp'),tags:getV('cl-tags'),preferencias:getV('cl-preferencias'),marketingConsent:!!el('cl-consent')?.checked,
   cep:getV('cl-cep'),rua:getV('cl-rua'),num:getV('cl-num'),bairro:getV('cl-bairro'),comp:getV('cl-comp'),cidade:getV('cl-cidade'),uf:getV('cl-uf'),obs:getV('cl-obs'),foto:clPendingPhoto||''};
+ if(tipoPessoa==='PJ'&&!clCnpjValido(data.cnpj)){toast('Informe um CNPJ válido, com 14 dígitos e verificadores corretos.');el('cl-cnpj')?.focus();return;}
  if(data.cpf&&clDigits(data.cpf).length!==11){toast('O CPF deve ter 11 dígitos ou ficar em branco.');return;}
  if(data.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){toast('Confira o e-mail do cliente.');return;}
  const duplicate=clFindDuplicate(data,id);
@@ -5856,7 +5896,7 @@ function openClienteDetail(id,tab='resumo'){
  let section='';
  if(tab==='resumo'){
   const latest=[...st.vendas].sort((a,b)=>String(b.data).localeCompare(String(a.data))).slice(0,3);
-  section=`<section class="cl-section"><h4>Dados de relacionamento</h4><div class="cl-info-grid">${item('CPF',c.cpf)}${item('Telefone',c.telefone)}${item('WhatsApp',c.whatsapp||c.telefone)}${item('E-mail',c.email)}${item('Nascimento',c.nascimento?fmtData(c.nascimento):'')}${item('Vendedor responsável',c.responsavel)}${item('Consentimento de marketing',c.marketingConsent?'Registrado':'Não registrado')}${item('Primeira compra',st.first?fmtData(st.first):'')}${item('Última compra',st.last?fmtData(st.last):'')}</div>
+  section=`<section class="cl-section"><h4>Dados de relacionamento</h4><div class="cl-info-grid">${c.tipoPessoa==='PJ'||c.cnpj?`${item('Tipo','Empresa · CNPJ')}${item('Razão social',c.nome)}${item('Nome fantasia',c.nomeFantasia)}${item('CNPJ',c.cnpj)}${item('Inscrição estadual',c.inscricaoEstadual)}${item('Contato',c.contatoEmpresa)}`:`${item('Tipo','Pessoa física · CPF')}${item('CPF',c.cpf)}${item('Nascimento',c.nascimento?fmtData(c.nascimento):'')}`}${item('Telefone',c.telefone)}${item('WhatsApp',c.whatsapp||c.telefone)}${item('E-mail',c.email)}${item('Vendedor responsável',c.responsavel)}${item('Consentimento de marketing',c.marketingConsent?'Registrado':'Não registrado')}${item('Primeira compra',st.first?fmtData(st.first):'')}${item('Última compra',st.last?fmtData(st.last):'')}</div>
   ${(c.tags||c.preferencias)?`<div class="cl-entry"><b>Preferências e etiquetas</b><small>${clEsc([c.tags,c.preferencias].filter(Boolean).join(' · '))}</small></div>`:''}
   ${c.obs?`<div class="cl-entry"><b>Observações</b><small>${clEsc(c.obs)}</small></div>`:''}
   ${(c.rua||c.cep)?`<div class="cl-entry"><b>Endereço</b><small>${clEsc([c.rua,c.num,c.bairro,c.cidade,c.uf,c.cep].filter(Boolean).join(', '))}</small></div>`:''}
@@ -7144,11 +7184,32 @@ function orcInterpretar(texto){
   });
   return {ofertas,pendentes};
 }
+/* Busca de fornecedores: listas antigas são reanalisadas só em memória, sem tocar nos
+   registros ou aceitar os produtos possivelmente inventados pela versão antiga.
+   Toda oferta antiga apresentada tem aviso de revisão até a lista ser salva no v3. */
+const orcBuscaRevisaoCache=new Map();
+function orcOfertasConsulta(f){
+  if(Number(f?.parserVersao)===3)return f.ofertas||[];
+  const texto=String(f?.raw||'').trim();
+  if(!texto)return [];
+  const chave=String(f.id||f.nome||'')+'|'+texto;
+  const cache=orcBuscaRevisaoCache.get(chave);
+  if(cache)return cache;
+  const interpretado=orcInterpretar(texto);
+  const ofertas=interpretado.ofertas.map(o=>({...o,revisaoPendente:true}));
+  if(orcBuscaRevisaoCache.size>30)orcBuscaRevisaoCache.clear();
+  orcBuscaRevisaoCache.set(chave,ofertas);
+  return ofertas;
+}
+function orcAvisoPesquisaLegado(){
+  const n=(db.fornecedores||[]).filter(f=>Number(f.parserVersao)!==3).length;
+  return n?`<div class="orc-meta" style="margin:8px 0 14px">${n} lista(s) antiga(s): pesquisa feita diretamente a partir do texto original, em modo prévia. Confira e salve a nova interpretação antes de usar preços não revisados.</div>`:'';
+}
 function orcAgrupar(busca=''){
   const termos=orcNorm(busca).replace(/[^A-Z0-9 ]/g,' ').split(/\s+/).filter(Boolean);
   const grupos=new Map();
-  (db.fornecedores||[]).filter(f=>f.parserVersao===3).forEach(f=>{
-    (f.ofertas||[]).forEach(o=>{
+  (db.fornecedores||[]).forEach(f=>{
+    orcOfertasConsulta(f).forEach(o=>{
       if(!o.modelo||!(Number(o.preco)>0)) return;
       const alvo=orcNorm([o.modelo,o.armazenamento,o.condicao,o.cor].join(' ')).replace(/[^A-Z0-9 ]/g,' ');
       if(!termos.every(t=>alvo.split(/\s+/).some(p=>p.startsWith(t)))) return;
@@ -7160,20 +7221,20 @@ function orcAgrupar(busca=''){
   });
   return [...grupos.values()].map(g=>({
     modelo:g.modelo,armazenamento:g.armazenamento,condicao:g.condicao,cor:g.cor,
-    ranking:[...g.porFornecedor.values()].sort((a,b)=>Number(a.preco)-Number(b.preco)||a.fornecedor.localeCompare(b.fornecedor,'pt-BR'))
+    ranking:[...g.porFornecedor.values()].sort((a,b)=>Number(!!a.revisaoPendente)-Number(!!b.revisaoPendente)||Number(a.preco)-Number(b.preco)||a.fornecedor.localeCompare(b.fornecedor,'pt-BR'))
   })).sort((a,b)=>a.modelo.localeCompare(b.modelo,'pt-BR',{numeric:true})||a.armazenamento.localeCompare(b.armazenamento,'pt-BR',{numeric:true}));
 }
 function orcResultadosHTML(){
   if(!orcBusca.trim()) return '<div class="empty" style="margin:16px 0">Pesquise um modelo, como “17 Pro Max”, para comparar os fornecedores.</div>';
   const grupos=orcAgrupar(orcBusca);
-  if(!grupos.length) return '<div class="empty" style="margin:16px 0">Nenhum preço encontrado. Confira a grafia, o armazenamento ou as linhas pendentes das listas.</div>';
-  return `<div class="orc-meta">${grupos.length} opção(ões) encontrada(s) · menor preço por fornecedor, respeitando modelo, capacidade, condição e cor</div>
+  if(!grupos.length) return orcAvisoPesquisaLegado()+'<div class="empty" style="margin:16px 0">Nenhum preço encontrado. Confira a grafia, o armazenamento ou as linhas pendentes das listas.</div>';
+  return `${orcAvisoPesquisaLegado()}<div class="orc-meta">${grupos.length} opção(ões) encontrada(s) · melhores ofertas verificadas primeiro; modelo, capacidade, condição e cor respeitados</div>
     ${grupos.map((g,indice)=>{
       const melhor=g.ranking[0];
       return `<section class="orc-card">
         <div class="orc-card-head"><div><h3>${orcEsc(g.modelo)} · ${orcEsc(g.armazenamento)}</h3><small>${orcEsc(g.cor)} · ${orcEsc(g.condicao)} · ${g.ranking.length} fornecedor(es)</small></div></div>
-        <div class="orc-best"><div><span class="orc-best-badge">Melhor Valor</span><br><b>${orcEsc(melhor.fornecedor)}</b><br><small>${orcEsc(melhor.cor)}</small></div><div class="orc-best-value"><strong class="money-in">${money(melhor.preco)}</strong><button type="button" class="orc-sim-btn" onclick="orcSimularOferta(${indice})" aria-label="Simular ${orcEsc(g.modelo)} ${orcEsc(g.armazenamento)}">Simular oferta →</button></div></div>
-        ${g.ranking.slice(1).map((o,i)=>`<div class="orc-rank"><div><b>${i+2}º ${orcEsc(o.fornecedor)}</b><br><small>${orcEsc(o.cor)}</small></div><div style="text-align:right"><b class="money-in">${money(o.preco)}</b><br><span class="orc-diff">+ ${money(o.preco-melhor.preco)}</span></div></div>`).join('')}
+        <div class="orc-best"><div><span class="orc-best-badge">${melhor.revisaoPendente?'Prévia — revisar lista':'Melhor Valor'}</span><br><b>${orcEsc(melhor.fornecedor)}</b><br><small>${orcEsc(melhor.cor)}</small></div><div class="orc-best-value"><strong class="money-in">${money(melhor.preco)}</strong><button type="button" class="orc-sim-btn" onclick="orcSimularOferta(${indice})" aria-label="Simular ${orcEsc(g.modelo)} ${orcEsc(g.armazenamento)}">Simular oferta →</button></div></div>
+        ${g.ranking.slice(1).map((o,i)=>`<div class="orc-rank"><div><b>${i+2}º ${orcEsc(o.fornecedor)}${o.revisaoPendente?' · Prévia':''}</b><br><small>${orcEsc(o.cor)}</small></div><div style="text-align:right"><b class="money-in">${money(o.preco)}</b><br><span class="orc-diff">+ ${money(o.preco-melhor.preco)}</span></div></div>`).join('')}
       </section>`;
     }).join('')}`;
 }
@@ -7661,7 +7722,7 @@ function simPaletaVisual(){
 function simOfertasBase(){
   const modelo=orcNorm(simState.modNovo),arm=orcNorm(simState.armNovo);
   if(!modelo||!arm)return [];
-  return (db.fornecedores||[]).flatMap(f=>(f.ofertas||[]).filter(o=>orcNorm(o.modelo)===modelo&&orcNorm(o.armazenamento)===arm&&Number(o.preco)>0).map(o=>({...o,fornecedor:f.nome||'Fornecedor',fornecedorId:f.id,atualizado:f.atualizado||''})));
+  return (db.fornecedores||[]).flatMap(f=>orcOfertasConsulta(f).filter(o=>orcNorm(o.modelo)===modelo&&orcNorm(o.armazenamento)===arm&&Number(o.preco)>0).map(o=>({...o,fornecedor:f.nome||'Fornecedor',fornecedorId:f.id,atualizado:f.atualizado||''})));
 }
 function simCoresDisponiveis(){
  const oficiais=simCoresOficiais(simState.modNovo);
@@ -7691,10 +7752,10 @@ function simResultadoCotacao(){
  const exatas=todas.filter(o=>orcNorm(o.condicao||'Não informada')===orcNorm(escolha));
  const unicas=new Map();
  for(const o of exatas){const k=String(o.fornecedorId||o.fornecedor);if(!unicas.has(k)||Number(o.preco)<Number(unicas.get(k).preco))unicas.set(k,o)}
- const lista=[...unicas.values()].sort((a,b)=>Number(a.preco)-Number(b.preco));
+ const lista=[...unicas.values()].sort((a,b)=>Number(!!a.revisaoPendente)-Number(!!b.revisaoPendente)||Number(a.preco)-Number(b.preco));
  const melhor=lista[0];
  if(!melhor)return condSelect+'<div class="sim-quote-empty">Sem cotações compatíveis.</div>';
- return condSelect+`<div class="sim-quote-best"><div><small>MENOR CUSTO · ${orcEsc(escolha)}</small><strong>${money(melhor.preco)}</strong><span>${orcEsc(melhor.fornecedor)} · ${orcEsc(simState.corNovo)} · ${orcEsc(simState.armNovo)}</span></div><span class="sim-quote-count">${lista.length} fornecedor(es)</span></div><p class="sim-quote-caption">Valor de compra informado pelo fornecedor, <b>não é o preço de venda</b>. Listas não atualizadas automaticamente.</p>${lista.slice(1,5).map(o=>`<div class="sim-quote-rank"><span>${orcEsc(o.fornecedor)}</span><b>${money(o.preco)}</b></div>`).join('')}`;
+ return condSelect+`<div class="sim-quote-best"><div><small>${melhor.revisaoPendente?'COTAÇÃO EM REVISÃO':'MENOR CUSTO'} · ${orcEsc(escolha)}</small><strong>${money(melhor.preco)}</strong><span>${orcEsc(melhor.fornecedor)} · ${orcEsc(simState.corNovo)} · ${orcEsc(simState.armNovo)}</span></div><span class="sim-quote-count">${lista.length} fornecedor(es)</span></div><p class="sim-quote-caption">${melhor.revisaoPendente?'Cotação preliminar recuperada do texto original de lista antiga. Reinterprete e salve para confirmar. ':' '}Valor de compra informado pelo fornecedor, <b>não é o preço de venda</b>. Listas não atualizadas automaticamente.</p>${lista.slice(1,5).map(o=>`<div class="sim-quote-rank"><span>${orcEsc(o.fornecedor)}</span><b>${money(o.preco)}</b></div>`).join('')}`;
 }
 function simAtualizarCotacoes(){const slot=el('sim-quote-results');if(slot)slot.innerHTML=simResultadoCotacao();}
 function simMudarModelo(v){simState.modNovo=v;simState.armNovo='';simState.corNovo='';simState.corNovoManual='';simState.condNovo='';simOferta=null;renderSimulador()}
@@ -7748,12 +7809,11 @@ function renderSimuladorInline(){
 
     ${simState.semTroca?'':`<div class="sim-card">
       <div style="font-weight:700;font-size:15px;margin-bottom:12px">${vectorIcon('swap')} Aparelho usado <span style="color:var(--text2);font-weight:400;font-size:13px">(entra na troca)</span></div>
-      <select class="input" id="sim-mod-usado" onchange="simState.modUsado=this.value;simState.corUsado='';renderSimulador()">${opt(simState.modUsado)}</select>
+      <select class="input" id="sim-mod-usado" onchange="simState.modUsado=this.value;renderSimulador()">${opt(simState.modUsado)}</select>
       <label class="mini-lbl" for="sim-arm-usado" style="display:block;margin:12px 0 7px">Armazenamento</label>
       <select class="input" id="sim-arm-usado" onchange="simState.armUsado=this.value">${opArmazenamento(simState.armUsado,simState.modUsado)}</select>
-      <label class="mini-lbl" for="sim-cor-usado" style="display:block;margin:12px 0 7px">Cor do aparelho usado (opcional)</label>
-      <input class="input" id="sim-cor-usado" type="text" placeholder="Ex.: Preto, Titânio natural" value="${attr(simState.corUsado)}" oninput="simState.corUsado=this.value" autocomplete="off">
-      <input class="input" id="sim-val-usado" type="text" inputmode="decimal" placeholder="Valor que você paga no usado (R$)" value="${attr(simState.valUsado)}" oninput="simState.valUsado=this.value;calcSimTroca()" style="margin-top:10px">
+      <label class="mini-lbl" for="sim-val-usado" style="display:block;margin:14px 0 7px;font-weight:750">Valor do aparelho usado na troca (R$)</label>
+      <input class="input" id="sim-val-usado" type="text" inputmode="decimal" placeholder="Ex.: 4.200,00" value="${attr(simState.valUsado)}" oninput="simState.valUsado=this.value;calcSimTroca()" aria-label="Valor do aparelho usado na troca">
     </div>`}</div><div class="sim-summary-col">
 
     <div class="sim-difer-box">
@@ -7839,7 +7899,6 @@ function textoSimTroca(){
   const armNovo=getV('sim-arm-novo')||simState.armNovo;
   const armUsado=semTroca?'':(getV('sim-arm-usado')||simState.armUsado);
   const corNovo=(getV('sim-cor-novo-manual')||simState.corNovoManual||getV('sim-cor-novo')||simState.corNovo).trim();
-  const corUsado=semTroca?'':(getV('sim-cor-usado')||simState.corUsado||'').trim();
   const tx=db.taxasCartao||{debito:1.5,imposto:0,credito:[]};
   const imposto=Number(tx.imposto)||0;
   const parc=simState.parcCred||1;
@@ -7854,7 +7913,6 @@ function textoSimTroca(){
   L.push('Cor do aparelho: '+(corNovo||'A confirmar'));
   if(!semTroca){
     L.push('Seu usado: '+[modUsado,armUsado].filter(Boolean).join(' ')+' — '+money(vUsado));
-    L.push('Cor do usado: '+(corUsado||'A confirmar'));
   }
   if(entrada>0) L.push('Entrada em dinheiro ou Pix: '+money(entrada));
   L.push('');
